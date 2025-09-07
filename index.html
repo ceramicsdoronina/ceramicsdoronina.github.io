@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ceramist Doronina — Anna Doronina</title>
+  <meta name="description" content="Anna Doronina è una ceramista: forme wabi-sabi, dettagli barocchi, pezzi unici che uniscono semplicità e raffinatezza." />
+
+  <!-- Open Graph / social preview -->
+  <meta property="og:title" content="Ceramist Doronina — Anna Doronina" />
+  <meta property="og:description" content="Ceramiche artigianali: wabi-sabi, perle barocche, equilibrio tra natura e lusso." />
+  <meta property="og:image" content="images/anna-hero.jpg" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://tuodominio.it/" />
+
+  <!-- Font & minimal reset -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0f0f10; --card:#151518; --muted:#a6a8ad; --text:#f5f6f7; --accent:#b1e4d9;
+      --ring: 0 0 0 8px rgb(177 228 217 / 15%);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      color:var(--text); background:radial-gradient(1200px 800px at 70% -10%,#1c1c22 0%,#0f0f10 60%);
+    }
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+    header{display:flex;gap:28px;align-items:center;justify-content:space-between;padding:18px 0}
+    .brand{display:flex;gap:14px;align-items:center;text-decoration:none;color:var(--text)}
+    .brand .dot{width:14px;height:14px;border-radius:50%;background:linear-gradient(45deg,#b1e4d9,#6fd1bc)}
+    .brand h1{font-size:18px;margin:0;font-weight:700;letter-spacing:.2px}
+    nav a{color:var(--muted);text-decoration:none;margin-left:18px}
+    nav a:hover{color:var(--text)}
+
+    .hero{
+      display:grid;grid-template-columns: 290px 1fr;gap:32px;align-items:center;
+      background:linear-gradient(180deg,#151518,transparent);
+      border:1px solid #2a2b31;border-radius:20px;padding:28px; box-shadow:0 10px 30px rgba(0,0,0,.35);
+    }
+    .portrait{
+      width:100%;aspect-ratio:1/1;border-radius:18px;object-fit:cover;border:1px solid #2a2b31;
+      box-shadow:var(--ring);
+    }
+    .hero h2{margin:0 0 8px 0;font-size:36px;line-height:1.1}
+    .hero p.lead{margin:0 0 18px 0;color:var(--muted);font-size:18px}
+    .tags{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 22px}
+    .tag{padding:6px 10px;border:1px solid #2a2b31;border-radius:999px;color:#d9dbdf;background:#18181c}
+    .cta{display:flex;gap:12px;flex-wrap:wrap}
+    .btn{
+      appearance:none;border:1px solid #2a2b31;background:#191a1f;color:var(--text);
+      padding:10px 14px;border-radius:12px;text-decoration:none;font-weight:600
+    }
+    .btn:hover{border-color:#3a3b44}
+    .btn.accent{background:linear-gradient(45deg,#b1e4d9,#80dbc9);color:#0b1a16;border:none}
+    .section{margin-top:42px}
+    .section h3{margin:0 0 14px 0;font-size:24px}
+    .grid{
+      display:grid;gap:14px;
+      grid-template-columns:repeat(3,1fr)
+    }
+    .card{
+      border:1px solid #2a2b31;border-radius:16px;overflow:hidden;background:#141419
+    }
+    .card img{display:block;width:100%;height:260px;object-fit:cover}
+    .card .cap{padding:10px 12px;color:var(--muted);font-size:14px}
+    .about{
+      display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:start
+    }
+    .about .box{
+      border:1px solid #2a2b31;border-radius:16px;padding:20px;background:#141419
+    }
+    .list{margin:0;padding-left:18px;color:var(--muted)}
+    footer{color:var(--muted);border-top:1px solid #2a2b31;margin-top:38px;padding:22px 0;font-size:14px}
+    @media (max-width:900px){
+      .hero{grid-template-columns:1fr}
+      .grid{grid-template-columns:1fr 1fr}
+      .about{grid-template-columns:1fr}
+    }
+    @media (max-width:640px){
+      .grid{grid-template-columns:1fr}
+      .hero h2{font-size:30px}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <a class="brand" href="#">
+        <span class="dot" aria-hidden="true"></span>
+        <h1>Ceramist Doronina</h1>
+      </a>
+      <nav>
+        <a href="#opere">Opere</a>
+        <a href="#bio">Bio</a>
+        <a href="https://www.instagram.com/ceramics_doronina/" target="_blank" rel="noopener">Instagram</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <!-- Sostituisci l'immagine con una tua foto di Anna (es. images/anna-hero.jpg) -->
+      <img class="portrait" src="images/anna-hero.jpg" alt="Anna Doronina, ceramista" />
+      <div>
+        <h2>Anna Doronina</h2>
+        <p class="lead">Ceramista autodidatta con formazione in Toscana. Le sue opere uniscono l’estetica <em>wabi-sabi</em> a tocchi barocchi — perle, oro, materia — creando pezzi unici dal carattere poetico.</p>
+        <div class="tags">
+          <span class="tag">Wabi-sabi</span>
+          <span class="tag">Barocco contemporaneo</span>
+          <span class="tag">Fatto a mano</span>
+          <span class="tag">Vasi • Tazze • Piatti</span>
+        </div>
+        <div class="cta">
+          <a class="btn accent" href="https://www.instagram.com/ceramics_doronina/" target="_blank" rel="noopener">Segui su Instagram</a>
+          <a class="btn" href="#contatti">Contatti</a>
+          <!-- opzionale: link a catalogo PDF -->
+          <!-- <a class="btn" href="catalogo.pdf">Scarica catalogo</a> -->
+        </div>
+      </div>
+    </section>
+
+    <section id="opere" class="section">
+      <h3>Opere recenti</h3>
+      <div class="grid">
+        <!-- Sostituisci le immagini con foto reali delle opere -->
+        <figure class="card">
+          <img src="images/opera-1.jpg" alt="Vaso in gres, smalto avorio, texture organica" />
+          <figcaption class="cap">Vaso in gres, avorio satinato, texture organica.</figcaption>
+        </figure>
+        <figure class="card">
+          <img src="images/opera-2.jpg" alt="Tazza modellata a mano in stile wabi-sabi" />
+          <figcaption class="cap">Tazza modellata a mano, estetica wabi-sabi.</figcaption>
+        </figure>
+        <figure class="card">
+          <img src="images/opera-3.jpg" alt="Piatto con dettaglio perla barocca" />
+          <figcaption class="cap">Piatto con dettaglio perla barocca.</figcaption>
+        </figure>
+      </div>
+      <p style="margin-top:10px;color:#a6a8ad">Vedi altri lavori su <a href="https://www.instagram.com/ceramics_doronina/" target="_blank" rel="noopener" style="color:#b1e4d9">Instagram</a>.</p>
+    </section>
+
+    <section id="bio" class="section about">
+      <div class="box">
+        <h3>Biografia</h3>
+        <p>Anna Doronina (Ceramist Doronina) ha studiato ceramica in Toscana e proviene da una famiglia di scultori. La sua ricerca esplora l’imperfezione come valore estetico e umano: superfici volutamente irregolari, linee non simmetriche, tracce del gesto. Integra elementi barocchi — come perle e dettagli luminosi — per bilanciare semplicità e lusso.</p>
+        <p>Con una formazione in psicologia clinica e didattica della creatività, Anna considera l’argilla un mezzo di benessere: lavorare con le mani aiuta concentrazione, respiro, presenza.</p>
+      </div>
+      <div class="box">
+        <h3>Materiali & Tecniche</h3>
+        <ul class="list">
+          <li>Gres e porcellana ad alta temperatura</li>
+          <li>Smaltature opache e satin</li>
+          <li>Finiture a lustro e inclusioni perlate</li>
+          <li>Modellazione a mano e colombino</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="contatti" class="section">
+      <h3>Contatti</h3>
+      <div class="hero" style="grid-template-columns:1fr">
+        <p class="lead" style="margin:0">
+          Per informazioni, collaborazioni o ordini personalizzati:
+          <br />
+          <strong>Email:</strong> <a href="mailto:info@ceramistdoronina.it" style="color:#b1e4d9">info@ceramistdoronina.it</a><br />
+          <strong>Instagram:</strong> <a href="https://www.instagram.com/ceramics_doronina/" target="_blank" rel="noopener" style="color:#b1e4d9">@ceramics_doronina</a>
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      © <span id="y"></span> Ceramist Doronina — Tutti i diritti riservati.
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
+
