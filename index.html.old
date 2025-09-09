@@ -60,11 +60,6 @@
     .price{font-weight:600}
     .buy{margin-top:auto;padding:10px 12px;border-radius:12px;border:1px solid #111827;background:#111827;color:#fff;text-align:center}
 
-    /* Etsy badge */
-    .etsy-badge{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid #e5e7eb;background:#fff}
-    .etsy-badge svg{width:18px;height:18px}
-    .etsy-note{color:var(--muted);font-size:14px;margin-top:8px}
-
     /* About */
     .about{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center}
     .about .img{border-radius:18px;overflow:hidden}
@@ -138,7 +133,7 @@
             <h4 data-i18n="p1.name">Vaso Avorio</h4>
             <p class="price">€120</p>
             <p data-i18n="p1.desc">Superficie sabbiata, dettagli perlacei.</p>
-            <a id="buy-p1" class="buy" href="#" target="_blank" rel="noopener sponsored" data-i18n="common.buy">Compra su Etsy</a>
+            <a class="buy" href="#shop" data-i18n="common.buy">Compra ora</a>
           </div>
         </article>
         <!-- Card 2 -->
@@ -148,7 +143,7 @@
             <h4 data-i18n="p2.name">Tazza Mare</h4>
             <p class="price">€34</p>
             <p data-i18n="p2.desc">Smalto blu profondo, interno lucido.</p>
-            <a id="buy-p2" class="buy" href="#" target="_blank" rel="noopener sponsored" data-i18n="common.buy">Compra su Etsy</a>
+            <a class="buy" href="#shop" data-i18n="common.buy">Compra ora</a>
           </div>
         </article>
         <!-- Card 3 -->
@@ -158,17 +153,9 @@
             <h4 data-i18n="p3.name">Piatto Onde</h4>
             <p class="price">€48</p>
             <p data-i18n="p3.desc">Bordo irregolare, texture naturale.</p>
-            <a id="buy-p3" class="buy" href="#" target="_blank" rel="noopener sponsored" data-i18n="common.buy">Compra su Etsy</a>
+            <a class="buy" href="#shop" data-i18n="common.buy">Compra ora</a>
           </div>
         </article>
-      </div>
-
-      <div class="etsy-note" style="margin-top:12px">
-        <span class="etsy-badge">
-          <!-- Simple Etsy icon -->
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 4h16v16H4z" fill="#FDE7DA"/><path d="M7 6h10v2H9v4h6v2H9v4h8v2H7V6z" fill="#F16522"/></svg>
-          <span>Pagamenti e spedizioni gestiti in sicurezza su Etsy</span>
-        </span>
       </div>
     </div>
   </section>
@@ -189,18 +176,22 @@
   <section id="shop" class="section">
     <div class="container">
       <h3 data-i18n="shop.title">Negozio</h3>
-      <p class="lead" data-i18n="shop.lead">Acquista direttamente su Etsy oppure dalla collezione qui sopra. I pulsanti “Compra su Etsy” ti portano alle singole inserzioni.</p>
-
+      <p class="lead" data-i18n="shop.lead">Per iniziare gratis puoi collegare Etsy o integrare Ecwid (piano free fino a 5 prodotti). Sostituisci i link qui sotto con il tuo negozio.</p>
       <div class="grid">
-        <a id="etsy-shop-card" class="card" href="#" target="_blank" rel="noopener sponsored">
-          <img class="media" src="images/etsy.jpg" alt="Vai al negozio Etsy" />
+        <a class="card" href="https://www.etsy.com/" target="_blank" rel="noopener">
+          <img class="media" src="images/etsy.jpg" alt="Collegamento al negozio Etsy" />
           <div class="body">
-            <h4>Etsy · Negozio ufficiale</h4>
-            <p data-i18n="shop.etsy">Sfoglia tutto il catalogo, opzioni di spedizione e pagamenti protetti.</p>
-            <div class="buy" style="margin-top:10px;text-align:center">Visita negozio</div>
+            <h4>Etsy</h4>
+            <p data-i18n="shop.etsy">Vendi su Etsy e collega i prodotti.</p>
           </div>
         </a>
-
+        <a class="card" href="#" onclick="alert('Inserisci qui il tuo widget Ecwid');return false;">
+          <img class="media" src="images/ecwid.jpg" alt="Integrazione Ecwid" />
+          <div class="body">
+            <h4>Ecwid</h4>
+            <p data-i18n="shop.ecwid">Integra il carrello direttamente sul sito.</p>
+          </div>
+        </a>
         <a class="card" href="mailto:hello@ceramicsdoronina.com">
           <img class="media" src="images/custom.jpg" alt="Richieste personalizzate" />
           <div class="body">
@@ -208,14 +199,13 @@
             <p data-i18n="shop.customDesc">Scrivici per commissioni personalizzate.</p>
           </div>
         </a>
-
-        <div class="card" style="display:flex;flex-direction:column;justify-content:center;align-items:center;padding:18px">
-          <div class="body" style="text-align:center">
-            <h4>Hai già il tuo carrello su Etsy</h4>
-            <p class="etsy-note">Quando aggiungi un prodotto su Etsy, il checkout rimane su Etsy per la massima sicurezza.</p>
-          </div>
-        </div>
       </div>
+
+      <!-- Esempio: incolla qui il widget Ecwid quando pronto
+      <div id="my-store-123456"></div>
+      <script data-cfasync="false" type="text/javascript" src="https://app.ecwid.com/script.js?123456&data_platform=code" charset="utf-8"></script>
+      <script type="text/javascript">xProductBrowser("categoriesPerRow=3","views=grid(20,3) list(60) table(60)","categoryView=grid","searchView=list","id=my-store-123456");</script>
+      -->
     </div>
   </section>
 
@@ -237,31 +227,7 @@
   </footer>
 
   <script>
-    // === CONFIGURA QUI I TUOI LINK ETSY ===
-    // Inserisci l'URL del tuo negozio Etsy e delle singole inserzioni.
-    const ETSY_SHOP_URL = 'https://www.etsy.com/shop/IlTuoNegozio';
-    const ETSY_LISTINGS = {
-      p1: 'https://www.etsy.com/listing/XXXXXXXXX', // Vaso Avorio
-      p2: 'https://www.etsy.com/listing/YYYYYYYYY', // Tazza Mare
-      p3: 'https://www.etsy.com/listing/ZZZZZZZZZ'  // Piatto Onde
-    };
-
-    // Applica i link Etsy ai pulsanti "Compra su Etsy"
-    const map = [
-      ['buy-p1', 'p1'],
-      ['buy-p2', 'p2'],
-      ['buy-p3', 'p3']
-    ];
-    map.forEach(([btnId, key]) => {
-      const a = document.getElementById(btnId);
-      if(a && ETSY_LISTINGS[key]) a.href = ETSY_LISTINGS[key];
-    });
-
-    // Card negozio Etsy
-    const shopCard = document.getElementById('etsy-shop-card');
-    if (shopCard && ETSY_SHOP_URL) shopCard.href = ETSY_SHOP_URL;
-
-    // === i18n semplice (IT/RU) ===
+    // Simple i18n (IT / RU) with localStorage persistence
     const messages = {
       it: {
         nav:{home:"Home",collection:"Collezione",about:"Chi siamo",contact:"Contatti"},
@@ -270,9 +236,9 @@
         p1:{name:"Vaso Avorio",desc:"Superficie sabbiata, dettagli perlacei."},
         p2:{name:"Tazza Mare",desc:"Smalto blu profondo, interno lucido."},
         p3:{name:"Piatto Onde",desc:"Bordo irregolare, texture naturale."},
-        common:{buy:"Compra su Etsy"},
+        common:{buy:"Compra ora"},
         about:{title:"Chi siamo",text1:"Ceramics Doronina nasce in Liguria, tra mare e colline. La formazione in Toscana e le radici familiari nella scultura si intrecciano in pezzi che uniscono semplicità e accenti barocchi.",text2:"Crediamo nella bellezza dell’imperfezione: ogni crepa lieve, ogni asimmetria racconta un gesto umano. Realizziamo anche pezzi su misura per interni e hotellerie."},
-        shop:{title:"Negozio",lead:"Acquista direttamente su Etsy oppure dalla collezione qui sopra. I pulsanti “Compra su Etsy” ti portano alle singole inserzioni.",etsy:"Sfoglia tutto il catalogo, opzioni di spedizione e pagamenti protetti.",ecwid:"Integra il carrello direttamente sul sito.",custom:"Richieste su misura",customDesc:"Scrivici per commissioni personalizzate."},
+        shop:{title:"Negozio",lead:"Per iniziare gratis puoi collegare Etsy o integrare Ecwid (piano free fino a 5 prodotti). Sostituisci i link qui sotto con il tuo negozio.",etsy:"Vendi su Etsy e collega i prodotti.",ecwid:"Integra il carrello direttamente sul sito.",custom:"Richieste su misura",customDesc:"Scrivici per commissioni personalizzate."},
         contact:{title:"Contatti",address:"Studio:"},
         footer:{made:"Realizzato con GitHub Pages"}
       },
@@ -283,9 +249,9 @@
         p1:{name:"Ваза Ivory",desc:"Песчаная поверхность, перламутровые детали."},
         p2:{name:"Чаша Mare",desc:"Глубокая синяя глазурь, блестящая внутренняя часть."},
         p3:{name:"Тарелка Waves",desc:"Неровный край, естественная текстура."},
-        common:{buy:"Купить на Etsy"},
-        about:{title:"О нас",text1:"Ceramics Doronina родилась в Лигурии, между морем и холмами. Учёба в Тоскане и семейные традиции скульптуры проявляются в работах, сочетающих простоту и барочные акценты.",text2:"Мы ценим красоту несовершенства: лёгкие трещинки и асимметрии — следы живого жеста. Выполняем заказы для интерьеров и отелей."},
-        shop:{title:"Магазин",lead:"Покупайте напрямую на Etsy или через карточки коллекции выше — кнопка ведёт на конкретный лот.",etsy:"Смотрите весь каталог, условия доставки и безопасные платежи.",ecwid:"Встраивайте корзину прямо на сайт.",custom:"Индивидуальные заказы",customDesc:"Пишите нам по персональным проектам."},
+        common:{buy:"Купить"},
+        about:{title:"О нас",text1:"Ceramics Doronina родилась в Лигурии, между морем и холмами. Учёба в Тоскане и семейные традиции скульптуры проявляются в работах, сочетающих простоту и барочные акценты.",text2:"Мы ценим красоту несовершенства: лёгкие трещинки и асимметрии — следы живого жеста. Выполняем заказы на предметы для интерьеров и отелей."},
+        shop:{title:"Магазин",lead:"Для старта без затрат подключите Etsy или встроите Ecwid (бесплатно до 5 товаров). Замените ссылки ниже на свой магазин.",etsy:"Продавайте на Etsy и связывайте товары.",ecwid:"Встраивайте корзину прямо на сайт.",custom:"Индивидуальные заказы",customDesc:"Пишите нам по персональным проектам."},
         contact:{title:"Контакты",address:"Мастерская:"},
         footer:{made:"Сайт на GitHub Pages"}
       }
