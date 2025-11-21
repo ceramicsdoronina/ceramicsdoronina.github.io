@@ -5,13 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ceramics Doronina · Handmade Ceramics · IT/EN/RU</title>
   <meta name="description" content="Ceramics Doronina · Handmade Ceramics · Итальянская художественная керамика ручной работы" />
-  <meta property="og:title" content="Ceramics Doronina" />
-  <meta property="og:description" content="Handmade Ceramics · Итальянская художественная керамика" />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="images/og-cover.jpg" />
-  <meta name="theme-color" content="#ffffff" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root{
       --bg:#fff;
@@ -21,7 +14,7 @@
       --brand-acc:#a78bfa;
     }
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;}
     a{color:inherit;text-decoration:none}
     img{max-width:100%;height:auto;display:block}
     .container{max-width:1200px;margin:0 auto;padding:0 20px}
@@ -36,17 +29,25 @@
     nav a{padding:8px 10px;border-radius:10px}
     nav a:hover{background:#f3f4f6}
     
-    /* Language Selector Styling */
+    /* STILE MENU A TENDINA (DROPDOWN) */
     .lang select {
       background: #f8fafc;
       border: 1px solid #e5e7eb;
       border-radius: 8px;
-      padding: 6px 8px;
+      padding: 8px 12px;
       font-family: inherit;
-      font-size: 13px;
+      font-size: 14px;
+      font-weight: 500;
       color: var(--text);
       cursor: pointer;
       outline: none;
+      appearance: none; /* Rimuove lo stile di default del browser */
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231f2937%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+      background-repeat: no-repeat;
+      background-position: right .7em top 50%;
+      background-size: .65em auto;
+      padding-right: 2.5em;
     }
     .lang select:focus {
       border-color: var(--brand-acc);
@@ -103,6 +104,7 @@
       .lang {margin-left: auto;}
     }
   </style>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
   <header>
@@ -120,11 +122,11 @@
         </ul>
       </nav>
       
-      <!-- MENU A TENDINA PER LA LINGUA -->
+      <!-- MENU A TENDINA CON INGLESE INCLUSO -->
       <div class="lang">
         <select id="language-selector" aria-label="Select Language">
           <option value="it">🇮🇹 IT</option>
-          <option value="en">🇬🇧 EN</option>
+          <option value="en">🇬🇧 EN</option> <!-- ECCO L'INGLESE -->
           <option value="ru">🇷🇺 RU</option>
         </select>
       </div>
