@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ceramics Doronina · Handmade Ceramics · IT/RU</title>
-  <meta name="description" content="Ceramics Doronina · Ceramiche fatte a mano · Итальянская художественная керамика ручной работы" />
+  <title>Ceramics Doronina · Handmade Ceramics · IT/EN/RU</title>
+  <meta name="description" content="Ceramics Doronina · Handmade Ceramics · Итальянская художественная керамика ручной работы" />
   <meta property="og:title" content="Ceramics Doronina" />
-  <meta property="og:description" content="Ceramiche fatte a mano · Итальянская художественная керамика" />
+  <meta property="og:description" content="Handmade Ceramics · Итальянская художественная керамика" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="images/og-cover.jpg" />
   <meta name="theme-color" content="#ffffff" />
@@ -18,7 +18,7 @@
       --text:#1f2937;
       --muted:#6b7280;
       --brand:#111827;
-      --brand-acc:#a78bfa; /* accent for small details */
+      --brand-acc:#a78bfa;
     }
     *{box-sizing:border-box}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
@@ -35,9 +35,23 @@
     nav ul{display:flex;gap:18px;list-style:none;margin:0;padding:0}
     nav a{padding:8px 10px;border-radius:10px}
     nav a:hover{background:#f3f4f6}
-    .lang{display:flex;align-items:center;gap:8px}
-    .lang button{background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;padding:6px 10px;font-size:13px;cursor:pointer}
-    .lang button.active{border-color:var(--brand-acc);box-shadow:0 0 0 2px rgba(167,139,250,.25)}
+    
+    /* Language Selector Styling */
+    .lang select {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 6px 8px;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text);
+      cursor: pointer;
+      outline: none;
+    }
+    .lang select:focus {
+      border-color: var(--brand-acc);
+      box-shadow: 0 0 0 2px rgba(167,139,250,.25);
+    }
 
     /* Hero */
     .hero{position:relative}
@@ -60,6 +74,11 @@
     .price{font-weight:600}
     .buy{margin-top:auto;padding:10px 12px;border-radius:12px;border:1px solid #111827;background:#111827;color:#fff;text-align:center}
 
+    /* Etsy badge */
+    .etsy-badge{display:inline-flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;border:1px solid #e5e7eb;background:#fff}
+    .etsy-badge svg{width:18px;height:18px}
+    .etsy-note{color:var(--muted);font-size:14px;margin-top:8px}
+
     /* About */
     .about{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center}
     .about .img{border-radius:18px;overflow:hidden}
@@ -80,6 +99,8 @@
     @media (max-width: 560px){
       .grid{grid-template-columns:1fr}
       .hero .copy h2{font-size:32px}
+      .nav {flex-wrap: wrap; gap: 10px;}
+      .lang {margin-left: auto;}
     }
   </style>
 </head>
@@ -98,10 +119,16 @@
           <li><a href="#contact" data-i18n="nav.contact">Contatti</a></li>
         </ul>
       </nav>
-      <div class="lang" aria-label="Language switcher">
-        <button id="lang-it" class="active" aria-pressed="true">IT</button>
-        <button id="lang-ru" aria-pressed="false">RU</button>
+      
+      <!-- MENU A TENDINA PER LA LINGUA -->
+      <div class="lang">
+        <select id="language-selector" aria-label="Select Language">
+          <option value="it">🇮🇹 IT</option>
+          <option value="en">🇬🇧 EN</option>
+          <option value="ru">🇷🇺 RU</option>
+        </select>
       </div>
+
     </div>
   </header>
 
@@ -133,7 +160,7 @@
             <h4 data-i18n="p1.name">Vaso Avorio</h4>
             <p class="price">€120</p>
             <p data-i18n="p1.desc">Superficie sabbiata, dettagli perlacei.</p>
-            <a class="buy" href="#shop" data-i18n="common.buy">Compra ora</a>
+            <a id="buy-p1" class="buy" href="#" target="_blank" rel="noopener sponsored" data-i18n="common.buy">Compra su Etsy</a>
           </div>
         </article>
         <!-- Card 2 -->
@@ -143,7 +170,7 @@
             <h4 data-i18n="p2.name">Tazza Mare</h4>
             <p class="price">€34</p>
             <p data-i18n="p2.desc">Smalto blu profondo, interno lucido.</p>
-            <a class="buy" href="#shop" data-i18n="common.buy">Compra ora</a>
+            <a id="buy-p2" class="buy" href="#" target="_blank" rel="noopener sponsored" data-i18n="common.buy">Compra su Etsy</a>
           </div>
         </article>
         <!-- Card 3 -->
@@ -153,9 +180,16 @@
             <h4 data-i18n="p3.name">Piatto Onde</h4>
             <p class="price">€48</p>
             <p data-i18n="p3.desc">Bordo irregolare, texture naturale.</p>
-            <a class="buy" href="#shop" data-i18n="common.buy">Compra ora</a>
+            <a id="buy-p3" class="buy" href="#" target="_blank" rel="noopener sponsored" data-i18n="common.buy">Compra su Etsy</a>
           </div>
         </article>
+      </div>
+
+      <div class="etsy-note" style="margin-top:12px">
+        <span class="etsy-badge">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 4h16v16H4z" fill="#FDE7DA"/><path d="M7 6h10v2H9v4h6v2H9v4h8v2H7V6z" fill="#F16522"/></svg>
+          <span data-i18n="shop.etsySecure">Pagamenti e spedizioni gestiti in sicurezza su Etsy</span>
+        </span>
       </div>
     </div>
   </section>
@@ -176,22 +210,18 @@
   <section id="shop" class="section">
     <div class="container">
       <h3 data-i18n="shop.title">Negozio</h3>
-      <p class="lead" data-i18n="shop.lead">Per iniziare gratis puoi collegare Etsy o integrare Ecwid (piano free fino a 5 prodotti). Sostituisci i link qui sotto con il tuo negozio.</p>
+      <p class="lead" data-i18n="shop.lead">Acquista direttamente su Etsy oppure dalla collezione qui sopra. I pulsanti “Compra su Etsy” ti portano alle singole inserzioni.</p>
+
       <div class="grid">
-        <a class="card" href="https://www.etsy.com/" target="_blank" rel="noopener">
-          <img class="media" src="images/etsy.jpg" alt="Collegamento al negozio Etsy" />
+        <a id="etsy-shop-card" class="card" href="#" target="_blank" rel="noopener sponsored">
+          <img class="media" src="images/etsy.jpg" alt="Vai al negozio Etsy" />
           <div class="body">
-            <h4>Etsy</h4>
-            <p data-i18n="shop.etsy">Vendi su Etsy e collega i prodotti.</p>
+            <h4 data-i18n="shop.etsyTitle">Etsy · Negozio ufficiale</h4>
+            <p data-i18n="shop.etsy">Sfoglia tutto il catalogo, opzioni di spedizione e pagamenti protetti.</p>
+            <div class="buy" style="margin-top:10px;text-align:center" data-i18n="shop.visit">Visita negozio</div>
           </div>
         </a>
-        <a class="card" href="#" onclick="alert('Inserisci qui il tuo widget Ecwid');return false;">
-          <img class="media" src="images/ecwid.jpg" alt="Integrazione Ecwid" />
-          <div class="body">
-            <h4>Ecwid</h4>
-            <p data-i18n="shop.ecwid">Integra il carrello direttamente sul sito.</p>
-          </div>
-        </a>
+
         <a class="card" href="mailto:hello@ceramicsdoronina.com">
           <img class="media" src="images/custom.jpg" alt="Richieste personalizzate" />
           <div class="body">
@@ -199,13 +229,14 @@
             <p data-i18n="shop.customDesc">Scrivici per commissioni personalizzate.</p>
           </div>
         </a>
-      </div>
 
-      <!-- Esempio: incolla qui il widget Ecwid quando pronto
-      <div id="my-store-123456"></div>
-      <script data-cfasync="false" type="text/javascript" src="https://app.ecwid.com/script.js?123456&data_platform=code" charset="utf-8"></script>
-      <script type="text/javascript">xProductBrowser("categoriesPerRow=3","views=grid(20,3) list(60) table(60)","categoryView=grid","searchView=list","id=my-store-123456");</script>
-      -->
+        <div class="card" style="display:flex;flex-direction:column;justify-content:center;align-items:center;padding:18px">
+          <div class="body" style="text-align:center">
+            <h4 data-i18n="shop.cartTitle">Hai già il tuo carrello su Etsy</h4>
+            <p class="etsy-note" data-i18n="shop.cartDesc">Quando aggiungi un prodotto su Etsy, il checkout rimane su Etsy per la massima sicurezza.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -227,7 +258,24 @@
   </footer>
 
   <script>
-    // Simple i18n (IT / RU) with localStorage persistence
+    // === CONFIGURA QUI I TUOI LINK ETSY ===
+    const ETSY_SHOP_URL = 'https://www.etsy.com/shop/IlTuoNegozio';
+    const ETSY_LISTINGS = {
+      p1: 'https://www.etsy.com/listing/XXXXXXXXX',
+      p2: 'https://www.etsy.com/listing/YYYYYYYYY',
+      p3: 'https://www.etsy.com/listing/ZZZZZZZZZ'
+    };
+
+    // Applica i link
+    const map = [['buy-p1', 'p1'], ['buy-p2', 'p2'], ['buy-p3', 'p3']];
+    map.forEach(([btnId, key]) => {
+      const a = document.getElementById(btnId);
+      if(a && ETSY_LISTINGS[key]) a.href = ETSY_LISTINGS[key];
+    });
+    const shopCard = document.getElementById('etsy-shop-card');
+    if (shopCard && ETSY_SHOP_URL) shopCard.href = ETSY_SHOP_URL;
+
+    // === DIZIONARIO TRADUZIONI (IT / EN / RU) ===
     const messages = {
       it: {
         nav:{home:"Home",collection:"Collezione",about:"Chi siamo",contact:"Contatti"},
@@ -236,11 +284,24 @@
         p1:{name:"Vaso Avorio",desc:"Superficie sabbiata, dettagli perlacei."},
         p2:{name:"Tazza Mare",desc:"Smalto blu profondo, interno lucido."},
         p3:{name:"Piatto Onde",desc:"Bordo irregolare, texture naturale."},
-        common:{buy:"Compra ora"},
+        common:{buy:"Compra su Etsy"},
         about:{title:"Chi siamo",text1:"Ceramics Doronina nasce in Liguria, tra mare e colline. La formazione in Toscana e le radici familiari nella scultura si intrecciano in pezzi che uniscono semplicità e accenti barocchi.",text2:"Crediamo nella bellezza dell’imperfezione: ogni crepa lieve, ogni asimmetria racconta un gesto umano. Realizziamo anche pezzi su misura per interni e hotellerie."},
-        shop:{title:"Negozio",lead:"Per iniziare gratis puoi collegare Etsy o integrare Ecwid (piano free fino a 5 prodotti). Sostituisci i link qui sotto con il tuo negozio.",etsy:"Vendi su Etsy e collega i prodotti.",ecwid:"Integra il carrello direttamente sul sito.",custom:"Richieste su misura",customDesc:"Scrivici per commissioni personalizzate."},
+        shop:{title:"Negozio",lead:"Acquista direttamente su Etsy oppure dalla collezione qui sopra. I pulsanti “Compra su Etsy” ti portano alle singole inserzioni.",etsyTitle:"Etsy · Negozio ufficiale",etsy:"Sfoglia tutto il catalogo, opzioni di spedizione e pagamenti protetti.",visit:"Visita negozio",custom:"Richieste su misura",customDesc:"Scrivici per commissioni personalizzate.",cartTitle:"Hai già il tuo carrello su Etsy",cartDesc:"Quando aggiungi un prodotto su Etsy, il checkout rimane su Etsy per la massima sicurezza.",etsySecure:"Pagamenti e spedizioni gestiti in sicurezza su Etsy"},
         contact:{title:"Contatti",address:"Studio:"},
         footer:{made:"Realizzato con GitHub Pages"}
+      },
+      en: {
+        nav:{home:"Home",collection:"Collection",about:"About",contact:"Contact"},
+        hero:{title:"Handmade ceramics inspired by wabi‑sabi",text:"Each piece is unique, hand-shaped in Genoa. Imperfect forms, tactile surfaces, baroque details like pearls and finishes that recall nature.",ctaBrowse:"View collection",ctaShop:"Shop now"},
+        collection:{title:"Collection",lead:"Selection of vases, cups, and plates. Each work can be customized upon request."},
+        p1:{name:"Ivory Vase",desc:"Sanded surface, pearly details."},
+        p2:{name:"Sea Cup",desc:"Deep blue glaze, glossy interior."},
+        p3:{name:"Waves Plate",desc:"Irregular rim, natural texture."},
+        common:{buy:"Buy on Etsy"},
+        about:{title:"About us",text1:"Ceramics Doronina was born in Liguria, between the sea and the hills. Training in Tuscany and family roots in sculpture intertwine in pieces that combine simplicity with baroque accents.",text2:"We believe in the beauty of imperfection: every slight crack, every asymmetry tells a human gesture. We also create bespoke pieces for interiors and hospitality."},
+        shop:{title:"Shop",lead:"Buy directly on Etsy or from the collection above. The “Buy on Etsy” buttons take you to individual listings.",etsyTitle:"Etsy · Official Shop",etsy:"Browse the full catalog, shipping options, and secure payments.",visit:"Visit Shop",custom:"Custom Requests",customDesc:"Write to us for personalized commissions.",cartTitle:"Your cart is on Etsy",cartDesc:"When you add a product on Etsy, checkout remains on Etsy for maximum security.",etsySecure:"Payments and shipping securely managed on Etsy"},
+        contact:{title:"Contact",address:"Studio:"},
+        footer:{made:"Made with GitHub Pages"}
       },
       ru: {
         nav:{home:"Главная",collection:"Коллекция",about:"О нас",contact:"Контакты"},
@@ -249,14 +310,15 @@
         p1:{name:"Ваза Ivory",desc:"Песчаная поверхность, перламутровые детали."},
         p2:{name:"Чаша Mare",desc:"Глубокая синяя глазурь, блестящая внутренняя часть."},
         p3:{name:"Тарелка Waves",desc:"Неровный край, естественная текстура."},
-        common:{buy:"Купить"},
-        about:{title:"О нас",text1:"Ceramics Doronina родилась в Лигурии, между морем и холмами. Учёба в Тоскане и семейные традиции скульптуры проявляются в работах, сочетающих простоту и барочные акценты.",text2:"Мы ценим красоту несовершенства: лёгкие трещинки и асимметрии — следы живого жеста. Выполняем заказы на предметы для интерьеров и отелей."},
-        shop:{title:"Магазин",lead:"Для старта без затрат подключите Etsy или встроите Ecwid (бесплатно до 5 товаров). Замените ссылки ниже на свой магазин.",etsy:"Продавайте на Etsy и связывайте товары.",ecwid:"Встраивайте корзину прямо на сайт.",custom:"Индивидуальные заказы",customDesc:"Пишите нам по персональным проектам."},
+        common:{buy:"Купить на Etsy"},
+        about:{title:"О нас",text1:"Ceramics Doronina родилась в Лигурии, между морем и холмами. Учёба в Тоскане и семейные традиции скульптуры проявляются в работах, сочетающих простоту и барочные акценты.",text2:"Мы ценим красоту несовершенства: лёгкие трещинки и асимметрии — следы живого жеста. Выполняем заказы для интерьеров и отелей."},
+        shop:{title:"Магазин",lead:"Покупайте напрямую на Etsy или через карточки коллекции выше — кнопка ведёт на конкретный лот.",etsyTitle:"Etsy · Официальный магазин",etsy:"Смотрите весь каталог, условия доставки и безопасные платежи.",visit:"Посетить магазин",custom:"Индивидуальные заказы",customDesc:"Пишите нам по персональным проектам.",cartTitle:"Ваша корзина на Etsy",cartDesc:"При добавлении товара оформление заказа происходит на Etsy для максимальной безопасности.",etsySecure:"Безопасные платежи и доставка через Etsy"},
         contact:{title:"Контакты",address:"Мастерская:"},
         footer:{made:"Сайт на GitHub Pages"}
       }
     };
 
+    // Funzione per aggiornare i testi
     const $t = (lang) => {
       document.querySelectorAll('[data-i18n]').forEach(el=>{
         const path = el.getAttribute('data-i18n').split('.');
@@ -266,24 +328,40 @@
       });
     };
 
+    // Funzione per impostare la lingua
     const setLang = (lang) => {
-      localStorage.setItem('lang', lang);
-      document.getElementById('lang-it').classList.toggle('active', lang==='it');
-      document.getElementById('lang-ru').classList.toggle('active', lang==='ru');
-      document.getElementById('lang-it').setAttribute('aria-pressed', lang==='it');
-      document.getElementById('lang-ru').setAttribute('aria-pressed', lang==='ru');
+      localStorage.setItem('lang', lang); // Salva la scelta
       document.documentElement.lang = lang;
+      document.getElementById('language-selector').value = lang; // Aggiorna il menu a tendina
       $t(lang);
     };
 
-    document.getElementById('lang-it').addEventListener('click', ()=> setLang('it'));
-    document.getElementById('lang-ru').addEventListener('click', ()=> setLang('ru'));
+    // Logica di rilevamento iniziale
+    const getPreferredLanguage = () => {
+      // 1. Controlla se l'utente ha già scelto in passato
+      const saved = localStorage.getItem('lang');
+      if (saved && messages[saved]) {
+        return saved;
+      }
 
-    // Init
-    const saved = localStorage.getItem('lang') || 'it';
-    setLang(saved);
+      // 2. Controlla la lingua del browser
+      const browserLang = (navigator.language || navigator.userLanguage).split('-')[0];
+      if (messages[browserLang]) {
+        return browserLang;
+      }
+
+      // 3. Fallback (Italiano)
+      return 'it';
+    };
+
+    // Event Listener sul menu a tendina
+    document.getElementById('language-selector').addEventListener('change', (e) => {
+      setLang(e.target.value);
+    });
+
+    // Inizializzazione
+    setLang(getPreferredLanguage());
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
-
