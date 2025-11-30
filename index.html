@@ -116,7 +116,7 @@
       display:flex;
       flex-direction:column
     }
-    .card .media{aspect-ratio:4/3;background:#f3f4f6}
+    .card .media{background:#f3f4f6}
     .card .body{padding:14px 14px 18px}
     .price{font-weight:600}
     .buy{
@@ -128,6 +128,27 @@
       color:#fff;
       text-align:center;
       cursor:pointer
+    }
+
+    .card .media img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    /* Catalogue thumbnail grid: 6 figures */
+    .media-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:2px;
+      aspect-ratio:4/3;
+      cursor:pointer;
+      overflow:hidden;
+    }
+    .media-grid img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
     }
 
     /* Etsy badge */
@@ -171,14 +192,14 @@
       font-size:14px
     }
 
-    /* === CATALOGUE GRID === */
+    /* Catalogue grid */
     .catalogue-grid{
       display:grid;
       grid-template-columns:repeat(3,1fr);
       gap:18px;
     }
 
-    /* === MODAL CATALOGUE GALLERY === */
+    /* Modal gallery */
     .modal{
       position:fixed;
       inset:0;
@@ -228,6 +249,7 @@
     }
     .modal-body{
       padding:14px 16px 18px;
+      overflow-y:auto;
     }
 
     .modal-gallery{
@@ -275,6 +297,31 @@
     .modal-counter{
       font-size:13px;
       color:var(--muted);
+    }
+
+    /* Vase specs */
+    .vase-specs{
+      margin-top:14px;
+      font-size:14px;
+      color:var(--text);
+    }
+    .vase-specs h5{
+      margin:0 0 8px;
+      font-size:15px;
+      font-weight:600;
+    }
+    .vase-specs dl{
+      margin:0;
+      display:grid;
+      grid-template-columns:auto 1fr;
+      gap:4px 12px;
+    }
+    .vase-specs dt{
+      font-weight:600;
+      color:var(--muted);
+    }
+    .vase-specs dd{
+      margin:0;
     }
 
     /* Responsive */
@@ -348,7 +395,9 @@
       <div class="grid">
         <!-- Card 1 -->
         <article class="card">
-          <img class="media" src="images/opera-1.jpg" alt="Vaso alto in ceramica color avorio" />
+          <div class="media">
+            <img src="images/opera-1.jpg" alt="Vaso alto in ceramica color avorio" />
+          </div>
           <div class="body">
             <h4 data-i18n="p1.name">Vaso Avorio</h4>
             <p class="price">€120</p>
@@ -358,7 +407,9 @@
         </article>
         <!-- Card 2 -->
         <article class="card">
-          <img class="media" src="images/opera-2.jpg" alt="Tazza artigianale smaltata blu" />
+          <div class="media">
+            <img src="images/opera-2.jpg" alt="Tazza artigianale smaltata blu" />
+          </div>
           <div class="body">
             <h4 data-i18n="p2.name">Tazza Mare</h4>
             <p class="price">€34</p>
@@ -368,7 +419,9 @@
         </article>
         <!-- Card 3 -->
         <article class="card">
-          <img class="media" src="images/opera-3.jpg" alt="Piatto in ceramica con bordo irregolare" />
+          <div class="media">
+            <img src="images/opera-3.jpg" alt="Piatto in ceramica con bordo irregolare" />
+          </div>
           <div class="body">
             <h4 data-i18n="p3.name">Piatto Onde</h4>
             <p class="price">€48</p>
@@ -396,7 +449,14 @@
       <div class="catalogue-grid">
         <!-- Accetto Rosso -->
         <article class="card">
-          <img class="media" src="images/catalogue/accetto-rosso-1.jpg" alt="Accetto Rosso vista frontale" />
+          <div class="media media-grid" data-modal-target="modal-v1">
+            <img src="images/catalogue/accetto-rosso-1.jpg" alt="Accetto Rosso vista frontale" />
+            <img src="images/catalogue/accetto-rosso-2.jpg" alt="Accetto Rosso vista laterale" />
+            <img src="images/catalogue/accetto-rosso-3.jpg" alt="Accetto Rosso in ambiente" />
+            <img src="images/catalogue/accetto-rosso-4.jpg" alt="Accetto Rosso dettaglio superficie" />
+            <img src="images/catalogue/accetto-rosso-5.jpg" alt="Accetto Rosso dettaglio bordo" />
+            <img src="images/catalogue/accetto-rosso-6.jpg" alt="Accetto Rosso dettaglio base" />
+          </div>
           <div class="body">
             <h4 data-i18n="cat.v1.name">Accetto Rosso</h4>
             <p data-i18n="cat.v1.desc">Vaso medio in gres, smalto rosso profondo con accenti materici.</p>
@@ -406,7 +466,14 @@
 
         <!-- Ракушка -->
         <article class="card">
-          <img class="media" src="images/catalogue/rakushka-1.jpg" alt="Ракушка vista frontale" />
+          <div class="media media-grid" data-modal-target="modal-v2">
+            <img src="images/catalogue/rakushka-1.jpg" alt="Ракушка vista frontale" />
+            <img src="images/catalogue/rakushka-2.jpg" alt="Ракушка vista laterale" />
+            <img src="images/catalogue/rakushka-3.jpg" alt="Ракушка in ambiente" />
+            <img src="images/catalogue/rakushka-4.jpg" alt="Ракушка dettaglio superficie" />
+            <img src="images/catalogue/rakushka-5.jpg" alt="Ракушка dettaglio bordo" />
+            <img src="images/catalogue/rakushka-6.jpg" alt="Ракушка dettaglio base" />
+          </div>
           <div class="body">
             <h4 data-i18n="cat.v2.name">Ракушка</h4>
             <p data-i18n="cat.v2.desc">Forma morbida ispirata a una conchiglia, smalti chiari e tattili.</p>
@@ -416,7 +483,14 @@
 
         <!-- Липия -->
         <article class="card">
-          <img class="media" src="images/catalogue/lipiya-1.jpg" alt="Липия vista frontale" />
+          <div class="media media-grid" data-modal-target="modal-v3">
+            <img src="images/catalogue/lipiya-1.jpg" alt="Липия vista frontale" />
+            <img src="images/catalogue/lipiya-2.jpg" alt="Липия vista laterale" />
+            <img src="images/catalogue/lipiya-3.jpg" alt="Липия in ambiente" />
+            <img src="images/catalogue/lipiya-4.jpg" alt="Липия dettaglio superficie" />
+            <img src="images/catalogue/lipiya-5.jpg" alt="Липия dettaglio bordo" />
+            <img src="images/catalogue/lipiya-6.jpg" alt="Липия dettaglio base" />
+          </div>
           <div class="body">
             <h4 data-i18n="cat.v3.name">Липия</h4>
             <p data-i18n="cat.v3.desc">Vaso slanciato, superfici leggere con dettagli organici.</p>
@@ -447,7 +521,9 @@
 
       <div class="grid">
         <a id="etsy-shop-card" class="card" href="#" target="_blank" rel="noopener sponsored">
-          <img class="media" src="images/etsy.jpg" alt="Vai al negozio Etsy" />
+          <div class="media">
+            <img src="images/etsy.jpg" alt="Vai al negozio Etsy" />
+          </div>
           <div class="body">
             <h4 data-i18n="shop.etsyTitle">Etsy · Negozio ufficiale</h4>
             <p data-i18n="shop.etsy">Sfoglia tutto il catalogo, opzioni di spedizione e pagamenti protetti.</p>
@@ -456,7 +532,9 @@
         </a>
 
         <a class="card" href="mailto:hello@ceramicsdoronina.com">
-          <img class="media" src="images/custom.jpg" alt="Richieste personalizzate" />
+          <div class="media">
+            <img src="images/custom.jpg" alt="Richieste personalizzate" />
+          </div>
           <div class="body">
             <h4 data-i18n="shop.custom">Richieste su misura</h4>
             <p data-i18n="shop.customDesc">Scrivici per commissioni personalizzate.</p>
@@ -505,12 +583,31 @@
             <img src="images/catalogue/accetto-rosso-1.jpg" alt="Accetto Rosso vista frontale" data-slide>
             <img src="images/catalogue/accetto-rosso-2.jpg" alt="Accetto Rosso vista laterale" data-slide>
             <img src="images/catalogue/accetto-rosso-3.jpg" alt="Accetto Rosso in ambiente" data-slide>
+            <img src="images/catalogue/accetto-rosso-4.jpg" alt="Accetto Rosso dettaglio superficie" data-slide>
+            <img src="images/catalogue/accetto-rosso-5.jpg" alt="Accetto Rosso dettaglio bordo" data-slide>
+            <img src="images/catalogue/accetto-rosso-6.jpg" alt="Accetto Rosso dettaglio base" data-slide>
           </div>
           <div class="modal-gallery-controls">
             <button class="modal-nav-btn" type="button" data-gallery-prev>&lsaquo;</button>
-            <span class="modal-counter" data-gallery-counter>1 / 3</span>
+            <span class="modal-counter" data-gallery-counter>1 / 6</span>
             <button class="modal-nav-btn" type="button" data-gallery-next>&rsaquo;</button>
           </div>
+        </div>
+
+        <div class="vase-specs">
+          <h5 data-i18n="catalogue.specTitle">Specifiche</h5>
+          <dl>
+            <dt data-i18n="catalogue.spec.height">Altezza</dt>
+            <dd>—</dd>
+            <dt data-i18n="catalogue.spec.diameter">Diametro</dt>
+            <dd>—</dd>
+            <dt data-i18n="catalogue.spec.material">Materiale</dt>
+            <dd>—</dd>
+            <dt data-i18n="catalogue.spec.technique">Tecnica</dt>
+            <dd>—</dd>
+            <dt data-i18n="catalogue.spec.finish">Finitura</dt>
+            <dd>—</dd>
+          </dl>
         </div>
       </div>
     </div>
@@ -527,14 +624,33 @@
         <div class="modal-gallery">
           <div class="modal-gallery-main">
             <img src="images/catalogue/rakushka-1.jpg" alt="Ракушка vista frontale" data-slide>
-            <img src="images/catalogue/rakushka-2.jpg" alt="Ракушка dettaglio smalto" data-slide>
+            <img src="images/catalogue/rakushka-2.jpg" alt="Ракушка vista laterale" data-slide>
             <img src="images/catalogue/rakushka-3.jpg" alt="Ракушка in ambiente" data-slide>
+            <img src="images/catalogue/rakushka-4.jpg" alt="Ракушка dettaglio superficie" data-slide>
+            <img src="images/catalogue/rakushka-5.jpg" alt="Ракушка dettaglio bordo" data-slide>
+            <img src="images/catalogue/rakushka-6.jpg" alt="Ракушка dettaglio base" data-slide>
           </div>
           <div class="modal-gallery-controls">
             <button class="modal-nav-btn" type="button" data-gallery-prev>&lsaquo;</button>
-            <span class="modal-counter" data-gallery-counter>1 / 3</span>
+            <span class="modal-counter" data-gallery-counter>1 / 6</span>
             <button class="modal-nav-btn" type="button" data-gallery-next>&rsaquo;</button>
           </div>
+        </div>
+
+        <div class="vase-specs">
+          <h5 data-i18n="catalogue.specTitle">Specifiche</h5>
+          <dl>
+            <dt data-i18n="catalogue.spec.height">Altezza</dt>
+            <dd>—</dd>
+            <dt data-i18n="catalogue.spec.diameter">Diametro</dt>
+            <dd>—</dd>
+            <dt data-i18n="catalogue.spec.material">Materiale</dt>
+            <dd>—</dd>
+            <dt data-i18n="catalogue.spec.technique">Tecnica</dt>
+            <dd>—</dd>
+            <dt data-i18n="catalogue.spec.finish">Finitura</dt>
+            <dd>—</dd>
+          </dl>
         </div>
       </div>
     </div>
@@ -551,14 +667,33 @@
         <div class="modal-gallery">
           <div class="modal-gallery-main">
             <img src="images/catalogue/lipiya-1.jpg" alt="Липия vista frontale" data-slide>
-            <img src="images/catalogue/lipiya-2.jpg" alt="Липия dettaglio superficie" data-slide>
+            <img src="images/catalogue/lipiya-2.jpg" alt="Липия vista laterale" data-slide>
             <img src="images/catalogue/lipiya-3.jpg" alt="Липия in ambiente" data-slide>
+            <img src="images/catalogue/lipiya-4.jpg" alt="Липия dettaglio superficie" data-slide>
+            <img src="images/catalogue/lipiya-5.jpg" alt="Липия dettaglio bordo" data-slide>
+            <img src="images/catalogue/lipiya-6.jpg" alt="Липия dettaglio base" data-slide>
           </div>
           <div class="modal-gallery-controls">
             <button class="modal-nav-btn" type="button" data-gallery-prev>&lsaquo;</button>
-            <span class="modal-counter" data-gallery-counter>1 / 3</span>
+            <span class="modal-counter" data-gallery-counter>1 / 6</span>
             <button class="modal-nav-btn" type="button" data-gallery-next>&rsaquo;</button>
           </div>
+        </div>
+
+        <div class="vase-specs">
+          <h5 data-i18n="catalogue.specTitle">Specifiche</h5>
+          <dl>
+            <dt data-i18n="catalogue.spec.height">Altezza</dt>
+            <dd>—</dd>
+            <dt data-i18n="catalogue.spec.diameter">Diametro</dt>
+            <dd>—</dd>
+            <dt data-i18n="catalogue.spec.material">Materiale</dt>
+            <dd>—</dd>
+            <dt data-i18n="catalogue.spec.technique">Tecnica</dt>
+            <dd>—</dd>
+            <dt data-i18n="catalogue.spec.finish">Finitura</dt>
+            <dd>—</dd>
+          </dl>
         </div>
       </div>
     </div>
@@ -591,7 +726,15 @@
         catalogue:{
           title:"Catalogo",
           lead:"Panoramica dettagliata dei vasi con più foto per ogni pezzo.",
-          viewPhotos:"Vedi foto"
+          viewPhotos:"Vedi foto",
+          specTitle:"Specifiche",
+          spec:{
+            height:"Altezza",
+            diameter:"Diametro",
+            material:"Materiale",
+            technique:"Tecnica",
+            finish:"Finitura"
+          }
         },
         p1:{name:"Vaso Avorio",desc:"Superficie sabbiata, dettagli perlacei."},
         p2:{name:"Tazza Mare",desc:"Smalto blu profondo, interno lucido."},
@@ -614,7 +757,15 @@
         catalogue:{
           title:"Catalogue",
           lead:"Detailed overview of vases with multiple photos for each piece.",
-          viewPhotos:"View photos"
+          viewPhotos:"View photos",
+          specTitle:"Specifications",
+          spec:{
+            height:"Height",
+            diameter:"Diameter",
+            material:"Material",
+            technique:"Technique",
+            finish:"Finish"
+          }
         },
         p1:{name:"Ivory Vase",desc:"Sanded surface, pearly details."},
         p2:{name:"Sea Cup",desc:"Deep blue glaze, glossy interior."},
@@ -637,7 +788,15 @@
         catalogue:{
           title:"Каталог",
           lead:"Подробный обзор ваз с несколькими фотографиями каждого изделия.",
-          viewPhotos:"Смотреть фото"
+          viewPhotos:"Смотреть фото",
+          specTitle:"Характеристики",
+          spec:{
+            height:"Высота",
+            diameter:"Диаметр",
+            material:"Материал",
+            technique:"Техника",
+            finish:"Покрытие"
+          }
         },
         p1:{name:"Ваза Ivory",desc:"Песчаная поверхность, перламутровые детали."},
         p2:{name:"Чаша Mare",desc:"Глубокая синяя глазурь, блестящая внутренняя часть."},
@@ -655,7 +814,7 @@
       }
     };
 
-    // Funzione per aggiornare i testi
+    // Traduzioni
     const $t = (lang) => {
       document.querySelectorAll('[data-i18n]').forEach(el=>{
         const path = el.getAttribute('data-i18n').split('.');
@@ -665,7 +824,6 @@
       });
     };
 
-    // Funzione per impostare la lingua
     const setLang = (lang) => {
       localStorage.setItem('lang', lang);
       document.documentElement.lang = lang;
