@@ -207,39 +207,25 @@ const messages = {
   }
 };
 
-// ================================
-// FUNZIONE DI TRADUZIONE
-// ================================
+// --------- traduzione ----------
 function applyTranslations(lang) {
   const dict = messages[lang] || messages.ru;
-
   document.querySelectorAll("[data-i18n]").forEach(el => {
     const path = el.getAttribute("data-i18n").split(".");
     let cur = dict;
     for (const p of path) {
-      if (cur && Object.prototype.hasOwnProperty.call(cur, p)) {
-        cur = cur[p];
-      } else {
-        cur = null;
-        break;
-      }
+      if (cur && Object.prototype.hasOwnProperty.call(cur, p)) cur = cur[p];
+      else { cur = null; break; }
     }
-    if (typeof cur === "string") {
-      el.textContent = cur;
-    }
+    if (typeof cur === "string") el.textContent = cur;
   });
 }
 
-// ================================
-// GESTIONE LINGUA
-// ================================
 function getInitialLang() {
   const stored = localStorage.getItem("lang");
   if (stored && messages[stored]) return stored;
-
   const browser = (navigator.language || "ru").slice(0,2);
   if (messages[browser]) return browser;
-
   return "ru";
 }
 
@@ -252,14 +238,11 @@ function setLang(lang) {
   applyTranslations(lang);
 }
 
-// ================================
-// VIEW MODE (DESKTOP / MOBILE)
-// ================================
+// --------- view toggle ----------
 function initViewToggle() {
   const btn = document.getElementById("view-toggle-btn");
   if (!btn) return;
 
-  // se schermo piccolo, partiamo con mobile-view
   if (window.innerWidth <= 768) {
     document.body.classList.add("mobile-view");
     btn.textContent = "Desktop";
@@ -274,14 +257,11 @@ function initViewToggle() {
   });
 }
 
-// ================================
-// MODAL + GALLERIA
-// ================================
+// --------- modali & gallerie ----------
 function openModal(modal) {
   if (!modal) return;
   modal.classList.add("open");
 
-  // reset gallery al primo slide
   const main = modal.querySelector(".modal-gallery-main");
   if (main) {
     const slides = Array.from(main.querySelectorAll("img[data-slide]"));
@@ -299,7 +279,6 @@ function closeModal(modal) {
 }
 
 function initModals() {
-  // aperture (click su media-grid o bottone)
   document.querySelectorAll("[data-modal-target]").forEach(el => {
     el.addEventListener("click", () => {
       const id = el.getAttribute("data-modal-target");
@@ -308,7 +287,6 @@ function initModals() {
     });
   });
 
-  // chiusura (x)
   document.querySelectorAll("[data-modal-close]").forEach(btn => {
     btn.addEventListener("click", () => {
       const modal = btn.closest(".modal");
@@ -316,26 +294,20 @@ function initModals() {
     });
   });
 
-  // chiusura cliccando fuori dal dialog
   document.querySelectorAll(".modal").forEach(modal => {
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal) {
-        closeModal(modal);
-      }
+    modal.addEventListener("click", e => {
+      if (e.target === modal) closeModal(modal);
     });
-  });
 
-  // gallerie
-  document.querySelectorAll(".modal").forEach(modal => {
     const main = modal.querySelector(".modal-gallery-main");
     if (!main) return;
     const slides = Array.from(main.querySelectorAll("img[data-slide]"));
     if (!slides.length) return;
-
     let index = 0;
     const counter = modal.querySelector("[data-gallery-counter]");
+
     const update = () => {
-      slides.forEach((img,i) => img.classList.toggle("active", i === index));
+      slides.forEach((img,i)=> img.classList.toggle("active", i === index));
       if (counter) counter.textContent = `${index+1} / ${slides.length}`;
     };
     update();
@@ -343,24 +315,18 @@ function initModals() {
     const prev = modal.querySelector("[data-gallery-prev]");
     const next = modal.querySelector("[data-gallery-next]");
 
-    if (prev) {
-      prev.addEventListener("click", () => {
-        index = (index - 1 + slides.length) % slides.length;
-        update();
-      });
-    }
-    if (next) {
-      next.addEventListener("click", () => {
-        index = (index + 1) % slides.length;
-        update();
-      });
-    }
+    if (prev) prev.addEventListener("click", () => {
+      index = (index - 1 + slides.length) % slides.length;
+      update();
+    });
+    if (next) next.addEventListener("click", () => {
+      index = (index + 1) % slides.length;
+      update();
+    });
   });
 }
 
-// ================================
-// ACCORDION
-// ================================
+// --------- accordion ----------
 function initAccordion() {
   document.querySelectorAll(".accordion").forEach(acc => {
     const headers = acc.querySelectorAll(".accordion-header");
@@ -368,40 +334,28 @@ function initAccordion() {
       header.addEventListener("click", () => {
         const panel = header.nextElementSibling;
         if (!panel) return;
-
         const isActive = panel.classList.contains("active");
-
-        // chiudi tutti
         acc.querySelectorAll(".accordion-panel").forEach(p => p.classList.remove("active"));
-
-        // apri solo se non era già attivo
-        if (!isActive) {
-          panel.classList.add("active");
-        }
+        if (!isActive) panel.classList.add("active");
       });
     });
   });
 }
 
-// ================================
-// INIT
-// ================================
-document.addEventListener("DOMContentLoaded", () => {
+// --------- INIT GLOBALE ----------
+window.appInit = function appInit() {
   const lang = getInitialLang();
   setLang(lang);
 
   const selector = document.getElementById("language-selector");
   if (selector) {
-    selector.addEventListener("change", (e) => {
-      setLang(e.target.value);
-    });
+    selector.addEventListener("change", e => setLang(e.target.value));
   }
 
-  // footer year
   const yearSpan = document.getElementById("year");
   if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
   initViewToggle();
   initModals();
   initAccordion();
-});
+};
