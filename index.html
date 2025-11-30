@@ -4,268 +4,189 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ceramics Doronina · Handmade Ceramics · IT/EN/RU</title>
-  <meta name="description" content="Ceramics Doronina · Handmade Ceramics · Итальянская художественная керамика ручной работы" />
+  <meta name="description" content="Ceramics Doronina · Handmade Ceramics · Интерьерная керамика с бисерной вышивкой" />
 
   <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 
-  <!-- Font -->
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
   <!-- JS -->
   <script src="app.js" defer></script>
 </head>
 <body>
+
+  <!-- ░░░ HEADER / NAVBAR ░░░ -->
+
   <header>
     <div class="container nav">
       <div class="brand">
-        <div class="brand-logo" aria-hidden="true"></div>
-        <h1>Ceramics Doronina</h1>
+        <div class="brand-logo"></div>
+        <h1>DORONINA</h1>
       </div>
+
       <nav aria-label="Primary">
         <ul>
-          <li><a href="#home" data-i18n="nav.home">Home</a></li>
-          <li><a href="#collection" data-i18n="nav.collection">Collezione</a></li>
-          <li><a href="#catalogue" data-i18n="nav.catalogue">Catalogo</a></li>
-          <li><a href="#about" data-i18n="nav.about">Chi siamo</a></li>
-          <li><a href="#contact" data-i18n="nav.contact">Contatti</a></li>
+          <li><a href="#home" data-i18n="nav.home">Главная</a></li>
+          <li><a href="#about" data-i18n="nav.about">О бренде</a></li>
+          <li><a href="#catalogue" data-i18n="nav.catalogue">Каталог</a></li>
+          <li><a href="#workshops" data-i18n="nav.workshops">Мастер-классы</a></li>
+          <li><a href="#contact" data-i18n="nav.contact">Контакты</a></li>
         </ul>
       </nav>
-      
+
       <div class="lang">
-        <select id="language-selector" aria-label="Select Language">
+        <select id="language-selector">
+          <option value="ru">🇷🇺 RU</option>
           <option value="it">🇮🇹 IT</option>
           <option value="en">🇬🇧 EN</option>
-          <option value="ru">🇷🇺 RU</option>
         </select>
       </div>
     </div>
   </header>
 
-  <!-- piccolo bottone fisso Mobile/Desktop -->
+  <!-- Bottone Mobile/Desktop -->
   <div class="view-toggle">
-    <button type="button" id="view-toggle-btn" aria-label="Cambia vista">Mobile</button>
+    <button id="view-toggle-btn">Mobile</button>
   </div>
 
-  <main id="home" class="hero">
-    <div class="container wrap">
-      <div class="copy">
-        <h2 data-i18n="hero.title">Ceramiche fatte a mano ispirate al wabi-sabi</h2>
-        <p data-i18n="hero.text">Ogni pezzo è unico, modellato a mano a Genova. Forme imperfette, superfici tattili, dettagli barocchi come perle e finiture che richiamano la natura.</p>
-        <div class="cta">
-          <a href="#collection" class="btn" data-i18n="hero.ctaBrowse">Vedi collezione</a>
-          <a href="#shop" class="btn secondary" data-i18n="hero.ctaShop">Acquista</a>
-        </div>
-      </div>
-      <div class="cover">
-        <img src="images/hero.jpg" alt="Vasi in ceramica artigianale su fondo chiaro" />
-      </div>
+  <!-- ░░░ HERO FULLSCREEN (DESKTOP MOCKUP VERSION) ░░░ -->
+
+  <main id="home" class="hero hero-landing">
+    <div class="hero-overlay">
+      <h2 class="hero-logo">DORONINA</h2>
+
+      <p class="hero-tagline" data-i18n="hero.tagline">
+        Тактильная интерьерная керамика с бисерной вышивкой, которая превратит ваш дом в место силы и вдохновения
+      </p>
+
+      <a href="#about" class="hero-scroll">↓</a>
     </div>
   </main>
 
-  <section id="collection" class="section">
-    <div class="container">
-      <h3 data-i18n="collection.title">Collezione</h3>
-      <p class="lead" data-i18n="collection.lead">Selezione di vasi, tazze e piatti. Ogni opera può essere personalizzata su richiesta.</p>
-      <div class="grid">
-        <!-- Card 1 -->
-        <article class="card">
-          <div class="media">
-            <img src="images/opera-1.jpg" alt="Vaso alto in ceramica color avorio" />
-          </div>
-          <div class="body">
-            <h4 data-i18n="p1.name">Vaso Avorio</h4>
-            <p class="price">€120</p>
-            <p data-i18n="p1.desc">Superficie sabbiata, dettagli perlacei.</p>
-            <a id="buy-p1" class="buy" href="#" target="_blank" rel="noopener sponsored" data-i18n="common.buy">Compra su Etsy</a>
-          </div>
-        </article>
-        <!-- Card 2 -->
-        <article class="card">
-          <div class="media">
-            <img src="images/opera-2.jpg" alt="Tazza artigianale smaltata blu" />
-          </div>
-          <div class="body">
-            <h4 data-i18n="p2.name">Tazza Mare</h4>
-            <p class="price">€34</p>
-            <p data-i18n="p2.desc">Smalto blu profondo, interno lucido.</p>
-            <a id="buy-p2" class="buy" href="#" target="_blank" rel="noopener sponsored" data-i18n="common.buy">Compra su Etsy</a>
-          </div>
-        </article>
-        <!-- Card 3 -->
-        <article class="card">
-          <div class="media">
-            <img src="images/opera-3.jpg" alt="Piatto in ceramica con bordo irregolare" />
-          </div>
-          <div class="body">
-            <h4 data-i18n="p3.name">Piatto Onde</h4>
-            <p class="price">€48</p>
-            <p data-i18n="p3.desc">Bordo irregolare, texture naturale.</p>
-            <a id="buy-p3" class="buy" href="#" target="_blank" rel="noopener sponsored" data-i18n="common.buy">Compra su Etsy</a>
-          </div>
-        </article>
-      </div>
+  <!-- ░░░ ABOUT ░░░ -->
 
-      <div class="etsy-note" style="margin-top:12px">
-        <span class="etsy-badge">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 4h16v16H4z" fill="#FDE7DA"/><path d="M7 6h10v2H9v4h6v2H9v4h8v2H7V6z" fill="#F16522"/></svg>
-          <span data-i18n="shop.etsySecure">Pagamenti e spedizioni gestiti in sicurezza su Etsy</span>
-        </span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== CATALOGO ===== -->
-  <section id="catalogue" class="section">
-    <div class="container">
-      <h3 data-i18n="catalogue.title">Catalogo</h3>
-      <p class="lead" data-i18n="catalogue.lead">Panoramica dettagliata dei vasi con più foto per ogni pezzo.</p>
-      <p class="catalogue-tagline" data-i18n="catalogue.tagline">Ogni pezzo è un’emozione unica per il tuo spazio.</p>
-
-      <div class="catalogue-grid">
-        <!-- Accetto Rosso -->
-        <article class="card">
-          <div class="media media-grid" data-modal-target="modal-v1">
-            <img src="images/catalogue/accetto-rosso-1.jpg" alt="Accetto Rosso vista frontale" />
-            <img src="images/catalogue/accetto-rosso-2.jpg" alt="Accetto Rosso vista laterale" />
-            <img src="images/catalogue/accetto-rosso-3.jpg" alt="Accetto Rosso in ambiente" />
-            <img src="images/catalogue/accetto-rosso-4.jpg" alt="Accetto Rosso dettaglio superficie" />
-            <img src="images/catalogue/accetto-rosso-5.jpg" alt="Accetto Rosso dettaglio bordo" />
-            <img src="images/catalogue/accetto-rosso-6.jpg" alt="Accetto Rosso dettaglio base" />
-          </div>
-          <div class="body">
-            <h4 data-i18n="cat.v1.name">Accetto Rosso</h4>
-            <p data-i18n="cat.v1.desc">Vaso medio in gres, smalto rosso profondo con accenti materici.</p>
-            <button class="buy" type="button" data-modal-target="modal-v1" data-i18n="catalogue.viewPhotos">Vedi foto</button>
-          </div>
-        </article>
-
-        <!-- Ракушка -->
-        <article class="card">
-          <div class="media media-grid" data-modal-target="modal-v2">
-            <img src="images/catalogue/rakushka-1.jpg" alt="Ракушка vista frontale" />
-            <img src="images/catalogue/rakushka-2.jpg" alt="Ракушка vista laterale" />
-            <img src="images/catalogue/rakushka-3.jpg" alt="Ракушка in ambiente" />
-            <img src="images/catalogue/rakushka-4.jpg" alt="Ракушка dettaglio superficie" />
-            <img src="images/catalogue/rakushka-5.jpg" alt="Ракушка dettaglio bordo" />
-            <img src="images/catalogue/rakushka-6.jpg" alt="Ракушка dettaglio base" />
-          </div>
-          <div class="body">
-            <h4 data-i18n="cat.v2.name">Ракушка</h4>
-            <p data-i18n="cat.v2.desc">Forma morbida ispirata a una conchiglia, smalti chiari e tattili.</p>
-            <button class="buy" type="button" data-modal-target="modal-v2" data-i18n="catalogue.viewPhotos">Vedi foto</button>
-          </div>
-        </article>
-
-        <!-- Липия -->
-        <article class="card">
-          <div class="media media-grid" data-modal-target="modal-v3">
-            <img src="images/catalogue/lipiya-1.jpg" alt="Липия vista frontale" />
-            <img src="images/catalogue/lipiya-2.jpg" alt="Липия vista laterale" />
-            <img src="images/catalogue/lipiya-3.jpg" alt="Липия in ambiente" />
-            <img src="images/catalogue/lipiya-4.jpg" alt="Липия dettaglio superficie" />
-            <img src="images/catalogue/lipiya-5.jpg" alt="Липия dettaglio bordo" />
-            <img src="images/catalogue/lipiya-6.jpg" alt="Липия dettaglio base" />
-          </div>
-          <div class="body">
-            <h4 data-i18n="cat.v3.name">Липия</h4>
-            <p data-i18n="cat.v3.desc">Vaso slanciato, superfici leggere con dettagli organici.</p>
-            <button class="buy" type="button" data-modal-target="modal-v3" data-i18n="catalogue.viewPhotos">Vedi foto</button>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== О БРЕНДЕ / ABOUT ===== -->
   <section id="about" class="section">
     <div class="container about">
+
       <div class="img">
-        <img src="images/anna-hero.jpg" alt="Anna nel suo studio di ceramica" />
+        <img src="images/anna-hero.jpg" alt="Anna Doronina nel suo studio">
       </div>
+
       <div>
-        <h3 data-i18n="about.title">Il brand</h3>
-        <p data-i18n="about.intro1">Mi chiamo Anna e creo ceramiche d’interni come oggetti d’arte che sostengono, ispirano e diventano parte del tuo spazio personale di forza.</p>
-        <p data-i18n="about.intro2">Credo che gli oggetti con cui viviamo influenzino il nostro stato interiore.</p>
+        <h3 data-i18n="about.title">О бренде</h3>
+
+        <p data-i18n="about.intro1">
+          Меня зовут Анна, и я создаю интерьерную керамику как объект искусства,
+          который поддерживает, вдохновляет и становится частью вашего личного пространства силы.
+        </p>
+
+        <p data-i18n="about.intro2">
+          Я верю, что предметы, с которыми мы живём, влияют на наше состояние.
+        </p>
 
         <div class="about-cta">
-          <a href="#catalogue" class="pill-btn" data-i18n="about.btnCatalogue">Catalogo</a>
-          <a href="#workshops" class="pill-btn" data-i18n="about.btnWorkshops">Masterclass</a>
+          <a href="#catalogue" class="pill-btn" data-i18n="about.btnCatalogue">Каталог</a>
+          <a href="#workshops" class="pill-btn" data-i18n="about.btnWorkshops">Мастер-классы</a>
           <a href="#giftcards" class="pill-btn" data-i18n="about.btnGiftCards">Gift Cards</a>
         </div>
 
-        <p data-i18n="about.text1">I miei vasi non sono solo forme, ma oggetti che trasformano l’atmosfera della casa, danno energia e motivano al nuovo.</p>
-        <p data-i18n="about.text2">In ogni pezzo ci sono argille ad alta temperatura, texture tattili, ricami di perle e l’unione di forme imperfette con una sensazione di lusso.</p>
+        <p data-i18n="about.text1">
+          Мои вазы — это не просто формы, а предметы, которые меняют атмосферу дома,
+          заряжают энергией и мотивируют на новое.
+        </p>
+
+        <p data-i18n="about.text2">
+          В каждой работе — высокотемпературная глина, тактильные текстуры,
+          бисерная вышивка и сочетание несовершенной формы с ощущением роскоши.
+        </p>
       </div>
     </div>
   </section>
 
-  <section id="shop" class="section">
-    <div class="container">
-      <h3 data-i18n="shop.title">Negozio</h3>
-      <p class="lead" data-i18n="shop.lead">Acquista direttamente su Etsy oppure dalla collezione qui sopra. I pulsanti “Compra su Etsy” ti portano alle singole inserzioni.</p>
+  <!-- ░░░ CATALOGO / 6 FOTO PER OGNI VASO ░░░ -->
 
-      <div class="grid">
-        <a id="etsy-shop-card" class="card" href="#" target="_blank" rel="noopener sponsored">
-          <div class="media">
-            <img src="images/etsy.jpg" alt="Vai al negozio Etsy" />
+  <section id="catalogue" class="section">
+    <div class="container">
+
+      <h3 data-i18n="catalogue.title">Каталог</h3>
+      <p class="lead" data-i18n="catalogue.lead">Каждое изделие — это уникальная эмоция для вашего пространства</p>
+
+      <div class="catalogue-grid">
+
+        <!-- ===== ACCETTO ROSSO ===== -->
+        <article class="card">
+          <div class="media media-grid" data-modal-target="modal-v1">
+            <img src="images/catalogue/accetto-rosso-1.jpg">
+            <img src="images/catalogue/accetto-rosso-2.jpg">
+            <img src="images/catalogue/accetto-rosso-3.jpg">
+            <img src="images/catalogue/accetto-rosso-4.jpg">
+            <img src="images/catalogue/accetto-rosso-5.jpg">
+            <img src="images/catalogue/accetto-rosso-6.jpg">
           </div>
           <div class="body">
-            <h4 data-i18n="shop.etsyTitle">Etsy · Negozio ufficiale</h4>
-            <p data-i18n="shop.etsy">Sfoglia tutto il catalogo, opzioni di spedizione e pagamenti protetti.</p>
-            <div class="buy" style="margin-top:10px;text-align:center" data-i18n="shop.visit">Visita negozio</div>
+            <h4 data-i18n="cat.v1.name">Accetto Rosso</h4>
+            <p data-i18n="cat.v1.desc">Глубокая красная глазурь и выразительная фактура поверхности</p>
+            <button class="buy" data-modal-target="modal-v1" data-i18n="catalogue.viewPhotos">Смотреть фото</button>
           </div>
-        </a>
+        </article>
 
-        <a class="card" href="mailto:hello@ceramicsdoronina.com">
-          <div class="media">
-            <img src="images/custom.jpg" alt="Richieste personalizzate" />
+        <!-- ===== РАКУШКА ===== -->
+        <article class="card">
+          <div class="media media-grid" data-modal-target="modal-v2">
+            <img src="images/catalogue/rakushka-1.jpg">
+            <img src="images/catalogue/rakushka-2.jpg">
+            <img src="images/catalogue/rakushka-3.jpg">
+            <img src="images/catalogue/rakushka-4.jpg">
+            <img src="images/catalogue/rakushka-5.jpg">
+            <img src="images/catalogue/rakushka-6.jpg">
           </div>
           <div class="body">
-            <h4 data-i18n="shop.custom">Richieste su misura</h4>
-            <p data-i18n="shop.customDesc">Scrivici per commissioni personalizzate.</p>
+            <h4 data-i18n="cat.v2.name">Ракушка</h4>
+            <p data-i18n="cat.v2.desc">Мягкая органичная форма и светлая тактильная глазурь</p>
+            <button class="buy" data-modal-target="modal-v2" data-i18n="catalogue.viewPhotos">Смотреть фото</button>
           </div>
-        </a>
+        </article>
 
-        <div class="card" style="display:flex;flex-direction:column;justify-content:center;align-items:center;padding:18px">
-          <div class="body" style="text-align:center">
-            <h4 data-i18n="shop.cartTitle">Hai già il tuo carrello su Etsy</h4>
-            <p class="etsy-note" data-i18n="shop.cartDesc">Quando aggiungi un prodotto su Etsy, il checkout rimane su Etsy per la massima sicurezza.</p>
+        <!-- ===== ЛИПИЯ ===== -->
+        <article class="card">
+          <div class="media media-grid" data-modal-target="modal-v3">
+            <img src="images/catalogue/lipiya-1.jpg">
+            <img src="images/catalogue/lipiya-2.jpg">
+            <img src="images/catalogue/lipiya-3.jpg">
+            <img src="images/catalogue/lipiya-4.jpg">
+            <img src="images/catalogue/lipiya-5.jpg">
+            <img src="images/catalogue/lipiya-6.jpg">
           </div>
-        </div>
+          <div class="body">
+            <h4 data-i18n="cat.v3.name">Липия</h4>
+            <p data-i18n="cat.v3.desc">Утончённый вытянутый силуэт с перламутровыми акцентами</p>
+            <button class="buy" data-modal-target="modal-v3" data-i18n="catalogue.viewPhotos">Смотреть фото</button>
+          </div>
+        </article>
+
       </div>
     </div>
   </section>
 
-  <section id="contact" class="section">
-    <div class="container">
-      <h3 data-i18n="contact.title">Contatti</h3>
-      <div class="contact-list">
-        <div class="contact-item"><strong>Email:</strong> <a href="mailto:ceramist.doronina@gmail.com">ceramist.doronina@gmail.com</a></div>
-        <div class="contact-item"><strong>Instagram:</strong> <a href="https://instagram.com/ceramicsdoronina" target="_blank" rel="noopener">@ceramicsdoronina</a></div>
-        <div class="contact-item"><strong data-i18n="contact.address">Studio:</strong> Genova, Italia</div>
-      </div>
-    </div>
-  </section>
+  <!-- ░░░ MODAL 1 – ACCETTO ROSSO ░░░ -->
 
-  <footer>
-    <div class="container">
-      © <span id="year"></span> Ceramics Doronina · <span data-i18n="footer.made">Realizzato con GitHub Pages</span>
-    </div>
-  </footer>
+  <div class="modal" id="modal-v1">
+    <div class="modal-dialog">
 
-  <!-- ===== MODAL: ACCETTO ROSSO ===== -->
-  <div class="modal" id="modal-v1" aria-hidden="true">
-    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-v1-title">
       <div class="modal-header">
-        <h4 id="modal-v1-title" data-i18n="cat.v1.name">Accetto Rosso</h4>
-        <button class="modal-close-btn" type="button" data-modal-close aria-label="Close">×</button>
+        <h4 data-i18n="cat.v1.name">Accetto Rosso</h4>
+        <button data-modal-close>×</button>
       </div>
+
       <div class="modal-body">
         <div class="modal-body-inner vase-layout">
+
           <div class="vase-detail-panel">
+
             <p class="vase-title" data-i18n="cat.v1.name">Accetto Rosso</p>
-            <p class="vase-rating">★★★★☆</p>
+            <p class="vase-rating">★★★★★</p>
 
             <div class="vase-price-row">
               <span class="vase-price">232€</span>
@@ -274,83 +195,87 @@
             </div>
 
             <div class="vase-actions">
-              <button class="vase-btn-primary" type="button" data-i18n="detail.buy">Купить</button>
-              <button class="vase-btn-outline" type="button" data-i18n="detail.addToCart">В корзину</button>
+              <button class="vase-btn-primary" data-i18n="detail.buy">КУПИТЬ</button>
+              <button class="vase-btn-outline" data-i18n="detail.addToCart">В КОРЗИНУ</button>
             </div>
 
             <div class="accordion">
-              <button class="accordion-header" type="button">
-                <span data-i18n="detail.description">Описание</span>
-                <span class="accordion-arrow">⌄</span>
+
+              <!-- Описание -->
+              <button class="accordion-header">
+                <span data-i18n="detail.description">Описание</span><span class="accordion-arrow">⌄</span>
               </button>
               <div class="accordion-panel">
-                <p data-i18n="cat.v1.longDesc">Ваза «Accetto Rosso» с глубокой красной глазурью и фактурной поверхностью, которая напоминает камень и морские водоросли.</p>
+                <p data-i18n="cat.v1.longDesc">
+                  Ваза «Accetto Rosso» с глубокой красной глазурью и фактурной поверхностью, напоминающей камень и морскую воду.
+                </p>
               </div>
 
-              <button class="accordion-header" type="button">
-                <span data-i18n="detail.characteristics">Характеристики</span>
-                <span class="accordion-arrow">⌄</span>
+              <!-- Характеристики -->
+              <button class="accordion-header">
+                <span data-i18n="detail.characteristics">Характеристики</span><span class="accordion-arrow">⌄</span>
               </button>
               <div class="accordion-panel">
                 <div class="vase-specs">
-                  <h5 data-i18n="catalogue.specTitle">Specifiche</h5>
                   <dl>
-                    <dt data-i18n="catalogue.spec.height">Altezza</dt>
-                    <dd>—</dd>
-                    <dt data-i18n="catalogue.spec.diameter">Diametro</dt>
-                    <dd>—</dd>
-                    <dt data-i18n="catalogue.spec.material">Materiale</dt>
-                    <dd>—</dd>
-                    <dt data-i18n="catalogue.spec.technique">Tecnica</dt>
-                    <dd>—</dd>
-                    <dt data-i18n="catalogue.spec.finish">Finitura</dt>
-                    <dd>—</dd>
+                    <dt data-i18n="catalogue.spec.height">Высота</dt><dd>—</dd>
+                    <dt data-i18n="catalogue.spec.diameter">Диаметр</dt><dd>—</dd>
+                    <dt data-i18n="catalogue.spec.material">Материал</dt><dd>—</dd>
+                    <dt data-i18n="catalogue.spec.technique">Техника</dt><dd>—</dd>
+                    <dt data-i18n="catalogue.spec.finish">Покрытие</dt><dd>—</dd>
                   </dl>
                 </div>
               </div>
 
-              <button class="accordion-header" type="button">
-                <span data-i18n="detail.delivery">Доставка</span>
-                <span class="accordion-arrow">⌄</span>
+              <!-- Доставка -->
+              <button class="accordion-header">
+                <span data-i18n="detail.delivery">Доставка</span><span class="accordion-arrow">⌄</span>
               </button>
               <div class="accordion-panel">
                 <p data-i18n="detail.deliveryText">
-                  Мы отправляем заказы по всему миру из Генуи, Италия. Сроки и стоимость доставки зависят от страны; по особым запросам напишите нам на email.
+                  Мы отправляем изделия по всему миру. Стоимость и сроки зависят от страны. По запросу — индивидуальная упаковка.
                 </p>
               </div>
+
             </div>
           </div>
 
           <div class="modal-gallery">
             <div class="modal-gallery-main">
-              <img src="images/catalogue/accetto-rosso-1.jpg" alt="Accetto Rosso vista frontale" data-slide>
-              <img src="images/catalogue/accetto-rosso-2.jpg" alt="Accetto Rosso vista laterale" data-slide>
-              <img src="images/catalogue/accetto-rosso-3.jpg" alt="Accetto Rosso in ambiente" data-slide>
-              <img src="images/catalogue/accetto-rosso-4.jpg" alt="Accetto Rosso dettaglio superficie" data-slide>
-              <img src="images/catalogue/accetto-rosso-5.jpg" alt="Accetto Rosso dettaglio bordo" data-slide>
-              <img src="images/catalogue/accetto-rosso-6.jpg" alt="Accetto Rosso dettaglio base" data-slide>
+              <img src="images/catalogue/accetto-rosso-1.jpg" data-slide>
+              <img src="images/catalogue/accetto-rosso-2.jpg" data-slide>
+              <img src="images/catalogue/accetto-rosso-3.jpg" data-slide>
+              <img src="images/catalogue/accetto-rosso-4.jpg" data-slide>
+              <img src="images/catalogue/accetto-rosso-5.jpg" data-slide>
+              <img src="images/catalogue/accetto-rosso-6.jpg" data-slide>
             </div>
+
             <div class="modal-gallery-controls">
-              <button class="modal-nav-btn" type="button" data-gallery-prev>&lsaquo;</button>
-              <span class="modal-counter" data-gallery-counter>1 / 6</span>
-              <button class="modal-nav-btn" type="button" data-gallery-next>&rsaquo;</button>
+              <button data-gallery-prev>&lsaquo;</button>
+              <span data-gallery-counter>1 / 6</span>
+              <button data-gallery-next>&rsaquo;</button>
             </div>
+
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ===== MODAL: РАКУШКА ===== -->
-  <div class="modal" id="modal-v2" aria-hidden="true">
-    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-v2-title">
+  <!-- ░░░ MODAL 2 – РАКУШКА ░░░ -->
+  <div class="modal" id="modal-v2">
+    <div class="modal-dialog">
+
       <div class="modal-header">
-        <h4 id="modal-v2-title" data-i18n="cat.v2.name">Ракушка</h4>
-        <button class="modal-close-btn" type="button" data-modal-close aria-label="Close">×</button>
+        <h4 data-i18n="cat.v2.name">Ракушка</h4>
+        <button data-modal-close>×</button>
       </div>
+
       <div class="modal-body">
         <div class="modal-body-inner vase-layout">
+
           <div class="vase-detail-panel">
+
             <p class="vase-title" data-i18n="cat.v2.name">Ракушка</p>
             <p class="vase-rating">★★★★★</p>
 
@@ -361,83 +286,84 @@
             </div>
 
             <div class="vase-actions">
-              <button class="vase-btn-primary" type="button" data-i18n="detail.buy">Купить</button>
-              <button class="vase-btn-outline" type="button" data-i18n="detail.addToCart">В корзину</button>
+              <button class="vase-btn-primary" data-i18n="detail.buy">КУПИТЬ</button>
+              <button class="vase-btn-outline" data-i18n="detail.addToCart">В КОРЗИНУ</button>
             </div>
 
             <div class="accordion">
-              <button class="accordion-header" type="button">
-                <span data-i18n="detail.description">Описание</span>
-                <span class="accordion-arrow">⌄</span>
+
+              <button class="accordion-header">
+                <span data-i18n="detail.description">Описание</span><span class="accordion-arrow">⌄</span>
               </button>
               <div class="accordion-panel">
-                <p data-i18n="cat.v2.longDesc">Ваза «Ракушка» с мягкими изгибами и светлой глазурью, напоминающей морскую пену и песок.</p>
+                <p data-i18n="cat.v2.longDesc">
+                  Ваза «Ракушка» с мягкими изгибами и светлой глазурью, напоминающей морскую пену и песок.
+                </p>
               </div>
 
-              <button class="accordion-header" type="button">
-                <span data-i18n="detail.characteristics">Характеристики</span>
-                <span class="accordion-arrow">⌄</span>
+              <button class="accordion-header">
+                <span data-i18n="detail.characteristics">Характеристики</span><span class="accordion-arrow">⌄</span>
               </button>
               <div class="accordion-panel">
                 <div class="vase-specs">
-                  <h5 data-i18n="catalogue.specTitle">Specifiche</h5>
                   <dl>
-                    <dt data-i18n="catalogue.spec.height">Altezza</dt>
-                    <dd>—</dd>
-                    <dt data-i18n="catalogue.spec.diameter">Diametro</dt>
-                    <dd>—</dd>
-                    <dt data-i18n="catalogue.spec.material">Materiale</dt>
-                    <dd>—</dd>
-                    <dt data-i18n="catalogue.spec.technique">Tecnica</dt>
-                    <dd>—</dd>
-                    <dt data-i18n="catalogue.spec.finish">Finitura</dt>
-                    <dd>—</dd>
+                    <dt data-i18n="catalogue.spec.height">Высота</dt><dd>—</dd>
+                    <dt data-i18n="catalogue.spec.diameter">Диаметр</dt><dd>—</dd>
+                    <dt data-i18n="catalogue.spec.material">Материал</dt><dd>—</dd>
+                    <dt data-i18n="catalogue.spec.technique">Техника</dt><dd>—</dd>
+                    <dt data-i18n="catalogue.spec.finish">Покрытие</dt><dd>—</dd>
                   </dl>
                 </div>
               </div>
 
-              <button class="accordion-header" type="button">
-                <span data-i18n="detail.delivery">Доставка</span>
-                <span class="accordion-arrow">⌄</span>
+              <button class="accordion-header">
+                <span data-i18n="detail.delivery">Доставка</span><span class="accordion-arrow">⌄</span>
               </button>
               <div class="accordion-panel">
                 <p data-i18n="detail.deliveryText">
-                  Мы отправляем заказы по всему миру из Генуи, Италия. Сроки и стоимость доставки зависят от страны; по особым запросам напишите нам на email.
+                  Мы отправляем изделия по всему миру. Стоимость и сроки зависят от страны.
                 </p>
               </div>
+
             </div>
           </div>
 
           <div class="modal-gallery">
             <div class="modal-gallery-main">
-              <img src="images/catalogue/rakushka-1.jpg" alt="Ракушка vista frontale" data-slide>
-              <img src="images/catalogue/rakushka-2.jpg" alt="Ракушка vista laterale" data-slide>
-              <img src="images/catalogue/rakushka-3.jpg" alt="Ракушка in ambiente" data-slide>
-              <img src="images/catalogue/rakushka-4.jpg" alt="Ракушка dettaglio superficie" data-slide>
-              <img src="images/catalogue/rakushka-5.jpg" alt="Ракушка dettaglio bordo" data-slide>
-              <img src="images/catalogue/rakushka-6.jpg" alt="Ракушка dettaglio base" data-slide>
+              <img src="images/catalogue/rakushka-1.jpg" data-slide>
+              <img src="images/catalogue/rakushka-2.jpg" data-slide>
+              <img src="images/catalogue/rakushka-3.jpg" data-slide>
+              <img src="images/catalogue/rakushka-4.jpg" data-slide>
+              <img src="images/catalogue/rakushka-5.jpg" data-slide>
+              <img src="images/catalogue/rakushka-6.jpg" data-slide>
             </div>
             <div class="modal-gallery-controls">
-              <button class="modal-nav-btn" type="button" data-gallery-prev>&lsaquo;</button>
-              <span class="modal-counter" data-gallery-counter>1 / 6</span>
-              <button class="modal-nav-btn" type="button" data-gallery-next>&rsaquo;</button>
+              <button data-gallery-prev>&lsaquo;</button>
+              <span data-gallery-counter>1 / 6</span>
+              <button data-gallery-next>&rsaquo;</button>
             </div>
           </div>
+
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ===== MODAL: ЛИПИЯ ===== -->
-  <div class="modal" id="modal-v3" aria-hidden="true">
-    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-v3-title">
+  <!-- ░░░ MODAL 3 – ЛИПИЯ ░░░ -->
+
+  <div class="modal" id="modal-v3">
+    <div class="modal-dialog">
+
       <div class="modal-header">
-        <h4 id="modal-v3-title" data-i18n="cat.v3.name">Липия</h4>
-        <button class="modal-close-btn" type="button" data-modal-close aria-label="Close">×</button>
+        <h4 data-i18n="cat.v3.name">Липия</h4>
+        <button data-modal-close>×</button>
       </div>
+
       <div class="modal-body">
         <div class="modal-body-inner vase-layout">
+
           <div class="vase-detail-panel">
+
             <p class="vase-title" data-i18n="cat.v3.name">Липия</p>
             <p class="vase-rating">★★★★☆</p>
 
@@ -448,72 +374,90 @@
             </div>
 
             <div class="vase-actions">
-              <button class="vase-btn-primary" type="button" data-i18n="detail.buy">Купить</button>
-              <button class="vase-btn-outline" type="button" data-i18n="detail.addToCart">В корзину</button>
+              <button class="vase-btn-primary" data-i18n="detail.buy">КУПИТЬ</button>
+              <button class="vase-btn-outline" data-i18n="detail.addToCart">В КОРЗИНУ</button>
             </div>
 
             <div class="accordion">
-              <button class="accordion-header" type="button">
-                <span data-i18n="detail.description">Описание</span>
-                <span class="accordion-arrow">⌄</span>
+
+              <button class="accordion-header">
+                <span data-i18n="detail.description">Описание</span><span class="accordion-arrow">⌄</span>
               </button>
               <div class="accordion-panel">
-                <p data-i18n="cat.v3.longDesc">Ваза «Липия» с вытянутым силуэтом и мягкими органичными линиями, которые подчёркивают перламутровые акценты глазури.</p>
+                <p data-i18n="cat.v3.longDesc">
+                  Ваза «Липия» с вытянутым силуэтом и мягкими линиями, подчёркивающими перламутровые акценты глазури.
+                </p>
               </div>
 
-              <button class="accordion-header" type="button">
-                <span data-i18n="detail.characteristics">Характеристики</span>
-                <span class="accordion-arrow">⌄</span>
+              <button class="accordion-header">
+                <span data-i18n="detail.characteristics">Характеристики</span><span class="accordion-arrow">⌄</span>
               </button>
               <div class="accordion-panel">
                 <div class="vase-specs">
-                  <h5 data-i18n="catalogue.specTitle">Specifiche</h5>
                   <dl>
-                    <dt data-i18n="catalogue.spec.height">Altezza</dt>
-                    <dd>—</dd>
-                    <dt data-i18n="catalogue.spec.diameter">Diametro</dt>
-                    <dd>—</dd>
-                    <dt data-i18n="catalogue.spec.material">Materiale</dt>
-                    <dd>—</dd>
-                    <dt data-i18n="catalogue.spec.technique">Tecnica</dt>
-                    <dd>—</dd>
-                    <dt data-i18n="catalogue.spec.finish">Finitura</dt>
-                    <dd>—</dd>
+                    <dt data-i18n="catalogue.spec.height">Высота</dt><dd>—</dd>
+                    <dt data-i18n="catalogue.spec.diameter">Диаметр</dt><dd>—</dd>
+                    <dt data-i18n="catalogue.spec.material">Материал</dt><dd>—</dd>
+                    <dt data-i18n="catalogue.spec.technique">Техника</dt><dd>—</dd>
+                    <dt data-i18n="catalogue.spec.finish">Покрытие</dt><dd>—</dd>
                   </dl>
                 </div>
               </div>
 
-              <button class="accordion-header" type="button">
-                <span data-i18n="detail.delivery">Доставка</span>
-                <span class="accordion-arrow">⌄</span>
+              <button class="accordion-header">
+                <span data-i18n="detail.delivery">Доставка</span><span class="accordion-arrow">⌄</span>
               </button>
               <div class="accordion-panel">
                 <p data-i18n="detail.deliveryText">
-                  Мы отправляем заказы по всему миру из Генуи, Италия. Сроки и стоимость доставки зависят от страны; по особым запросам напишите нам на email.
+                  Мы отправляем изделия по всему миру. Стоимость и сроки зависят от страны.
                 </p>
               </div>
+
             </div>
           </div>
 
           <div class="modal-gallery">
             <div class="modal-gallery-main">
-              <img src="images/catalogue/lipiya-1.jpg" alt="Липия vista frontale" data-slide>
-              <img src="images/catalogue/lipiya-2.jpg" alt="Липия vista laterale" data-slide>
-              <img src="images/catalogue/lipiya-3.jpg" alt="Липия in ambiente" data-slide>
-              <img src="images/catalogue/lipiya-4.jpg" alt="Липия dettaglio superficie" data-slide>
-              <img src="images/catalogue/lipiya-5.jpg" alt="Липия dettaglio bordo" data-slide>
-              <img src="images/catalogue/lipiya-6.jpg" alt="Липия dettaglio base" data-slide>
+              <img src="images/catalogue/lipiya-1.jpg" data-slide>
+              <img src="images/catalogue/lipiya-2.jpg" data-slide>
+              <img src="images/catalogue/lipiya-3.jpg" data-slide>
+              <img src="images/catalogue/lipiya-4.jpg" data-slide>
+              <img src="images/catalogue/lipiya-5.jpg" data-slide>
+              <img src="images/catalogue/lipiya-6.jpg" data-slide>
             </div>
             <div class="modal-gallery-controls">
-              <button class="modal-nav-btn" type="button" data-gallery-prev>&lsaquo;</button>
-              <span class="modal-counter" data-gallery-counter>1 / 6</span>
-              <button class="modal-nav-btn" type="button" data-gallery-next>&rsaquo;</button>
+              <button data-gallery-prev>&lsaquo;</button>
+              <span data-gallery-counter>1 / 6</span>
+              <button data-gallery-next>&rsaquo;</button>
             </div>
           </div>
+
         </div>
       </div>
     </div>
   </div>
+
+  <!-- ░░░ CONTACT ░░░ -->
+
+  <section id="contact" class="section">
+    <div class="container">
+      <h3 data-i18n="contact.title">Контакты</h3>
+
+      <div class="contact-list">
+        <div class="contact-item"><strong>Email:</strong> <a href="mailto:ceramist.doronina@gmail.com">ceramist.doronina@gmail.com</a></div>
+        <div class="contact-item"><strong>Instagram:</strong> <a href="https://instagram.com/ceramicsdoronina">@ceramicsdoronina</a></div>
+        <div class="contact-item"><strong data-i18n="contact.address">Адрес мастерской:</strong> Genova, Italy</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ░░░ FOOTER ░░░ -->
+  <footer>
+    <div class="container">
+      © <span id="year"></span> Doronina · <span data-i18n="footer.made">Сайт создан на GitHub Pages</span>
+    </div>
+  </footer>
 
 </body>
 </html>
