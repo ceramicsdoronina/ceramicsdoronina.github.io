@@ -219,8 +219,8 @@
     .modal-dialog{
       background:#fff;
       border-radius:18px;
-      max-width:800px;
-      width:90%;
+      max-width:900px;
+      width:92%;
       max-height:90vh;
       overflow:hidden;
       box-shadow:0 25px 60px rgba(15,23,42,.4);
@@ -248,8 +248,13 @@
       color:#6b7280;
     }
     .modal-body{
-      padding:14px 16px 18px;
+      padding:16px 18px 20px;
       overflow-y:auto;
+    }
+    .modal-body-inner{
+      display:flex;
+      flex-direction:column;
+      gap:16px;
     }
 
     .modal-gallery{
@@ -259,7 +264,7 @@
     }
     .modal-gallery-main{
       position:relative;
-      aspect-ratio:4/3;
+      aspect-ratio:3/2;
       overflow:hidden;
       border-radius:14px;
       background:#f9fafb;
@@ -301,7 +306,6 @@
 
     /* Vase specs */
     .vase-specs{
-      margin-top:14px;
       font-size:14px;
       color:var(--text);
     }
@@ -324,19 +328,100 @@
       margin:0;
     }
 
-    /* Responsive */
+    /* VIEW SWITCH BANNERS */
+    .view-switch{
+      display:none;
+      font-size:13px;
+    }
+    .view-switch .container{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      padding:6px 20px;
+    }
+    .view-switch-btn{
+      border-radius:999px;
+      border:1px solid #fbbf24;
+      padding:4px 10px;
+      background:#fffbeb;
+      cursor:pointer;
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .view-switch-btn:hover{
+      background:#fef3c7;
+    }
+
+    .view-switch--mobile{
+      background:#fef3c7;
+      border-bottom:1px solid #fde68a;
+    }
+    .view-switch--desktop{
+      background:#e0f2fe;
+      border-bottom:1px solid #bfdbfe;
+    }
+
+    body.mobile-view .view-switch--mobile{
+      display:block;
+    }
+    body.desktop-view .view-switch--desktop{
+      display:block;
+    }
+    /* se desktop-view è attiva, niente banner mobile */
+    body.desktop-view .view-switch--mobile{
+      display:none;
+    }
+
+    /* MOBILE-VIEW OVERRIDES */
+    body.mobile-view header{
+      position:static;
+    }
+    body.mobile-view .hero .wrap{
+      grid-template-columns:1fr;
+      padding:28px 0 24px;
+    }
+    body.mobile-view .hero .copy h2{
+      font-size:28px;
+    }
+    body.mobile-view .hero .cover{
+      display:none; /* nasconde l'immagine grande su mobile */
+    }
+    body.mobile-view .section{
+      padding:32px 0;
+    }
+    body.mobile-view .section h3{
+      font-size:24px;
+    }
+    body.mobile-view .grid{
+      grid-template-columns:1fr;
+    }
+    body.mobile-view .catalogue-grid{
+      grid-template-columns:1fr;
+    }
+    body.mobile-view .contact-list{
+      grid-template-columns:1fr;
+    }
+    body.mobile-view .card{
+      border-radius:14px;
+    }
+    body.mobile-view .card .body{
+      padding:10px 12px 14px;
+    }
+
+    /* Responsive (desktop baseline + fallback) */
     @media (max-width: 960px){
-      .hero .wrap{grid-template-columns:1fr}
-      .grid{grid-template-columns:1fr 1fr}
+      body.desktop-view .hero .wrap{grid-template-columns:1fr}
+      body.desktop-view .grid{grid-template-columns:1fr 1fr}
       .about{grid-template-columns:1fr}
       .contact-list{grid-template-columns:1fr}
-      .catalogue-grid{grid-template-columns:1fr 2fr}
+      body.desktop-view .catalogue-grid{grid-template-columns:1fr 2fr}
     }
     @media (max-width: 720px){
-      .catalogue-grid{grid-template-columns:1fr}
+      body.desktop-view .catalogue-grid{grid-template-columns:1fr}
     }
     @media (max-width: 560px){
-      .grid{grid-template-columns:1fr}
+      body.desktop-view .grid{grid-template-columns:1fr}
       .hero .copy h2{font-size:32px}
       .nav {flex-wrap: wrap; gap: 10px;}
       .lang {margin-left: auto;}
@@ -371,6 +456,28 @@
 
     </div>
   </header>
+
+  <!-- Banner vista desktop -->
+  <div class="view-switch view-switch--desktop">
+    <div class="container">
+      <span data-i18n="view.desktopInfo">
+        Stai visualizzando la versione completa per computer.
+      </span>
+      <button class="view-switch-btn" type="button" data-view-switch="mobile" data-i18n="view.toMobile">
+        Vai alla versione cellulare
+      </button>
+    </div>
+  </div>
+
+  <!-- Banner vista mobile -->
+  <div class="view-switch view-switch--mobile">
+    <div class="container">
+      <span data-i18n="view.mobileInfo">Stai visualizzando la versione ottimizzata per cellulare.</span>
+      <button class="view-switch-btn" type="button" data-view-switch="desktop" data-i18n="view.toDesktop">
+        Vai alla versione completa
+      </button>
+    </div>
+  </div>
 
   <main id="home" class="hero">
     <div class="container wrap">
@@ -578,36 +685,38 @@
         <button class="modal-close-btn" type="button" data-modal-close aria-label="Close">×</button>
       </div>
       <div class="modal-body">
-        <div class="modal-gallery">
-          <div class="modal-gallery-main">
-            <img src="images/catalogue/accetto-rosso-1.jpg" alt="Accetto Rosso vista frontale" data-slide>
-            <img src="images/catalogue/accetto-rosso-2.jpg" alt="Accetto Rosso vista laterale" data-slide>
-            <img src="images/catalogue/accetto-rosso-3.jpg" alt="Accetto Rosso in ambiente" data-slide>
-            <img src="images/catalogue/accetto-rosso-4.jpg" alt="Accetto Rosso dettaglio superficie" data-slide>
-            <img src="images/catalogue/accetto-rosso-5.jpg" alt="Accetto Rosso dettaglio bordo" data-slide>
-            <img src="images/catalogue/accetto-rosso-6.jpg" alt="Accetto Rosso dettaglio base" data-slide>
+        <div class="modal-body-inner">
+          <div class="vase-specs">
+            <h5 data-i18n="catalogue.specTitle">Specifiche</h5>
+            <dl>
+              <dt data-i18n="catalogue.spec.height">Altezza</dt>
+              <dd>—</dd>
+              <dt data-i18n="catalogue.spec.diameter">Diametro</dt>
+              <dd>—</dd>
+              <dt data-i18n="catalogue.spec.material">Materiale</dt>
+              <dd>—</dd>
+              <dt data-i18n="catalogue.spec.technique">Tecnica</dt>
+              <dd>—</dd>
+              <dt data-i18n="catalogue.spec.finish">Finitura</dt>
+              <dd>—</dd>
+            </dl>
           </div>
-          <div class="modal-gallery-controls">
-            <button class="modal-nav-btn" type="button" data-gallery-prev>&lsaquo;</button>
-            <span class="modal-counter" data-gallery-counter>1 / 6</span>
-            <button class="modal-nav-btn" type="button" data-gallery-next>&rsaquo;</button>
-          </div>
-        </div>
 
-        <div class="vase-specs">
-          <h5 data-i18n="catalogue.specTitle">Specifiche</h5>
-          <dl>
-            <dt data-i18n="catalogue.spec.height">Altezza</dt>
-            <dd>—</dd>
-            <dt data-i18n="catalogue.spec.diameter">Diametro</dt>
-            <dd>—</dd>
-            <dt data-i18n="catalogue.spec.material">Materiale</dt>
-            <dd>—</dd>
-            <dt data-i18n="catalogue.spec.technique">Tecnica</dt>
-            <dd>—</dd>
-            <dt data-i18n="catalogue.spec.finish">Finitura</dt>
-            <dd>—</dd>
-          </dl>
+          <div class="modal-gallery">
+            <div class="modal-gallery-main">
+              <img src="images/catalogue/accetto-rosso-1.jpg" alt="Accetto Rosso vista frontale" data-slide>
+              <img src="images/catalogue/accetto-rosso-2.jpg" alt="Accetto Rosso vista laterale" data-slide>
+              <img src="images/catalogue/accetto-rosso-3.jpg" alt="Accetto Rosso in ambiente" data-slide>
+              <img src="images/catalogue/accetto-rosso-4.jpg" alt="Accetto Rosso dettaglio superficie" data-slide>
+              <img src="images/catalogue/accetto-rosso-5.jpg" alt="Accetto Rosso dettaglio bordo" data-slide>
+              <img src="images/catalogue/accetto-rosso-6.jpg" alt="Accetto Rosso dettaglio base" data-slide>
+            </div>
+            <div class="modal-gallery-controls">
+              <button class="modal-nav-btn" type="button" data-gallery-prev>&lsaquo;</button>
+              <span class="modal-counter" data-gallery-counter>1 / 6</span>
+              <button class="modal-nav-btn" type="button" data-gallery-next>&rsaquo;</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -621,36 +730,38 @@
         <button class="modal-close-btn" type="button" data-modal-close aria-label="Close">×</button>
       </div>
       <div class="modal-body">
-        <div class="modal-gallery">
-          <div class="modal-gallery-main">
-            <img src="images/catalogue/rakushka-1.jpg" alt="Ракушка vista frontale" data-slide>
-            <img src="images/catalogue/rakushka-2.jpg" alt="Ракушка vista laterale" data-slide>
-            <img src="images/catalogue/rakushka-3.jpg" alt="Ракушка in ambiente" data-slide>
-            <img src="images/catalogue/rakushka-4.jpg" alt="Ракушка dettaglio superficie" data-slide>
-            <img src="images/catalogue/rakushka-5.jpg" alt="Ракушка dettaglio bordo" data-slide>
-            <img src="images/catalogue/rakushka-6.jpg" alt="Ракушка dettaglio base" data-slide>
+        <div class="modal-body-inner">
+          <div class="vase-specs">
+            <h5 data-i18n="catalogue.specTitle">Specifiche</h5>
+            <dl>
+              <dt data-i18n="catalogue.spec.height">Altezza</dt>
+              <dd>—</dd>
+              <dt data-i18n="catalogue.spec.diameter">Diametro</dt>
+              <dd>—</dd>
+              <dt data-i18n="catalogue.spec.material">Materiale</dt>
+              <dd>—</dd>
+              <dt data-i18n="catalogue.spec.technique">Tecnica</dt>
+              <dd>—</dd>
+              <dt data-i18n="catalogue.spec.finish">Finitura</dt>
+              <dd>—</dd>
+            </dl>
           </div>
-          <div class="modal-gallery-controls">
-            <button class="modal-nav-btn" type="button" data-gallery-prev>&lsaquo;</button>
-            <span class="modal-counter" data-gallery-counter>1 / 6</span>
-            <button class="modal-nav-btn" type="button" data-gallery-next>&rsaquo;</button>
-          </div>
-        </div>
 
-        <div class="vase-specs">
-          <h5 data-i18n="catalogue.specTitle">Specifiche</h5>
-          <dl>
-            <dt data-i18n="catalogue.spec.height">Altezza</dt>
-            <dd>—</dd>
-            <dt data-i18n="catalogue.spec.diameter">Diametro</dt>
-            <dd>—</dd>
-            <dt data-i18n="catalogue.spec.material">Materiale</dt>
-            <dd>—</dd>
-            <dt data-i18n="catalogue.spec.technique">Tecnica</dt>
-            <dd>—</dd>
-            <dt data-i18n="catalogue.spec.finish">Finitura</dt>
-            <dd>—</dd>
-          </dl>
+          <div class="modal-gallery">
+            <div class="modal-gallery-main">
+              <img src="images/catalogue/rakushka-1.jpg" alt="Ракушка vista frontale" data-slide>
+              <img src="images/catalogue/rakushka-2.jpg" alt="Ракушка vista laterale" data-slide>
+              <img src="images/catalogue/rakushka-3.jpg" alt="Ракушка in ambiente" data-slide>
+              <img src="images/catalogue/rakushka-4.jpg" alt="Ракушка dettaglio superficie" data-slide>
+              <img src="images/catalogue/rakushka-5.jpg" alt="Ракушка dettaglio bordo" data-slide>
+              <img src="images/catalogue/rakushka-6.jpg" alt="Ракушка dettaglio base" data-slide>
+            </div>
+            <div class="modal-gallery-controls">
+              <button class="modal-nav-btn" type="button" data-gallery-prev>&lsaquo;</button>
+              <span class="modal-counter" data-gallery-counter>1 / 6</span>
+              <button class="modal-nav-btn" type="button" data-gallery-next>&rsaquo;</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -664,36 +775,38 @@
         <button class="modal-close-btn" type="button" data-modal-close aria-label="Close">×</button>
       </div>
       <div class="modal-body">
-        <div class="modal-gallery">
-          <div class="modal-gallery-main">
-            <img src="images/catalogue/lipiya-1.jpg" alt="Липия vista frontale" data-slide>
-            <img src="images/catalogue/lipiya-2.jpg" alt="Липия vista laterale" data-slide>
-            <img src="images/catalogue/lipiya-3.jpg" alt="Липия in ambiente" data-slide>
-            <img src="images/catalogue/lipiya-4.jpg" alt="Липия dettaglio superficie" data-slide>
-            <img src="images/catalogue/lipiya-5.jpg" alt="Липия dettaglio bordo" data-slide>
-            <img src="images/catalogue/lipiya-6.jpg" alt="Липия dettaglio base" data-slide>
+        <div class="modal-body-inner">
+          <div class="vase-specs">
+            <h5 data-i18n="catalogue.specTitle">Specifiche</h5>
+            <dl>
+              <dt data-i18n="catalogue.spec.height">Altezza</dt>
+              <dd>—</dd>
+              <dt data-i18n="catalogue.spec.diameter">Diametro</dt>
+              <dd>—</dd>
+              <dt data-i18n="catalogue.spec.material">Materiale</dt>
+              <dd>—</dd>
+              <dt data-i18n="catalogue.spec.technique">Tecnica</dt>
+              <dd>—</dd>
+              <dt data-i18n="catalogue.spec.finish">Finitura</dt>
+              <dd>—</dd>
+            </dl>
           </div>
-          <div class="modal-gallery-controls">
-            <button class="modal-nav-btn" type="button" data-gallery-prev>&lsaquo;</button>
-            <span class="modal-counter" data-gallery-counter>1 / 6</span>
-            <button class="modal-nav-btn" type="button" data-gallery-next>&rsaquo;</button>
-          </div>
-        </div>
 
-        <div class="vase-specs">
-          <h5 data-i18n="catalogue.specTitle">Specifiche</h5>
-          <dl>
-            <dt data-i18n="catalogue.spec.height">Altezza</dt>
-            <dd>—</dd>
-            <dt data-i18n="catalogue.spec.diameter">Diametro</dt>
-            <dd>—</dd>
-            <dt data-i18n="catalogue.spec.material">Materiale</dt>
-            <dd>—</dd>
-            <dt data-i18n="catalogue.spec.technique">Tecnica</dt>
-            <dd>—</dd>
-            <dt data-i18n="catalogue.spec.finish">Finitura</dt>
-            <dd>—</dd>
-          </dl>
+          <div class="modal-gallery">
+            <div class="modal-gallery-main">
+              <img src="images/catalogue/lipiya-1.jpg" alt="Липия vista frontale" data-slide>
+              <img src="images/catalogue/lipiya-2.jpg" alt="Липия vista laterale" data-slide>
+              <img src="images/catalogue/lipiya-3.jpg" alt="Липия in ambiente" data-slide>
+              <img src="images/catalogue/lipiya-4.jpg" alt="Липия dettaglio superficie" data-slide>
+              <img src="images/catalogue/lipiya-5.jpg" alt="Липия dettaglio bordo" data-slide>
+              <img src="images/catalogue/lipiya-6.jpg" alt="Липия dettaglio base" data-slide>
+            </div>
+            <div class="modal-gallery-controls">
+              <button class="modal-nav-btn" type="button" data-gallery-prev>&lsaquo;</button>
+              <span class="modal-counter" data-gallery-counter>1 / 6</span>
+              <button class="modal-nav-btn" type="button" data-gallery-next>&rsaquo;</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -736,6 +849,12 @@
             finish:"Finitura"
           }
         },
+        view:{
+          mobileInfo:"Stai visualizzando la versione ottimizzata per cellulare.",
+          toDesktop:"Vai alla versione completa",
+          desktopInfo:"Stai visualizzando la versione completa per computer.",
+          toMobile:"Vai alla versione cellulare"
+        },
         p1:{name:"Vaso Avorio",desc:"Superficie sabbiata, dettagli perlacei."},
         p2:{name:"Tazza Mare",desc:"Smalto blu profondo, interno lucido."},
         p3:{name:"Piatto Onde",desc:"Bordo irregolare, texture naturale."},
@@ -767,6 +886,12 @@
             finish:"Finish"
           }
         },
+        view:{
+          mobileInfo:"You are viewing the mobile-optimized version.",
+          toDesktop:"Go to full version",
+          desktopInfo:"You are viewing the full desktop version.",
+          toMobile:"Switch to mobile version"
+        },
         p1:{name:"Ivory Vase",desc:"Sanded surface, pearly details."},
         p2:{name:"Sea Cup",desc:"Deep blue glaze, glossy interior."},
         p3:{name:"Waves Plate",desc:"Irregular rim, natural texture."},
@@ -797,6 +922,12 @@
             technique:"Техника",
             finish:"Покрытие"
           }
+        },
+        view:{
+          mobileInfo:"Вы просматриваете мобильную версию сайта.",
+          toDesktop:"Перейти к полной версии",
+          desktopInfo:"Вы просматриваете полную версию сайта.",
+          toMobile:"Перейти к мобильной версии"
         },
         p1:{name:"Ваза Ivory",desc:"Песчаная поверхность, перламутровые детали."},
         p2:{name:"Чаша Mare",desc:"Глубокая синяя глазурь, блестящая внутренняя часть."},
@@ -843,12 +974,38 @@
       return 'it';
     };
 
+    // === VIEW MODE (DESKTOP / MOBILE) ===
+    const isMobileDevice = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    const applyViewMode = () => {
+      const mode = localStorage.getItem('viewMode') || (isMobileDevice ? 'mobile' : 'desktop');
+      document.body.classList.toggle('mobile-view', mode === 'mobile');
+      document.body.classList.toggle('desktop-view', mode === 'desktop');
+    };
+
+    const setViewMode = (mode) => {
+      localStorage.setItem('viewMode', mode);
+      applyViewMode();
+    };
+
+    // Event listeners lingua
     document.getElementById('language-selector').addEventListener('change', (e) => {
       setLang(e.target.value);
     });
 
+    // Inizializzazione lingua + view mode
     setLang(getPreferredLanguage());
+    applyViewMode();
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Tasti cambio vista (desktop <-> mobile)
+    document.querySelectorAll('[data-view-switch]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-view-switch');
+        if (target === 'desktop') setViewMode('desktop');
+        if (target === 'mobile') setViewMode('mobile');
+      });
+    });
 
     // === MODAL & GALLERY LOGIC ===
     const openButtons = document.querySelectorAll('[data-modal-target]');
