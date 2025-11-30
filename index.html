@@ -6,13 +6,13 @@
   <title>Ceramics Doronina · Handmade Ceramics · IT/EN/RU</title>
   <meta name="description" content="Ceramics Doronina · Handmade Ceramics · Итальянская художественная керамика ручной работы" />
 
-  <!-- CSS esterno -->
+  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 
   <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-  <!-- JS esterno -->
+  <!-- JS -->
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -39,11 +39,10 @@
           <option value="ru">🇷🇺 RU</option>
         </select>
       </div>
-
     </div>
   </header>
 
-  <!-- Piccolo toggle fisso in basso a destra -->
+  <!-- piccolo bottone fisso Mobile/Desktop -->
   <div class="view-toggle">
     <button type="button" id="view-toggle-btn" aria-label="Cambia vista">Mobile</button>
   </div>
@@ -116,11 +115,12 @@
     </div>
   </section>
 
-  <!-- === CATALOGUE SECTION === -->
+  <!-- ===== CATALOGO ===== -->
   <section id="catalogue" class="section">
     <div class="container">
       <h3 data-i18n="catalogue.title">Catalogo</h3>
       <p class="lead" data-i18n="catalogue.lead">Panoramica dettagliata dei vasi con più foto per ogni pezzo.</p>
+      <p class="catalogue-tagline" data-i18n="catalogue.tagline">Ogni pezzo è un’emozione unica per il tuo spazio.</p>
 
       <div class="catalogue-grid">
         <!-- Accetto Rosso -->
@@ -177,15 +177,25 @@
     </div>
   </section>
 
+  <!-- ===== О БРЕНДЕ / ABOUT ===== -->
   <section id="about" class="section">
     <div class="container about">
       <div class="img">
-        <img src="images/anna-hero.jpg" alt="Studio di ceramica con strumenti e argilla" />
+        <img src="images/anna-hero.jpg" alt="Anna nel suo studio di ceramica" />
       </div>
       <div>
-        <h3 data-i18n="about.title">Chi siamo</h3>
-        <p data-i18n="about.text1">Ceramics Doronina nasce in Liguria, tra mare e colline. La formazione in Toscana e le radici familiari nella scultura si intrecciano in pezzi che uniscono semplicità e accenti barocchi.</p>
-        <p data-i18n="about.text2">Crediamo nella bellezza dell’imperfezione: ogni crepa lieve, ogni asimmetria racconta un gesto umano. Realizziamo anche pezzi su misura per interni e hotellerie.</p>
+        <h3 data-i18n="about.title">Il brand</h3>
+        <p data-i18n="about.intro1">Mi chiamo Anna e creo ceramiche d’interni come oggetti d’arte che sostengono, ispirano e diventano parte del tuo spazio personale di forza.</p>
+        <p data-i18n="about.intro2">Credo che gli oggetti con cui viviamo influenzino il nostro stato interiore.</p>
+
+        <div class="about-cta">
+          <a href="#catalogue" class="pill-btn" data-i18n="about.btnCatalogue">Catalogo</a>
+          <a href="#workshops" class="pill-btn" data-i18n="about.btnWorkshops">Masterclass</a>
+          <a href="#giftcards" class="pill-btn" data-i18n="about.btnGiftCards">Gift Cards</a>
+        </div>
+
+        <p data-i18n="about.text1">I miei vasi non sono solo forme, ma oggetti che trasformano l’atmosfera della casa, danno energia e motivano al nuovo.</p>
+        <p data-i18n="about.text2">In ogni pezzo ci sono argille ad alta temperatura, texture tattili, ricami di perle e l’unione di forme imperfette con una sensazione di lusso.</p>
       </div>
     </div>
   </section>
@@ -244,9 +254,7 @@
     </div>
   </footer>
 
-  <!-- === MODALS FOR CATALOGUE VASES === -->
-
-  <!-- Accetto Rosso -->
+  <!-- ===== MODAL: ACCETTO ROSSO ===== -->
   <div class="modal" id="modal-v1" aria-hidden="true">
     <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-v1-title">
       <div class="modal-header">
@@ -254,21 +262,63 @@
         <button class="modal-close-btn" type="button" data-modal-close aria-label="Close">×</button>
       </div>
       <div class="modal-body">
-        <div class="modal-body-inner">
-          <div class="vase-specs">
-            <h5 data-i18n="catalogue.specTitle">Specifiche</h5>
-            <dl>
-              <dt data-i18n="catalogue.spec.height">Altezza</dt>
-              <dd>—</dd>
-              <dt data-i18n="catalogue.spec.diameter">Diametro</dt>
-              <dd>—</dd>
-              <dt data-i18n="catalogue.spec.material">Materiale</dt>
-              <dd>—</dd>
-              <dt data-i18n="catalogue.spec.technique">Tecnica</dt>
-              <dd>—</dd>
-              <dt data-i18n="catalogue.spec.finish">Finitura</dt>
-              <dd>—</dd>
-            </dl>
+        <div class="modal-body-inner vase-layout">
+          <div class="vase-detail-panel">
+            <p class="vase-title" data-i18n="cat.v1.name">Accetto Rosso</p>
+            <p class="vase-rating">★★★★☆</p>
+
+            <div class="vase-price-row">
+              <span class="vase-price">232€</span>
+              <span class="vase-discount">-20%</span>
+              <span class="vase-old-price">290€</span>
+            </div>
+
+            <div class="vase-actions">
+              <button class="vase-btn-primary" type="button" data-i18n="detail.buy">Купить</button>
+              <button class="vase-btn-outline" type="button" data-i18n="detail.addToCart">В корзину</button>
+            </div>
+
+            <div class="accordion">
+              <button class="accordion-header" type="button">
+                <span data-i18n="detail.description">Описание</span>
+                <span class="accordion-arrow">⌄</span>
+              </button>
+              <div class="accordion-panel">
+                <p data-i18n="cat.v1.longDesc">Ваза «Accetto Rosso» с глубокой красной глазурью и фактурной поверхностью, которая напоминает камень и морские водоросли.</p>
+              </div>
+
+              <button class="accordion-header" type="button">
+                <span data-i18n="detail.characteristics">Характеристики</span>
+                <span class="accordion-arrow">⌄</span>
+              </button>
+              <div class="accordion-panel">
+                <div class="vase-specs">
+                  <h5 data-i18n="catalogue.specTitle">Specifiche</h5>
+                  <dl>
+                    <dt data-i18n="catalogue.spec.height">Altezza</dt>
+                    <dd>—</dd>
+                    <dt data-i18n="catalogue.spec.diameter">Diametro</dt>
+                    <dd>—</dd>
+                    <dt data-i18n="catalogue.spec.material">Materiale</dt>
+                    <dd>—</dd>
+                    <dt data-i18n="catalogue.spec.technique">Tecnica</dt>
+                    <dd>—</dd>
+                    <dt data-i18n="catalogue.spec.finish">Finitura</dt>
+                    <dd>—</dd>
+                  </dl>
+                </div>
+              </div>
+
+              <button class="accordion-header" type="button">
+                <span data-i18n="detail.delivery">Доставка</span>
+                <span class="accordion-arrow">⌄</span>
+              </button>
+              <div class="accordion-panel">
+                <p data-i18n="detail.deliveryText">
+                  Мы отправляем заказы по всему миру из Генуи, Италия. Сроки и стоимость доставки зависят от страны; по особым запросам напишите нам на email.
+                </p>
+              </div>
+            </div>
           </div>
 
           <div class="modal-gallery">
@@ -291,7 +341,7 @@
     </div>
   </div>
 
-  <!-- Ракушка -->
+  <!-- ===== MODAL: РАКУШКА ===== -->
   <div class="modal" id="modal-v2" aria-hidden="true">
     <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-v2-title">
       <div class="modal-header">
@@ -299,21 +349,63 @@
         <button class="modal-close-btn" type="button" data-modal-close aria-label="Close">×</button>
       </div>
       <div class="modal-body">
-        <div class="modal-body-inner">
-          <div class="vase-specs">
-            <h5 data-i18n="catalogue.specTitle">Specifiche</h5>
-            <dl>
-              <dt data-i18n="catalogue.spec.height">Altezza</dt>
-              <dd>—</dd>
-              <dt data-i18n="catalogue.spec.diameter">Diametro</dt>
-              <dd>—</dd>
-              <dt data-i18n="catalogue.spec.material">Materiale</dt>
-              <dd>—</dd>
-              <dt data-i18n="catalogue.spec.technique">Tecnica</dt>
-              <dd>—</dd>
-              <dt data-i18n="catalogue.spec.finish">Finitura</dt>
-              <dd>—</dd>
-            </dl>
+        <div class="modal-body-inner vase-layout">
+          <div class="vase-detail-panel">
+            <p class="vase-title" data-i18n="cat.v2.name">Ракушка</p>
+            <p class="vase-rating">★★★★★</p>
+
+            <div class="vase-price-row">
+              <span class="vase-price">248€</span>
+              <span class="vase-discount">-15%</span>
+              <span class="vase-old-price">292€</span>
+            </div>
+
+            <div class="vase-actions">
+              <button class="vase-btn-primary" type="button" data-i18n="detail.buy">Купить</button>
+              <button class="vase-btn-outline" type="button" data-i18n="detail.addToCart">В корзину</button>
+            </div>
+
+            <div class="accordion">
+              <button class="accordion-header" type="button">
+                <span data-i18n="detail.description">Описание</span>
+                <span class="accordion-arrow">⌄</span>
+              </button>
+              <div class="accordion-panel">
+                <p data-i18n="cat.v2.longDesc">Ваза «Ракушка» с мягкими изгибами и светлой глазурью, напоминающей морскую пену и песок.</p>
+              </div>
+
+              <button class="accordion-header" type="button">
+                <span data-i18n="detail.characteristics">Характеристики</span>
+                <span class="accordion-arrow">⌄</span>
+              </button>
+              <div class="accordion-panel">
+                <div class="vase-specs">
+                  <h5 data-i18n="catalogue.specTitle">Specifiche</h5>
+                  <dl>
+                    <dt data-i18n="catalogue.spec.height">Altezza</dt>
+                    <dd>—</dd>
+                    <dt data-i18n="catalogue.spec.diameter">Diametro</dt>
+                    <dd>—</dd>
+                    <dt data-i18n="catalogue.spec.material">Materiale</dt>
+                    <dd>—</dd>
+                    <dt data-i18n="catalogue.spec.technique">Tecnica</dt>
+                    <dd>—</dd>
+                    <dt data-i18n="catalogue.spec.finish">Finitura</dt>
+                    <dd>—</dd>
+                  </dl>
+                </div>
+              </div>
+
+              <button class="accordion-header" type="button">
+                <span data-i18n="detail.delivery">Доставка</span>
+                <span class="accordion-arrow">⌄</span>
+              </button>
+              <div class="accordion-panel">
+                <p data-i18n="detail.deliveryText">
+                  Мы отправляем заказы по всему миру из Генуи, Италия. Сроки и стоимость доставки зависят от страны; по особым запросам напишите нам на email.
+                </p>
+              </div>
+            </div>
           </div>
 
           <div class="modal-gallery">
@@ -336,7 +428,7 @@
     </div>
   </div>
 
-  <!-- Липия -->
+  <!-- ===== MODAL: ЛИПИЯ ===== -->
   <div class="modal" id="modal-v3" aria-hidden="true">
     <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-v3-title">
       <div class="modal-header">
@@ -344,21 +436,63 @@
         <button class="modal-close-btn" type="button" data-modal-close aria-label="Close">×</button>
       </div>
       <div class="modal-body">
-        <div class="modal-body-inner">
-          <div class="vase-specs">
-            <h5 data-i18n="catalogue.specTitle">Specifiche</h5>
-            <dl>
-              <dt data-i18n="catalogue.spec.height">Altezza</dt>
-              <dd>—</dd>
-              <dt data-i18n="catalogue.spec.diameter">Diametro</dt>
-              <dd>—</dd>
-              <dt data-i18n="catalogue.spec.material">Materiale</dt>
-              <dd>—</dd>
-              <dt data-i18n="catalogue.spec.technique">Tecnica</dt>
-              <dd>—</dd>
-              <dt data-i18n="catalogue.spec.finish">Finitura</dt>
-              <dd>—</dd>
-            </dl>
+        <div class="modal-body-inner vase-layout">
+          <div class="vase-detail-panel">
+            <p class="vase-title" data-i18n="cat.v3.name">Липия</p>
+            <p class="vase-rating">★★★★☆</p>
+
+            <div class="vase-price-row">
+              <span class="vase-price">260€</span>
+              <span class="vase-discount">-10%</span>
+              <span class="vase-old-price">289€</span>
+            </div>
+
+            <div class="vase-actions">
+              <button class="vase-btn-primary" type="button" data-i18n="detail.buy">Купить</button>
+              <button class="vase-btn-outline" type="button" data-i18n="detail.addToCart">В корзину</button>
+            </div>
+
+            <div class="accordion">
+              <button class="accordion-header" type="button">
+                <span data-i18n="detail.description">Описание</span>
+                <span class="accordion-arrow">⌄</span>
+              </button>
+              <div class="accordion-panel">
+                <p data-i18n="cat.v3.longDesc">Ваза «Липия» с вытянутым силуэтом и мягкими органичными линиями, которые подчёркивают перламутровые акценты глазури.</p>
+              </div>
+
+              <button class="accordion-header" type="button">
+                <span data-i18n="detail.characteristics">Характеристики</span>
+                <span class="accordion-arrow">⌄</span>
+              </button>
+              <div class="accordion-panel">
+                <div class="vase-specs">
+                  <h5 data-i18n="catalogue.specTitle">Specifiche</h5>
+                  <dl>
+                    <dt data-i18n="catalogue.spec.height">Altezza</dt>
+                    <dd>—</dd>
+                    <dt data-i18n="catalogue.spec.diameter">Diametro</dt>
+                    <dd>—</dd>
+                    <dt data-i18n="catalogue.spec.material">Materiale</dt>
+                    <dd>—</dd>
+                    <dt data-i18n="catalogue.spec.technique">Tecnica</dt>
+                    <dd>—</dd>
+                    <dt data-i18n="catalogue.spec.finish">Finitura</dt>
+                    <dd>—</dd>
+                  </dl>
+                </div>
+              </div>
+
+              <button class="accordion-header" type="button">
+                <span data-i18n="detail.delivery">Доставка</span>
+                <span class="accordion-arrow">⌄</span>
+              </button>
+              <div class="accordion-panel">
+                <p data-i18n="detail.deliveryText">
+                  Мы отправляем заказы по всему миру из Генуи, Италия. Сроки и стоимость доставки зависят от страны; по особым запросам напишите нам на email.
+                </p>
+              </div>
+            </div>
           </div>
 
           <div class="modal-gallery">
@@ -380,5 +514,6 @@
       </div>
     </div>
   </div>
+
 </body>
 </html>
