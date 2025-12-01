@@ -342,6 +342,22 @@ function initAccordion() {
   });
 }
 
+function initMobileNav() {
+  const navToggle = document.getElementById("nav-toggle");
+  if (!navToggle) return;
+
+  navToggle.addEventListener("click", () => {
+    document.body.classList.toggle("nav-open");
+  });
+
+  document.querySelectorAll("nav a[href^='#']").forEach(link => {
+    link.addEventListener("click", () => {
+      document.body.classList.remove("nav-open");
+    });
+  });
+}
+
+
 // --------- INIT GLOBALE ----------
 window.appInit = function appInit() {
   const lang = getInitialLang();
@@ -356,6 +372,7 @@ window.appInit = function appInit() {
   if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
   initViewToggle();
+  initMobileNav();
   initModals();
   initAccordion();
 };
