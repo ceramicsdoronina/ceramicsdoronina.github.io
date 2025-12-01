@@ -784,3 +784,114 @@ body.mobile-view .hero-scroll{
   font-size:18px;
 }
 
+/* ─────────────────────────────────────────────
+   ABOUT – LAYOUT DUE COLONNE (DESKTOP)
+──────────────────────────────────────────────*/
+
+.about{
+  display:grid;
+  grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
+  gap:40px;
+  align-items:flex-start;
+}
+
+.about-col{
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+}
+
+.about-img-main img,
+.about-img-secondary img{
+  width:100%;
+  display:block;
+  border-radius:18px;
+}
+
+.about-text-top h3{
+  margin-top:0;
+}
+
+.about-text-top p,
+.about-text-bottom p{
+  margin:0 0 10px;
+}
+
+/* CTA pill – già definita ma la rendiamo coerente */
+.about-cta{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin:18px 0 4px;
+}
+
+.pill-btn{
+  padding:8px 18px;
+  border-radius:999px;
+  border:1px solid var(--text);
+  font-size:14px;
+}
+
+/* ─────────────────────────────────────────────
+   VERSIONE MOBILE: STACK VERTICALE
+──────────────────────────────────────────────*/
+
+body.mobile-view .about{
+  grid-template-columns:1fr;
+  gap:24px;
+}
+
+body.mobile-view .about-col{
+  gap:16px;
+}
+
+body.mobile-view .about-img-secondary{
+  /* su mobile la foto del vaso viene dopo il testo lungo */
+  order:2;
+}
+
+body.mobile-view .about-cta{
+  margin:12px 0 0;
+}
+
+body.mobile-view .pill-btn{
+  font-size:12px;
+  padding:6px 12px;
+}
+
+.catalogue-header{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:32px;
+  margin-bottom:28px;
+}
+.catalogue-header h3{
+  margin:0;
+  font-family:"Playfair Display",serif;
+  font-size:40px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.catalogue-header .lead{
+  margin:0;
+  max-width:460px;
+  text-align:right;
+  color:var(--muted);
+  font-size:15px;
+  line-height:1.5;
+}
+
+/* mobile */
+body.mobile-view .catalogue-header{
+  flex-direction:column;
+  align-items:flex-start;
+  gap:4px;
+  margin-bottom:18px;
+}
+body.mobile-view .catalogue-header .lead{
+  text-align:left;
+  max-width:100%;
+  font-size:13px;
+}
+
