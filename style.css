@@ -381,9 +381,11 @@ body.mobile-view .catalogue-header .lead{
 }
 
 .new-price{
-  font-size:17px;
-  font-weight:700;
+  font-size: 18px;                 /* nuovo un po’ più grande */
+  font-weight: 700;
+  color: #b91c1c;                  /* rosso elegante */
 }
+
 
 /* Scritte “Venduto / Sold out” */
 .card-sold{
@@ -534,6 +536,7 @@ body.mobile-view .buy{
 .vase-price{
   font-size:24px;
   font-weight:700;
+  color: #b91c1c;   /* rosso anche nel popup */
 }
 .vase-old-price{
   text-decoration:line-through;
