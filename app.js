@@ -119,6 +119,10 @@ function setLang(lang){
   localStorage.setItem("lang", lang);
   applyTranslations(lang);
   buildCatalogue();
+
+  // aggiorna il selettore lingua
+  const sel = document.getElementById("language-selector");
+  if (sel) sel.value = lang;
 }
 
 /* ============================================================
@@ -443,6 +447,8 @@ function initAccordion(){
 window.appInit = function(){
   const lang = getInitialLang();
   applyTranslations(lang);
+  const sel = document.getElementById("language-selector");
+  if (sel) sel.value = lang;
   initViewToggle();
   initMobileNav();
   buildCatalogue();
