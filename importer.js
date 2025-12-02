@@ -13,9 +13,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     ["import-hero", "partials/hero.html"],
     ["import-about", "partials/about.html"],
     ["import-catalogue", "partials/catalogue.html"],
-    ["import-modal-v1", "partials/modal-accetto-rosso.html"],
-    ["import-modal-v2", "partials/modal-rakushka.html"],
-    ["import-modal-v3", "partials/modal-lipiya.html"],
     ["import-contact", "partials/contact.html"],
     ["import-footer", "partials/footer.html"],
     ["import-view-toggle", "partials/view-toggle.html"]
@@ -28,3 +25,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     window.appInit();
   }
 });
+
