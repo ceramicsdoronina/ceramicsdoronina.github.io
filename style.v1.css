@@ -18,9 +18,6 @@
 
   /* Modal background */
   --modal-bg:rgba(15,23,42,.65);
-
-  /* Discount */
-  --discount:#b88a4a;
 }
 
 /* Reset */
@@ -34,7 +31,6 @@ html,body{
 }
 img{max-width:100%;display:block;}
 a{text-decoration:none;color:inherit;}
-button{font-family:inherit;}
 
 /* Layout container */
 .container{
@@ -60,7 +56,6 @@ header{
   justify-content:space-between;
   align-items:center;
   padding:18px 0;
-  position:relative;
 }
 
 .brand{
@@ -106,14 +101,8 @@ nav a:hover{
   font-size:14px;
 }
 
-/* hamburger – nascosto default (mostrato in mobile-view via body.mobile-view) */
-.nav-toggle-btn,
-#nav-toggle{
-  display:none;
-}
-
 /* ─────────────────────────────────────────────
-   HERO FULLSCREEN
+   HERO FULLSCREEN (DESKTOP MOCKUP)
 ──────────────────────────────────────────────*/
 .hero{
   position:relative;
@@ -176,31 +165,23 @@ nav a:hover{
 
 /* MOBILE HERO */
 body.mobile-view .hero{
-  min-height:60vh;
-  align-items:flex-end;
-  padding-bottom:32px;
-}
-body.mobile-view .hero-landing{
-  background-position:center top;
+  min-height:70vh;
 }
 body.mobile-view .hero-logo{
-  font-size:clamp(34px,9vw,52px);
-  letter-spacing:0.13em;
-  margin-bottom:8px;
+  font-size:clamp(40px,12vw,65px);
+  letter-spacing:0.12em;
 }
 body.mobile-view .hero-tagline{
-  font-size:13px;
+  font-size:14px;
   max-width:90%;
 }
 body.mobile-view .hero-scroll{
-  margin-top:20px;
-  width:36px;
-  height:36px;
-  font-size:18px;
+  margin-top:24px;
+  width:40px;height:40px;
 }
 
 /* ─────────────────────────────────────────────
-   SECTION / ABOUT
+   ABOUT
 ──────────────────────────────────────────────*/
 .section{
   padding:70px 0;
@@ -214,112 +195,32 @@ body.mobile-view .hero-scroll{
 
 .about{
   display:grid;
-  grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
-  gap:40px;
-  align-items:flex-start;
+  grid-template-columns:1fr 1fr;
+  gap:32px;
+  align-items:center;
 }
 
-.about-col{
-  display:flex;
-  flex-direction:column;
-  gap:24px;
-}
-
-.about-img-main img,
-.about-img-secondary img{
-  width:100%;
-  display:block;
+.about .img img{
   border-radius:18px;
 }
 
-.about-text-top h3{
-  margin-top:0;
-}
-.about-text-top p,
-.about-text-bottom p{
-  margin:0 0 10px;
-}
-
-/* CTA pill */
 .about-cta{
   display:flex;
   gap:12px;
-  flex-wrap:wrap;
-  margin:18px 0 4px;
+  margin:18px 0 28px;
 }
+
 .pill-btn{
   padding:8px 18px;
-  border-radius:999px;
   border:1px solid var(--text);
+  border-radius:999px;
   font-size:14px;
+  display:inline-flex;
 }
 
 /* MOBILE ABOUT */
-body.mobile-view .section{
-  padding:40px 0;
-}
-body.mobile-view .section h3{
-  font-size:26px;
-  margin-bottom:8px;
-}
-body.mobile-view .section .lead{
-  font-size:13px;
-}
 body.mobile-view .about{
   grid-template-columns:1fr;
-  gap:24px;
-}
-body.mobile-view .about-col{
-  gap:16px;
-}
-body.mobile-view .about-img-secondary{
-  order:2;
-}
-body.mobile-view .about-cta{
-  margin:12px 0 0;
-}
-body.mobile-view .pill-btn{
-  font-size:12px;
-  padding:6px 12px;
-}
-
-/* ─────────────────────────────────────────────
-   CATALOG HEADER
-──────────────────────────────────────────────*/
-.catalogue-header{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:32px;
-  margin-bottom:28px;
-}
-.catalogue-header h3{
-  margin:0;
-  font-family:"Playfair Display",serif;
-  font-size:40px;
-  letter-spacing:.12em;
-  text-transform:uppercase;
-}
-.catalogue-header .lead{
-  margin:0;
-  max-width:460px;
-  text-align:right;
-  color:var(--muted);
-  font-size:15px;
-  line-height:1.5;
-}
-
-/* mobile header */
-body.mobile-view .catalogue-header{
-  flex-direction:column;
-  align-items:flex-start;
-  gap:4px;
-  margin-bottom:18px;
-}
-body.mobile-view .catalogue-header .lead{
-  text-align:left;
-  max-width:100%;
-  font-size:13px;
 }
 
 /* ─────────────────────────────────────────────
@@ -337,11 +238,24 @@ body.mobile-view .catalogue-header .lead{
   overflow:hidden;
   display:flex;
   flex-direction:column;
-  background:#fff;
+}
+
+.media-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:2px;
+  cursor:pointer;
+  aspect-ratio:4/3;
+}
+.media-grid img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
 }
 
 .media-single{
   width:100%;
+  height:auto;
   cursor:pointer;
   aspect-ratio:4/3;
   overflow:hidden;
@@ -352,105 +266,24 @@ body.mobile-view .catalogue-header .lead{
   object-fit:cover;
 }
 
+
 .card .body{
   padding:16px;
 }
-.card h4{
-  margin:0 0 4px;
-  font-size:18px;
-}
-.card p{
-  margin:0 0 8px;
-  color:var(--muted);
-  font-size:14px;
-}
 
-/* Prezzi in catalogo */
-.card-price{
-  display:flex;
-  align-items:center;
-  flex-wrap:wrap;
-  gap:6px;
-  margin:4px 0 10px;
-}
-
-.old-price{
-  text-decoration:line-through;
-  color:var(--muted);
-  font-size:13px;
-}
-
-.new-price{
-  font-size:17px;
-  font-weight:700;
-}
-
-/* Scritte “Venduto / Sold out” */
-.card-sold{
-  margin:4px 0 10px;
-  font-weight:600;
-  text-transform:uppercase;
-  letter-spacing:.08em;
-  color:#7d0f0f;
-  font-size:13px;
-}
-
-/* Badge sconto */
-.discount-badge{
-  padding:3px 8px;
-  border-radius:999px;
-  border:1px solid var(--discount);
-  color:var(--discount);
-  font-size:12px;
-  font-weight:600;
-  text-transform:uppercase;
-  letter-spacing:.06em;
-}
-
-/* Bottone “compra / vedi foto” */
 .buy{
   background:var(--brand);
   padding:10px;
   text-align:center;
   color:white;
   border-radius:12px;
-  margin-top:8px;
+  margin-top:12px;
   cursor:pointer;
-  border:none;
-  font-size:14px;
 }
 
 /* MOBILE CATALOG GRID */
 body.mobile-view .catalogue-grid{
   grid-template-columns:1fr;
-  gap:18px;
-}
-body.mobile-view .card{
-  border-radius:14px;
-}
-body.mobile-view .media-single{
-  aspect-ratio:4/3;
-}
-body.mobile-view .card .body{
-  padding:12px 14px 14px;
-}
-body.mobile-view .card h4{
-  font-size:16px;
-}
-body.mobile-view .card p{
-  font-size:13px;
-}
-body.mobile-view .buy{
-  font-size:13px;
-  padding:9px;
-}
-
-/* Responsive general fallback */
-@media (max-width:960px){
-  .catalogue-grid{grid-template-columns:1fr 1fr;}
-}
-@media (max-width:640px){
-  .catalogue-grid{grid-template-columns:1fr;}
 }
 
 /* ─────────────────────────────────────────────
@@ -490,22 +323,19 @@ body.mobile-view .buy{
   align-items:center;
   padding:14px 20px;
   border-bottom:1px solid var(--border);
-  gap:12px;
 }
-.modal-header h4{
-  margin:0;
-}
+
 .modal-header button{
   background:none;
   border:none;
   font-size:24px;
-  cursor:pointer;
 }
 
 .modal-body{
   padding:0;
   overflow-y:auto;
 }
+
 .modal-body-inner{
   display:flex;
   gap:24px;
@@ -523,37 +353,56 @@ body.mobile-view .buy{
   font-family:"Playfair Display",serif;
   margin:0 0 4px;
 }
+.vase-rating{
+  font-size:18px;
+  color:#a22;
+}
 
 .vase-price-row{
   display:flex;
   align-items:center;
-  flex-wrap:wrap;
-  gap:8px;
-  margin:10px 0 18px;
+  gap:12px;
+  margin:18px 0;
 }
 .vase-price{
-  font-size:24px;
+  font-size:26px;
   font-weight:700;
+}
+.vase-discount{
+  background:#a22;
+  color:white;
+  padding:4px 6px;
+  border-radius:6px;
+  font-size:13px;
 }
 .vase-old-price{
   text-decoration:line-through;
   color:var(--muted);
+}
+
+/* Buttons */
+.vase-actions{
+  display:flex;
+  gap:12px;
+  margin-bottom:20px;
+}
+.vase-btn-primary{
+  background:var(--btn-primary);
+  color:white;
+  padding:12px 18px;
+  border-radius:10px;
+  border:none;
   font-size:15px;
+  cursor:pointer;
 }
-
-/* Stato venduto in modale */
-.vase-status-sold{
-  margin:10px 0 18px;
-  font-weight:700;
-  font-size:18px;
-  text-transform:uppercase;
-  letter-spacing:.12em;
-  color:#7d0f0f;
-}
-
-/* Badge sconto in modale */
-.modal-discount{
-  font-size:12px;
+.vase-btn-outline{
+  border:1px solid var(--btn-primary);
+  color:var(--btn-primary);
+  padding:12px 18px;
+  border-radius:10px;
+  background:none;
+  font-size:15px;
+  cursor:pointer;
 }
 
 /* Accordion */
@@ -576,8 +425,7 @@ body.mobile-view .buy{
   display:block;
 }
 
-.vase-specs dl,
-.accordion-panel dl{
+.vase-specs dl{
   display:grid;
   grid-template-columns:120px auto;
   gap:6px 12px;
@@ -588,6 +436,7 @@ body.mobile-view .buy{
 .modal-gallery{
   flex:1;
 }
+
 .modal-gallery-main{
   position:relative;
   aspect-ratio:3/2;
@@ -610,9 +459,7 @@ body.mobile-view .buy{
 .modal-gallery-controls{
   display:flex;
   justify-content:space-between;
-  align-items:center;
   margin-top:8px;
-  gap:8px;
 }
 .modal-gallery-controls button{
   border:1px solid var(--border);
@@ -620,43 +467,11 @@ body.mobile-view .buy{
   border-radius:8px;
   padding:4px 10px;
   font-size:18px;
-  cursor:pointer;
-}
-.modal-gallery-controls span{
-  font-size:13px;
-  color:var(--muted);
 }
 
 /* MOBILE MODAL */
-body.mobile-view .modal-dialog{
-  max-width:100%;
-  width:100%;
-  height:100%;
-  max-height:100vh;
-  border-radius:0;
-}
 body.mobile-view .modal-body-inner{
   flex-direction:column;
-  gap:16px;
-  padding:16px;
-}
-body.mobile-view .vase-title{
-  font-size:20px;
-}
-body.mobile-view .vase-price-row{
-  margin:12px 0;
-}
-body.mobile-view .vase-price{
-  font-size:22px;
-}
-body.mobile-view .accordion-header{
-  font-size:14px;
-}
-body.mobile-view .accordion-panel{
-  font-size:13px;
-}
-body.mobile-view .modal-gallery-main{
-  aspect-ratio:4/3;
 }
 
 /* ─────────────────────────────────────────────
@@ -667,18 +482,16 @@ body.mobile-view .modal-gallery-main{
   grid-template-columns:repeat(3,1fr);
   gap:20px;
 }
+
 .contact-item{
   border:1px solid var(--border);
   border-radius:14px;
   padding:14px;
 }
+
+/* MOBILE */
 body.mobile-view .contact-list{
   grid-template-columns:1fr;
-  gap:12px;
-}
-body.mobile-view .contact-item{
-  padding:10px 12px;
-  font-size:13px;
 }
 
 /* ─────────────────────────────────────────────
@@ -691,10 +504,6 @@ footer{
   color:var(--muted);
   text-align:center;
 }
-body.mobile-view footer{
-  padding:18px 0;
-  font-size:12px;
-}
 
 /* ─────────────────────────────────────────────
    VIEW MODE TOGGLE BUTTON
@@ -705,6 +514,7 @@ body.mobile-view footer{
   right:16px;
   z-index:2000;
 }
+
 .view-toggle button{
   background:#111;
   color:white;
@@ -719,11 +529,194 @@ body.mobile-view footer{
   opacity:1;
 }
 
+/* Responsive general fallback */
+@media (max-width:960px){
+  .catalogue-grid{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:640px){
+  .catalogue-grid{grid-template-columns:1fr;}
+}
+
+/* ─────────────────────────────────────────────
+   MOBILE VIEW – STILE GENERALE
+   (attivo quando il body ha class="mobile-view")
+──────────────────────────────────────────────*/
+body.mobile-view{
+  font-size:14px;
+}
+
+/* header più compatto */
+body.mobile-view header{
+  border-bottom:1px solid var(--border);
+}
+body.mobile-view .nav{
+  padding:10px 0;
+}
+body.mobile-view .brand h1{
+  font-size:18px;
+  letter-spacing:0.12em;
+}
+body.mobile-view nav ul{
+  gap:14px;
+}
+body.mobile-view nav a{
+  font-size:13px;
+  padding:4px 0;
+}
+
+/* sezioni più leggere */
+body.mobile-view .section{
+  padding:40px 0;
+}
+body.mobile-view .section h3{
+  font-size:26px;
+  margin-bottom:8px;
+}
+body.mobile-view .section .lead{
+  font-size:13px;
+}
+
+/* hero mobile più leggero */
+body.mobile-view .hero{
+  min-height:70vh;
+  align-items:flex-end;
+  padding-bottom:40px;
+}
+body.mobile-view .hero-overlay{
+  padding:0 16px 0;
+}
+body.mobile-view .hero-logo{
+  font-size:clamp(38px,10vw,58px);
+  letter-spacing:0.14em;
+  margin-bottom:10px;
+}
+body.mobile-view .hero-tagline{
+  font-size:13px;
+  max-width:90%;
+}
+body.mobile-view .hero-scroll{
+  margin-top:20px;
+  width:36px;
+  height:36px;
+  font-size:18px;
+}
+
+body.mobile-view .about{
+  grid-template-columns:1fr;
+  gap:20px;
+}
+body.mobile-view .about .img img{
+  border-radius:14px;
+}
+body.mobile-view .about-cta{
+  flex-wrap:wrap;
+  gap:8px;
+  margin:12px 0 20px;
+}
+body.mobile-view .pill-btn{
+  font-size:12px;
+  padding:6px 12px;
+}
+
+body.mobile-view .catalogue-grid{
+  grid-template-columns:1fr;
+  gap:18px;
+}
+
+body.mobile-view .card{
+  border-radius:14px;
+}
+
+body.mobile-view .media-single{
+  aspect-ratio:4/3;
+}
+
+body.mobile-view .card .body{
+  padding:12px 14px 14px;
+}
+body.mobile-view .card h4{
+  font-size:16px;
+  margin:0 0 4px;
+}
+body.mobile-view .card p{
+  font-size:13px;
+}
+body.mobile-view .buy{
+  font-size:13px;
+  padding:9px;
+}
+
+body.mobile-view .modal-dialog{
+  max-width:100%;
+  width:100%;
+  height:100%;
+  max-height:100vh;
+  border-radius:0;
+}
+
+body.mobile-view .modal-body-inner{
+  flex-direction:column;
+  gap:16px;
+  padding:16px;
+}
+
+body.mobile-view .vase-title{
+  font-size:20px;
+}
+body.mobile-view .vase-price-row{
+  margin:12px 0;
+}
+body.mobile-view .vase-price{
+  font-size:22px;
+}
+body.mobile-view .vase-actions{
+  flex-wrap:wrap;
+}
+
+body.mobile-view .accordion-header{
+  font-size:14px;
+}
+body.mobile-view .accordion-panel{
+  font-size:13px;
+}
+
+body.mobile-view .modal-gallery-main{
+  aspect-ratio:4/3;
+}
+body.mobile-view .modal-gallery-controls{
+  font-size:13px;
+}
+
+body.mobile-view .contact-list{
+  grid-template-columns:1fr;
+  gap:12px;
+}
+body.mobile-view .contact-item{
+  padding:10px 12px;
+  font-size:13px;
+}
+
+body.mobile-view footer{
+  padding:18px 0;
+  font-size:12px;
+}
+
 /* ─────────────────────────────────────────────
    NAV MOBILE: HAMBURGER + DROPDOWN
 ──────────────────────────────────────────────*/
-body.mobile-view .nav-toggle-btn,
-body.mobile-view #nav-toggle{
+
+/* La nav deve essere relativa per posizionare il dropdown */
+.nav{
+  position:relative;
+}
+
+/* di default (desktop) l'hamburger non si vede */
+.nav-toggle-btn{
+  display:none;
+}
+
+/* in mobile-view visibile */
+body.mobile-view .nav-toggle-btn{
   display:inline-flex;
   align-items:center;
   justify-content:center;
@@ -764,8 +757,141 @@ body.mobile-view nav a{
   padding:4px 0;
 }
 
-/* mobile base font */
-body.mobile-view{
+/* ─────────────────────────────────────────────
+   HERO MOBILE – banner più piccolo
+──────────────────────────────────────────────*/
+body.mobile-view .hero{
+  min-height:60vh;           /* era 70 */
+  align-items:flex-end;
+  padding-bottom:32px;
+}
+body.mobile-view .hero-landing{
+  background-position:center top; /* banner meno "zoomato" */
+}
+body.mobile-view .hero-logo{
+  font-size:clamp(34px,9vw,52px);
+  letter-spacing:0.13em;
+  margin-bottom:8px;
+}
+body.mobile-view .hero-tagline{
+  font-size:13px;
+  max-width:90%;
+}
+body.mobile-view .hero-scroll{
+  margin-top:20px;
+  width:36px;
+  height:36px;
+  font-size:18px;
+}
+
+/* ─────────────────────────────────────────────
+   ABOUT – LAYOUT DUE COLONNE (DESKTOP)
+──────────────────────────────────────────────*/
+
+.about{
+  display:grid;
+  grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
+  gap:40px;
+  align-items:flex-start;
+}
+
+.about-col{
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+}
+
+.about-img-main img,
+.about-img-secondary img{
+  width:100%;
+  display:block;
+  border-radius:18px;
+}
+
+.about-text-top h3{
+  margin-top:0;
+}
+
+.about-text-top p,
+.about-text-bottom p{
+  margin:0 0 10px;
+}
+
+/* CTA pill – già definita ma la rendiamo coerente */
+.about-cta{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin:18px 0 4px;
+}
+
+.pill-btn{
+  padding:8px 18px;
+  border-radius:999px;
+  border:1px solid var(--text);
   font-size:14px;
+}
+
+/* ─────────────────────────────────────────────
+   VERSIONE MOBILE: STACK VERTICALE
+──────────────────────────────────────────────*/
+
+body.mobile-view .about{
+  grid-template-columns:1fr;
+  gap:24px;
+}
+
+body.mobile-view .about-col{
+  gap:16px;
+}
+
+body.mobile-view .about-img-secondary{
+  /* su mobile la foto del vaso viene dopo il testo lungo */
+  order:2;
+}
+
+body.mobile-view .about-cta{
+  margin:12px 0 0;
+}
+
+body.mobile-view .pill-btn{
+  font-size:12px;
+  padding:6px 12px;
+}
+
+.catalogue-header{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:32px;
+  margin-bottom:28px;
+}
+.catalogue-header h3{
+  margin:0;
+  font-family:"Playfair Display",serif;
+  font-size:40px;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.catalogue-header .lead{
+  margin:0;
+  max-width:460px;
+  text-align:right;
+  color:var(--muted);
+  font-size:15px;
+  line-height:1.5;
+}
+
+/* mobile */
+body.mobile-view .catalogue-header{
+  flex-direction:column;
+  align-items:flex-start;
+  gap:4px;
+  margin-bottom:18px;
+}
+body.mobile-view .catalogue-header .lead{
+  text-align:left;
+  max-width:100%;
+  font-size:13px;
 }
 

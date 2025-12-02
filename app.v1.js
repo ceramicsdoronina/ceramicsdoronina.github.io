@@ -38,13 +38,13 @@ const messages = {
     hero:{tagline:"Ceramica tattile da interno con ricami di perle che trasforma la tua casa in un luogo di forza e ispirazione."},
     about:{
       title:"Il brand",
-      intro1:"Mi chiamo Anna e creo ceramiche d’interni come oggetti d’arte che sostengono, ispirano e diventano parte del tuo spazio personale di forza.",
+      intro1:"Mi chiamo Anna e creo ceramiche d’interni come oggetti d’arte.",
       intro2:"Credo che gli oggetti con cui viviamo influenzino il nostro stato interiore.",
       btnCatalogue:"Catalogo",
       btnWorkshops:"Masterclass",
       btnGiftCards:"Gift Card",
-      text1:"I miei vasi non sono solo forme, ma oggetti che trasformano l’atmosfera della casa.",
-      text2:"In ogni pezzo ci sono argille ad alta temperatura, texture tattili, ricami di perle e l’unione di forme imperfette con una sensazione di lusso."
+      text1:"I miei vasi non sono solo forme, ma oggetti che trasformano l’atmosfera.",
+      text2:"In ogni pezzo ci sono argille ad alta temperatura, texture tattili e ricami di perle."
     },
     catalogue:{
       title:"Catalogo",
@@ -65,16 +65,16 @@ const messages = {
 
   en: {
     nav:{home:"Home",about:"About",catalogue:"Catalogue",workshops:"Workshops",contact:"Contact"},
-    hero:{tagline:"Tactile interior ceramics with bead embroidery that turns your home into a place of strength and inspiration."},
+    hero:{tagline:"Tactile interior ceramics with bead embroidery."},
     about:{
       title:"About the brand",
-      intro1:"My name is Anna and I create interior ceramics as art objects that support, inspire and become part of your personal space of strength.",
-      intro2:"I believe the objects we live with shape our inner state.",
+      intro1:"My name is Anna and I create interior ceramics as art objects.",
+      intro2:"Objects we live with shape our inner state.",
       btnCatalogue:"Catalogue",
       btnWorkshops:"Workshops",
       btnGiftCards:"Gift Cards",
-      text1:"My vases are not just shapes, but pieces that transform the atmosphere of your home.",
-      text2:"Each piece combines high-fire clays, tactile textures, bead embroidery and a sense of quiet luxury."
+      text1:"My vases transform the atmosphere of your home.",
+      text2:"High-fire clays, textures, bead embroidery, quiet luxury."
     },
     catalogue:{
       title:"Catalogue",
@@ -86,7 +86,7 @@ const messages = {
       description:"Description",
       characteristics:"Characteristics",
       delivery:"Shipping",
-      deliveryText:"We ship worldwide from Liguria, Italy."
+      deliveryText:"We ship worldwide from Liguria."
     },
     status:{sold:"Sold out"},
     contact:{title:"Contact",address:"Studio address:"},
@@ -182,7 +182,7 @@ async function buildCatalogue(){
   const lang = getInitialLang();
   const items = await loadCSV("catalogue/vasi.csv");
 
-  // Ordinamento: prima non venduti, poi venduti
+  // Ordinamento: prima i non venduti, poi i venduti
   items.sort((a,b)=> (a.venduto==="si") - (b.venduto==="si"));
 
   const grid = document.getElementById("catalogue-grid");
@@ -205,39 +205,26 @@ async function buildCatalogue(){
 
     const img1 = vase.img1 && vase.img1 !== "-" ? `images/catalogue/${vase.img1}` : "images/placeholder.jpg";
 
-    const priceOldStr = vase.price_old && vase.price_old !== "-" ? vase.price_old : null;
-    const priceNewStr = vase.price_new && vase.price_new !== "-" ? vase.price_new : null;
-
-    // Calcolo sconto in % se possibile
-    let discount = null;
-    if (!sold && priceOldStr && priceNewStr){
-      const oldNum = parseFloat(String(priceOldStr).replace(",", "."));
-      const newNum = parseFloat(String(priceNewStr).replace(",", "."));
-      if (!isNaN(oldNum) && !isNaN(newNum) && oldNum > newNum){
-        discount = Math.round((1 - newNum/oldNum)*100);
-        if (discount <= 0) discount = null;
-      }
-    }
+    const priceOld = vase.price_old && vase.price_old !== "-" ? vase.price_old : null;
+    const priceNew = vase.price_new && vase.price_new !== "-" ? vase.price_new : null;
 
     /* ---------- CARD CATALOGO ---------- */
+
     let cardStatusBlock = "";
 
-    if (sold){
+    if (sold) {
+      // Solo scritta “Venduto / Sold out / Продано”
       cardStatusBlock = `
         <div class="card-sold">
           ${messages[lang].status.sold}
         </div>
       `;
-    } else if (priceNewStr){
-      let discountBlock = "";
-      if (discount){
-        discountBlock = `<span class="discount-badge">-${discount}%</span>`;
-      }
+    } else if (priceNew) {
+      // Prezzo attuale + eventualmente barrato
       cardStatusBlock = `
         <div class="card-price">
-          ${priceOldStr ? `<span class="old-price">${priceOldStr}€</span>` : ""}
-          <span class="new-price">${priceNewStr}€</span>
-          ${discountBlock}
+          ${priceOld ? `<span class="old-price">${priceOld}€</span>` : ""}
+          <span class="new-price">${priceNew}€</span>
         </div>
       `;
     }
@@ -262,6 +249,7 @@ async function buildCatalogue(){
     grid.appendChild(card);
 
     /* ---------- IMMAGINI MODALE ---------- */
+
     const imgs = [
       vase.img1,vase.img2,vase.img3,
       vase.img4,vase.img5,vase.img6
@@ -271,30 +259,27 @@ async function buildCatalogue(){
       <img src="images/catalogue/${img}" data-slide="${i}" class="${i===0?"active":""}">
     `).join("");
 
-    /* ---------- PREZZO / VENDUTO IN MODALE ---------- */
+    /* ---------- BLOCCO PREZZO / VENDUTO IN MODALE ---------- */
+
     let modalPriceBlock = "";
 
-    if (sold){
+    if (sold) {
       modalPriceBlock = `
         <div class="vase-status-sold">
           ${messages[lang].status.sold}
         </div>
       `;
-    } else if (priceNewStr){
-      let modalDiscount = "";
-      if (discount){
-        modalDiscount = `<span class="discount-badge modal-discount">-${discount}%</span>`;
-      }
+    } else if (priceNew) {
       modalPriceBlock = `
         <div class="vase-price-row">
-          ${priceOldStr ? `<span class="vase-old-price">${priceOldStr}€</span>` : ""}
-          <span class="vase-price">${priceNewStr}€</span>
-          ${modalDiscount}
+          ${priceOld ? `<span class="vase-old-price">${priceOld}€</span>` : ""}
+          <span class="vase-price">${priceNew}€</span>
         </div>
       `;
     }
 
     /* ---------- MODALE ---------- */
+
     const modal = document.createElement("div");
     modal.className = "modal";
     modal.id = `modal-${vase.id}`;
@@ -354,7 +339,7 @@ async function buildCatalogue(){
               </div>
               <div class="modal-gallery-controls">
                 <button data-gallery-prev>←</button>
-                <span data-gallery-counter">1 / ${imgs.length}</span>
+                <span data-gallery-counter>1 / ${imgs.length}</span>
                 <button data-gallery-next>→</button>
               </div>
             </div>
@@ -404,7 +389,7 @@ function initModals(){
 
     const update = ()=>{
       slides.forEach((img,i)=> img.classList.toggle("active", i===index));
-      if (counter) counter.textContent = `${index+1} / ${slides.length}`;
+      counter.textContent = `${index+1} / ${slides.length}`;
     };
 
     update();
