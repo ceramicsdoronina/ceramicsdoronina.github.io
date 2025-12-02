@@ -1,37 +1,51 @@
 <!doctype html>
-<html lang="it">
+<html lang="ru">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Doronina · Interior Ceramics · IT/EN/RU</title>
-  <meta name="description" content="Тактильная интерьерная керамика с бисерной вышивкой · Doronina" />
+  <title>Ceramics Doronina · Handmade Ceramics · IT / EN / RU</title>
+  <meta name="description" content="Tactile interior ceramics with bead embroidery by Ceramist Doronina. Handmade vases and art objects created in Liguria, Italy." />
 
-  <link rel="stylesheet" href="style.css">
+  <!-- Font -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-  <!-- app.js definisce appInit() -->
-  <script src="app.js" defer></script>
-  <!-- importer.js carica i partial e poi chiama appInit() -->
-  <script src="importer.js" defer></script>
+  <!-- Stili principali -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- segnaposto per i partial -->
+  <!-- Navbar -->
   <div id="import-navbar"></div>
-  <div id="import-hero"></div>
-  <div id="import-about"></div>
-  <div id="import-catalogue"></div>
 
-  <!-- modali separati, uno per vaso -->
-  <div id="import-modal-v1"></div>
-  <div id="import-modal-v2"></div>
-  <div id="import-modal-v3"></div>
+  <!-- Contenuto principale -->
+  <main>
+    <!-- Hero full-screen -->
+    <div id="import-hero"></div>
 
-  <div id="import-contact"></div>
+    <!-- Sezione About / Brand story -->
+    <div id="import-about"></div>
+
+    <!-- Catalogo (griglia vasi, riempita da app.js leggendo vasi.csv) -->
+    <div id="import-catalogue"></div>
+
+    <!-- Contatti -->
+    <div id="import-contact"></div>
+  </main>
+
+  <!-- Modali dinamiche (container vuoto riempito da app.js) -->
+  <div id="import-modals"></div>
+
+  <!-- Footer -->
   <div id="import-footer"></div>
 
-  <!-- bottone Mobile/Desktop in un partial suo -->
+  <!-- Bottone piccolo per switch Desktop/Mobile view -->
   <div id="import-view-toggle"></div>
 
+  <!-- Script applicazione (definisce window.appInit, buildCatalogue, ecc.) -->
+  <script src="app.js" defer></script>
+
+  <!-- Script importer che carica i partial e poi chiama appInit() -->
+  <script src="importer.js" defer></script>
 </body>
 </html>
+

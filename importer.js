@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     ["import-hero", "partials/hero.html"],
     ["import-about", "partials/about.html"],
     ["import-catalogue", "partials/catalogue.html"],
+    ["import-modals", "partials/modals.html"],   
     ["import-contact", "partials/contact.html"],
     ["import-footer", "partials/footer.html"],
     ["import-view-toggle", "partials/view-toggle.html"]
