@@ -69,7 +69,7 @@ const messages = {
     about:{
       title:"About the brand",
       intro1:"My name is Anna and I create interior ceramics as art objects.",
-      intro2:"I believe the objects we live with shape our inner state.",
+      intro2:"Objects we live with shape our inner state.",
       btnCatalogue:"Catalogue",
       btnWorkshops:"Workshops",
       btnGiftCards:"Gift Cards",
@@ -94,19 +94,15 @@ const messages = {
   }
 };
 
-
 /* ============================================================
    TRADUZIONI
 ============================================================ */
-
 function applyTranslations(lang){
   document.querySelectorAll("[data-i18n]").forEach(el=>{
-    const path = el.dataset.i18n.split(".");
+    const keys = el.dataset.i18n.split(".");
     let value = messages[lang];
-    for (const p of path){
-      if (value && value[p] != null){
-        value = value[p];
-      }
+    for (const k of keys){
+      if (value && value[k] != null) value = value[k];
     }
     if (typeof value === "string") el.textContent = value;
   });
@@ -116,8 +112,7 @@ function getInitialLang(){
   const saved = localStorage.getItem("lang");
   if (saved && messages[saved]) return saved;
   const browser = (navigator.language||"ru").slice(0,2);
-  if (messages[browser]) return browser;
-  return "ru";
+  return messages[browser] ? browser : "ru";
 }
 
 function setLang(lang){
@@ -126,19 +121,15 @@ function setLang(lang){
   buildCatalogue();
 }
 
-
 /* ============================================================
    MENU MOBILE
 ============================================================ */
-
 function initMobileNav(){
   const btn = document.getElementById("nav-toggle");
   if (!btn) return;
-
   btn.addEventListener("click", ()=>{
     document.body.classList.toggle("nav-open");
   });
-
   document.querySelectorAll("nav a").forEach(a=>{
     a.addEventListener("click", ()=>{
       document.body.classList.remove("nav-open");
@@ -146,11 +137,9 @@ function initMobileNav(){
   });
 }
 
-
 /* ============================================================
    TOGGLE DESKTOP/MOBILE-VIEW
 ============================================================ */
-
 function initViewToggle(){
   const btn = document.getElementById("view-toggle-btn");
   if (!btn) return;
@@ -170,37 +159,30 @@ function initViewToggle(){
   });
 }
 
-
 /* ============================================================
    CSV Loader
 ============================================================ */
-
 async function loadCSV(url){
   const res = await fetch(url);
   const text = await res.text();
   const rows = text.split("\n").map(r=>r.trim()).filter(r=>r.length>0);
-
   const headers = rows[0].split(",");
   return rows.slice(1).map(row=>{
     const cols = row.split(",");
     const obj = {};
-    headers.forEach((h,i)=>{
-      obj[h.trim()] = cols[i] ? cols[i].trim() : "-";
-    });
+    headers.forEach((h,i)=> obj[h.trim()] = cols[i] ? cols[i].trim() : "-");
     return obj;
   });
 }
 
-
 /* ============================================================
-   COSTRUZIONE DINAMICA DEL CATALOGO + MODALI
+   COSTRUZIONE DINAMICA CATALOGO + MODALI
 ============================================================ */
-
 async function buildCatalogue(){
   const lang = getInitialLang();
   const items = await loadCSV("catalogue/vasi.csv");
 
-  // ordinamento: prima disponibili, poi venduti
+  // 🔥 Ordinamento: disponibili → venduti
   items.sort((a,b)=> (a.venduto==="si") - (b.venduto==="si"));
 
   const grid = document.getElementById("catalogue-grid");
@@ -215,14 +197,14 @@ async function buildCatalogue(){
     const short = vase[`short_${lang}`] !== "-" ? vase[`short_${lang}`] : vase.short_ru;
     const long = vase[`long_${lang}`] !== "-" ? vase[`long_${lang}`] : vase.long_ru;
 
-    const img1 = vase.img1 !== "-" ? `images/catalogue/${vase.img1}` : "images/placeholder.jpg";
+    const sold = vase.venduto === "si";
 
-    const sold = vase.venduto==="si";
+    const img1 = vase.img1 !== "-" ? `images/catalogue/${vase.img1}` : "images/placeholder.jpg";
 
     const priceOld = vase.price_old !== "-" ? vase.price_old : null;
     const priceNew = vase.price_new !== "-" ? vase.price_new : null;
 
-    /* ───── Card catalogo ───── */
+    /* ---------- CARD CATALOGO ---------- */
     const card = document.createElement("article");
     card.className = "card";
 
@@ -231,7 +213,6 @@ async function buildCatalogue(){
         <img src="${img1}" alt="${name}">
         ${sold ? `<div class="sold-badge">${messages[lang].status.sold}</div>` : ""}
       </div>
-
       <div class="body">
         <h4>${name}</h4>
         <p>${short}</p>
@@ -251,17 +232,16 @@ async function buildCatalogue(){
 
     grid.appendChild(card);
 
-
-    /* ───── Modal con 6 immagini ───── */
+    /* ---------- IMMAGINI MODALE ---------- */
     const imgs = [
-      vase.img1,vase.img2,vase.img3,
-      vase.img4,vase.img5,vase.img6
-    ].filter(x=>x && x!=="-");
+      vase.img1,vase.img2,vase.img3,vase.img4,vase.img5,vase.img6
+    ].filter(x=>x && x !== "-");
 
     const gallery = imgs.map((img,i)=>`
       <img src="images/catalogue/${img}" data-slide="${i}" class="${i===0?"active":""}">
     `).join("");
 
+    /* ---------- MODALE ---------- */
     const modal = document.createElement("div");
     modal.className = "modal";
     modal.id = `modal-${vase.id}`;
@@ -314,14 +294,17 @@ async function buildCatalogue(){
                   ${messages[lang].detail.delivery}
                   <span>›</span>
                 </button>
-                <div class="accordion-panel">${messages[lang].detail.deliveryText}</div>
+                <div class="accordion-panel">
+                  ${messages[lang].detail.deliveryText}
+                </div>
 
               </div>
             </div>
 
             <div class="modal-gallery">
-              <div class="modal-gallery-main">${gallery}</div>
-
+              <div class="modal-gallery-main">
+                ${gallery}
+              </div>
               <div class="modal-gallery-controls">
                 <button data-gallery-prev>←</button>
                 <span data-gallery-counter>1 / ${imgs.length}</span>
@@ -331,7 +314,6 @@ async function buildCatalogue(){
 
           </div>
         </div>
-
       </div>
     `;
 
@@ -342,11 +324,9 @@ async function buildCatalogue(){
   initAccordion();
 }
 
-
 /* ============================================================
-   MODALI E GALLERIA
+   MODALI + GALLERY
 ============================================================ */
-
 function initModals(){
   document.querySelectorAll("[data-modal-target]").forEach(el=>{
     el.addEventListener("click", ()=>{
@@ -392,46 +372,36 @@ function initModals(){
   });
 }
 
-
 /* ============================================================
    ACCORDION
 ============================================================ */
-
 function initAccordion(){
   document.querySelectorAll(".accordion").forEach(acc=>{
-    const headers = acc.querySelectorAll(".accordion-header");
-    headers.forEach(h=>{
+    acc.querySelectorAll(".accordion-header").forEach(h=>{
       h.addEventListener("click", ()=>{
         const panel = h.nextElementSibling;
-        const isOpen = panel.classList.contains("active");
-
+        const open = panel.classList.contains("active");
         acc.querySelectorAll(".accordion-panel").forEach(p=>p.classList.remove("active"));
-
-        if (!isOpen) panel.classList.add("active");
+        if (!open) panel.classList.add("active");
       });
     });
   });
 }
 
-
 /* ============================================================
    INIT SITO
 ============================================================ */
-
 window.appInit = function(){
   const lang = getInitialLang();
   applyTranslations(lang);
-
   initViewToggle();
   initMobileNav();
   buildCatalogue();
-};
-
+}
 
 /* ============================================================
    CAMBIO LINGUA
 ============================================================ */
-
 document.addEventListener("change", e=>{
   if (e.target.id === "language-selector"){
     setLang(e.target.value);
