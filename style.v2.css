@@ -10,7 +10,7 @@
   --white:#fafafa;
 
   /* Buttons */
-  --btn-primary:#111827;
+  --btn-primary:#7d0f0f;
   --btn-primary-text:#ffffff;
 
   /* Borders */
@@ -23,31 +23,25 @@
   --discount:#b88a4a;
 }
 
-/* ─────────────────────────────────────────────
-   RESET & BASE
-──────────────────────────────────────────────*/
+/* Reset */
 *{box-sizing:border-box;}
 html,body{
   margin:0;
   padding:0;
   background:var(--bg);
+  font-family:Inter,system-ui,sans-serif;
   color:var(--text);
-  font-family:"Cormorant Garamond", serif;
-  font-size:18px;
-  line-height:1.5;
 }
 img{max-width:100%;display:block;}
 a{text-decoration:none;color:inherit;}
 button{font-family:inherit;}
 
+/* Layout container */
 .container{
   max-width:1200px;
   margin:0 auto;
   padding:0 20px;
 }
-
-/* Utility */
-.muted{color:var(--muted);}
 
 /* ─────────────────────────────────────────────
    NAVBAR
@@ -56,7 +50,7 @@ header{
   position:sticky;
   top:0;
   z-index:50;
-  background:rgba(255,255,255,.9);
+  background:rgba(255,255,255,.85);
   backdrop-filter:saturate(180%) blur(14px);
   border-bottom:1px solid var(--border);
 }
@@ -82,17 +76,10 @@ header{
 }
 
 .brand h1{
-  margin:0;
-  font-family:"Cormorant Garamond", serif;
+  font-family:"Playfair Display",serif;
   font-size:22px;
   letter-spacing:.18em;
-}
-
-/* menu principale in Inter per leggibilità */
-nav,
-nav a,
-.lang select{
-  font-family:Inter,system-ui,sans-serif;
+  margin:0;
 }
 
 nav ul{
@@ -119,7 +106,7 @@ nav a:hover{
   font-size:14px;
 }
 
-/* hamburger – sarà visibile solo in mobile-view */
+/* hamburger – nascosto default (mostrato in mobile-view via body.mobile-view) */
 .nav-toggle-btn,
 #nav-toggle{
   display:none;
@@ -160,13 +147,12 @@ nav a:hover{
 }
 
 .hero-logo{
-  font-family:"Cormorant Garamond", serif;
+  font-family:"Playfair Display",serif;
   font-size:clamp(64px,9vw,140px);
   letter-spacing:0.22em;
   font-weight:400;
   margin:0 0 20px;
   color:var(--white);
-  text-transform:uppercase;
 }
 
 .hero-tagline{
@@ -221,18 +207,11 @@ body.mobile-view .hero-scroll{
 }
 
 .section h3{
-  font-family:"Cormorant Garamond",serif;
+  font-family:"Playfair Display",serif;
   font-size:36px;
-  letter-spacing:.08em;
-  text-transform:uppercase;
-  margin:0 0 12px;
+  margin-bottom:12px;
 }
 
-.section .lead{
-  color:var(--muted);
-}
-
-/* layout due colonne */
 .about{
   display:grid;
   grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
@@ -261,42 +240,18 @@ body.mobile-view .hero-scroll{
   margin:0 0 10px;
 }
 
-/* CTA pill – in Inter per look più “UI” */
+/* CTA pill */
 .about-cta{
   display:flex;
-  flex-direction:column;      /* ← in colonna */
-  align-items:flex-start;     /* ← allineati a sinistra */
   gap:12px;
+  flex-wrap:wrap;
   margin:18px 0 4px;
 }
-
 .pill-btn{
-  width:260px;                       /* ← stessa lunghezza per tutti */
-  padding:10px 18px;
-  border:1px solid var(--text);
+  padding:8px 18px;
   border-radius:999px;
-  background:transparent;
-  cursor:pointer;
-
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-
-  font-family:Inter,system-ui,sans-serif;
-  font-size:16px;
-}
-
-.pill-text{
-  font-family:"Cormorant Garamond", serif;
-  font-size:20px;
-  font-weight:400;
-}
-
-.pill-arrow{
-  font-family:Inter,system-ui,sans-serif;
-  font-size:16px;
-  letter-spacing:-1px;
-  opacity:0.7;
+  border:1px solid var(--text);
+  font-size:14px;
 }
 
 /* MOBILE ABOUT */
@@ -324,14 +279,9 @@ body.mobile-view .about-cta{
   margin:12px 0 0;
 }
 body.mobile-view .pill-btn{
-  width:100%;
-  max-width:260px;
-  font-size:14px;
+  font-size:12px;
+  padding:6px 12px;
 }
-body.mobile-view .pill-text{
-  font-size:18px;
-}
-
 
 /* ─────────────────────────────────────────────
    CATALOG HEADER
@@ -345,7 +295,7 @@ body.mobile-view .pill-text{
 }
 .catalogue-header h3{
   margin:0;
-  font-family:"Cormorant Garamond",serif;
+  font-family:"Playfair Display",serif;
   font-size:40px;
   letter-spacing:.12em;
   text-transform:uppercase;
@@ -390,7 +340,6 @@ body.mobile-view .catalogue-header .lead{
   background:#fff;
 }
 
-/* immagine singola */
 .media-single{
   width:100%;
   cursor:pointer;
@@ -409,22 +358,20 @@ body.mobile-view .catalogue-header .lead{
 .card h4{
   margin:0 0 4px;
   font-size:18px;
-  font-family:"Cormorant Garamond",serif;
 }
 .card p{
   margin:0 0 8px;
   color:var(--muted);
-  font-size:16px;
+  font-size:14px;
 }
 
-/* Prezzi in catalogo – in Inter */
+/* Prezzi in catalogo */
 .card-price{
   display:flex;
   align-items:center;
   flex-wrap:wrap;
   gap:6px;
   margin:4px 0 10px;
-  font-family:Inter,system-ui,sans-serif;
 }
 
 .old-price{
@@ -434,10 +381,11 @@ body.mobile-view .catalogue-header .lead{
 }
 
 .new-price{
-  font-size:18px;
-  font-weight:700;
-  color:#b91c1c;
+  font-size: 18px;                 /* nuovo un po’ più grande */
+  font-weight: 700;
+  color: #b91c1c;                  /* rosso elegante */
 }
+
 
 /* Scritte “Venduto / Sold out” */
 .card-sold{
@@ -447,7 +395,6 @@ body.mobile-view .catalogue-header .lead{
   letter-spacing:.08em;
   color:#7d0f0f;
   font-size:13px;
-  font-family:Inter,system-ui,sans-serif;
 }
 
 /* Badge sconto */
@@ -460,10 +407,9 @@ body.mobile-view .catalogue-header .lead{
   font-weight:600;
   text-transform:uppercase;
   letter-spacing:.06em;
-  font-family:Inter,system-ui,sans-serif;
 }
 
-/* Bottone “View photos” – in Inter */
+/* Bottone “compra / vedi foto” */
 .buy{
   background:var(--brand);
   padding:10px;
@@ -474,7 +420,6 @@ body.mobile-view .catalogue-header .lead{
   cursor:pointer;
   border:none;
   font-size:14px;
-  font-family:Inter,system-ui,sans-serif;
 }
 
 /* MOBILE CATALOG GRID */
@@ -551,7 +496,6 @@ body.mobile-view .buy{
 }
 .modal-header h4{
   margin:0;
-  font-family:"Cormorant Garamond",serif;
 }
 .modal-header button{
   background:none;
@@ -578,7 +522,7 @@ body.mobile-view .buy{
 
 .vase-title{
   font-size:28px;
-  font-family:"Cormorant Garamond",serif;
+  font-family:"Playfair Display",serif;
   margin:0 0 4px;
 }
 
@@ -588,17 +532,16 @@ body.mobile-view .buy{
   flex-wrap:wrap;
   gap:8px;
   margin:10px 0 18px;
-  font-family:Inter,system-ui,sans-serif;
+}
+.vase-price{
+  font-size:24px;
+  font-weight:700;
+  color: #b91c1c;   /* rosso anche nel popup */
 }
 .vase-old-price{
   text-decoration:line-through;
   color:var(--muted);
   font-size:15px;
-}
-.vase-price{
-  font-size:24px;
-  font-weight:700;
-  color:#b91c1c;
 }
 
 /* Stato venduto in modale */
@@ -609,7 +552,6 @@ body.mobile-view .buy{
   text-transform:uppercase;
   letter-spacing:.12em;
   color:#7d0f0f;
-  font-family:Inter,system-ui,sans-serif;
 }
 
 /* Badge sconto in modale */
@@ -628,17 +570,16 @@ body.mobile-view .buy{
   cursor:pointer;
   background:none;
   border:none;
-  font-family:Inter,system-ui,sans-serif;
 }
 .accordion-panel{
   display:none;
   padding:10px 0 20px;
-  font-size:16px;
 }
 .accordion-panel.active{
   display:block;
 }
 
+.vase-specs dl,
 .accordion-panel dl{
   display:grid;
   grid-template-columns:120px auto;
@@ -683,12 +624,10 @@ body.mobile-view .buy{
   padding:4px 10px;
   font-size:18px;
   cursor:pointer;
-  font-family:Inter,system-ui,sans-serif;
 }
 .modal-gallery-controls span{
   font-size:13px;
   color:var(--muted);
-  font-family:Inter,system-ui,sans-serif;
 }
 
 /* MOBILE MODAL */
@@ -736,9 +675,6 @@ body.mobile-view .modal-gallery-main{
   border-radius:14px;
   padding:14px;
 }
-.contact-item strong{
-  font-family:Inter,system-ui,sans-serif;
-}
 body.mobile-view .contact-list{
   grid-template-columns:1fr;
   gap:12px;
@@ -757,7 +693,6 @@ footer{
   font-size:14px;
   color:var(--muted);
   text-align:center;
-  font-family:Inter,system-ui,sans-serif;
 }
 body.mobile-view footer{
   padding:18px 0;
@@ -782,7 +717,6 @@ body.mobile-view footer{
   border:none;
   cursor:pointer;
   opacity:.85;
-  font-family:Inter,system-ui,sans-serif;
 }
 .view-toggle button:hover{
   opacity:1;
