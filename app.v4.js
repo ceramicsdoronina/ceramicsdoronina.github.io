@@ -52,15 +52,15 @@ const messages = {
     footer: {
       made: "Сайт создан на GitHub Pages"
     },
-    workshops: {
-      title: "Мастер-классы",
-      lead: "Камерные занятия по работе с глиной в мастерской в Генуе.",
-      item1: "Базовые техники ручной лепки и работа с высокотемпературной глиной.",
-      item2: "Создание вазы или интерьерного объекта в духе ваби-саби.",
-      item3: "Небольшие группы и внимательное сопровождение каждого участника.",
-      note: "Чтобы узнать расписание ближайших мастер-классов или организовать частное занятие, напишите мне.",
-      cta: "Написать для записи"
-    }
+   workshops: {
+     title: "Мастер-классы",
+     lead: "Камерные занятия по работе с глиной в мастерской в Генуе.",
+     item1: "Базовые техники ручной лепки и работа с высокотемпературной глиной.",
+     item2: "Создание вазы или интерьерного объекта в духе ваби-саби.",
+     item3: "Небольшие группы и внимательное сопровождение каждого участника.",
+     note: "Чтобы узнать расписание ближайших мастер-классов или организовать частное занятие, напишите мне.",
+     cta: "Написать для записи"
+   }
   },
 
   it: {
@@ -348,9 +348,8 @@ async function buildCatalogue(){
     const sold = (vendutoVal === "si" || vendutoVal === "sì" || vendutoVal === "yes");
 
     // immagine principale per la card: sempre img1, anche se venduto
-    const img1Name = (vase.img1 || "").trim();
-    const img1 = img1Name && img1Name !== "-"
-      ? `images/catalogue/${img1Name}`
+    const img1 = (vase.img1 && vase.img1 !== "-")
+      ? `images/catalogue/${vase.img1}`
       : "images/placeholder.jpg";
 
     const priceOldStr = (vase.price_old && vase.price_old !== "-") ? vase.price_old : null;
@@ -411,9 +410,7 @@ async function buildCatalogue(){
     const imgs = [
       vase.img1, vase.img2, vase.img3,
       vase.img4, vase.img5, vase.img6
-    ]
-      .map(x => (x || "").trim())
-      .filter(x => x && x !== "-");
+    ].filter(x => x && x !== "-");
 
     const galleryHTML = imgs.map((img,i)=>`
       <img src="images/catalogue/${img}" data-slide="${i}" class="${i === 0 ? "active" : ""}">

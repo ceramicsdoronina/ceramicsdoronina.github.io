@@ -264,13 +264,12 @@ body.mobile-view .hero-scroll{
 /* CTA pill – in Inter per look più “UI” */
 .about-cta{
   display:flex;
-  flex-direction:column;      /* in colonna */
-  align-items:flex-start;
+  flex-direction:column;      /* ← in colonna */
+  align-items:flex-start;     /* ← allineati a sinistra */
   gap:12px;
   margin:18px 0 4px;
 }
 
-/* workshops */
 .workshops{
   display:grid;
   grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
@@ -317,9 +316,9 @@ body.mobile-view .workshops-img img{
   border-radius:14px;
 }
 
-/* pill buttons */
+
 .pill-btn{
-  width:340px;
+  width:340px;                       /* ← stessa lunghezza per tutti */
   padding:10px 18px;
   border:1px solid var(--text);
   border-radius:999px;
@@ -328,12 +327,13 @@ body.mobile-view .workshops-img img{
 
   display:flex;
   align-items:center;
-  justify-content:flex-start;
+  justify-content:flex-start;        /* testo a sinistra, freccia dopo */
   gap:12px;
 
   font-family:Inter,system-ui,sans-serif;
   font-size:16px;
 
+  /* nuova ombra soft */
   box-shadow:0 6px 18px rgba(0,0,0,.06);
   transition:box-shadow .2s ease, transform .2s ease, background-color .2s ease;
 }
@@ -344,6 +344,7 @@ body.mobile-view .workshops-img img{
   background:#fdfdfd;
 }
 
+
 .pill-text{
   font-family:"Cormorant Garamond", serif;
   font-size:20px;
@@ -351,28 +352,31 @@ body.mobile-view .workshops-img img{
 }
 
 .pill-arrow{
-  flex:1;
+  flex:1;                            /* occupa tutto lo spazio a destra */
   display:flex;
   align-items:center;
   justify-content:flex-end;
   min-width:0;
 }
 
+/* linea grigia */
 .pill-arrow::before{
   content:"";
   display:block;
   height:1px;
-  width:130px;
-  background:#d1d5db;
+  width:130px;                       /* lunghezza della linea */
+  background:#d1d5db;               /* grigio chiaro */
   margin-right:6px;
 }
 
+/* freccia grigia */
 .pill-arrow::after{
   content:"→";
   font-family:Inter,system-ui,sans-serif;
   font-size:16px;
-  color:#9ca3af;
+  color:#9ca3af;                     /* grigio medio, non nero */
 }
+
 
 /* MOBILE ABOUT */
 body.mobile-view .section{
@@ -406,6 +410,7 @@ body.mobile-view .pill-btn{
 body.mobile-view .pill-text{
   font-size:18px;
 }
+
 
 /* ─────────────────────────────────────────────
    CATALOG HEADER
@@ -513,22 +518,15 @@ body.mobile-view .catalogue-header .lead{
   color:#b91c1c;
 }
 
-/* Badge “Venduto / Sold out” riutilizzabile */
-.sold-badge{
-  display:inline-block;
-  padding:3px 10px;
-  border-radius:999px;
-  border:1px solid #7d0f0f;
-  color:#7d0f0f;
+/* Scritte “Venduto / Sold out” */
+.card-sold{
+  margin:4px 0 10px;
+  font-weight:600;
   text-transform:uppercase;
   letter-spacing:.08em;
-  font-size:11px;
-  font-weight:600;
+  color:#7d0f0f;
+  font-size:13px;
   font-family:Inter,system-ui,sans-serif;
-  background:rgba(125,15,15,0.02);
-}
-.sold-badge-modal{
-  margin-left:auto;
 }
 
 /* Badge sconto */
@@ -691,6 +689,11 @@ body.mobile-view .buy{
   letter-spacing:.12em;
   color:#7d0f0f;
   font-family:Inter,system-ui,sans-serif;
+}
+
+/* Badge sconto in modale */
+.modal-discount{
+  font-size:12px;
 }
 
 /* Accordion */
