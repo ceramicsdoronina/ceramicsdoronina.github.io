@@ -9,6 +9,7 @@ const messages = {
       about: "О бренде",
       catalogue: "Каталог",
       workshops: "Мастер-классы",
+      giftcards:"Подарочные сертификаты",
       contact: "Контакты"
     },
     hero: {
@@ -78,6 +79,7 @@ const messages = {
       about: "Il brand",
       catalogue: "Catalogo",
       workshops: "Masterclass",
+      giftcards:"Gift Card",
       contact: "Contatti"
     },
     hero: {
@@ -147,6 +149,7 @@ const messages = {
       about: "About",
       catalogue: "Catalogue",
       workshops: "Workshops",
+      giftcards:"Gift Cards",
       contact: "Contact"
     },
     hero: {
