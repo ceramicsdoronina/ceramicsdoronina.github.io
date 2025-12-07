@@ -9,16 +9,14 @@ async function importHTML(id, file) {
 
 document.addEventListener("DOMContentLoaded", async () => {
   const imports = [
-    ["import-navbar",    "partials/navbar.html"],
-    ["import-hero",      "partials/hero.html"],
-    ["import-about",     "partials/about.html"],
+    ["import-navbar", "partials/navbar.html"],
+    ["import-hero", "partials/hero.html"],
+    ["import-about", "partials/about.html"],
     ["import-catalogue", "partials/catalogue.html"],
-    ["import-workshops", "partials/workshops.html"],   // ← NEW: sezione Masterclass DOPO il catalogo
-    ["import-giftcards", "partials/giftcards.html"],   // ← NEW: Gift Cards dopo le Masterclass
-    ["import-modals",    "partials/modals.html"],
-    ["import-contact",   "partials/contact.html"],
-    ["import-footer",    "partials/footer.html"],
-    ["import-view-toggle","partials/view-toggle.html"]
+    ["import-modals", "partials/modals.html"],   
+    ["import-contact", "partials/contact.html"],
+    ["import-footer", "partials/footer.html"],
+    ["import-view-toggle", "partials/view-toggle.html"]
   ];
 
   await Promise.all(imports.map(([id, file]) => importHTML(id, file)));

@@ -60,6 +60,15 @@ const messages = {
       item3: "Небольшие группы и внимательное сопровождение каждого участника.",
       note: "Чтобы узнать расписание ближайших мастер-классов или организовать частное занятие, напишите мне.",
       cta: "Написать для записи"
+    },
+    giftcards: {
+      title: "Подарочные сертификаты",
+      lead: "Нежный способ подарить керамику или мастер-класс: человек сам выбирает то, что ему откликается.",
+      item1: "Гибкий формат: сертификат на определённую сумму или на конкретное изделие.",
+      item2: "Возможность подарить участие в мастер-классе в мастерской в Генуе.",
+      item3: "Цифровой сертификат с персональным посланием, отправленный по e-mail.",
+      note: "Напишите мне, чтобы подобрать сумму, формат и текст подарка.",
+      cta: "Написать о подарочном сертификате"
     }
   },
 
@@ -120,6 +129,15 @@ const messages = {
       item3: "Gruppi raccolti, attenzione personale ad ogni partecipante.",
       note: "Per il calendario aggiornato o per organizzare una masterclass privata, scrivimi.",
       cta: "Scrivi per iscriverti"
+    },
+    giftcards: {
+      title: "Gift Card",
+      lead: "Un modo delicato per regalare arte e presenza: il destinatario sceglie il vaso o il workshop che sente più suo.",
+      item1: "Formati flessibili: voucher per un importo specifico o per un singolo pezzo.",
+      item2: "Possibilità di abbinare la gift card a una masterclass nel laboratorio a Genova.",
+      item3: "Gift card digitale con messaggio personalizzato, inviata via email.",
+      note: "Scrivimi per scegliere insieme l’importo, la formula e il testo personale del tuo regalo.",
+      cta: "Scrivi per una Gift Card"
     }
   },
 
@@ -180,6 +198,15 @@ const messages = {
       item3: "Small groups and individual guidance for each participant.",
       note: "For the updated schedule or to organise a private workshop, feel free to contact me.",
       cta: "Write to join"
+    },
+    giftcards: {
+      title: "Gift Cards",
+      lead: "A gentle way to gift art and presence: the recipient chooses the vase or workshop that resonates most.",
+      item1: "Flexible formats: a voucher for a specific amount or for a particular piece.",
+      item2: "You can also gift a place in a workshop in the studio in Genoa.",
+      item3: "Digital gift card with a personalised message, sent via email.",
+      note: "Write to me to define the amount, format, and personal text for your gift.",
+      cta: "Write about a Gift Card"
     }
   }
 };

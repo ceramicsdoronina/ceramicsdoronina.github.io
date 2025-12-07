@@ -296,7 +296,7 @@ body.mobile-view .hero-scroll{
 
 .workshops-note{
   margin:10px 0 0;
-  font-size:14px;
+  font-size:1em;          /* uguale al testo normale */
   color:var(--muted);
 }
 
@@ -314,6 +314,54 @@ body.mobile-view .workshops{
 }
 
 body.mobile-view .workshops-img img{
+  border-radius:14px;
+}
+
+/* ─────────────────────────────────────────────
+   GIFT CARDS
+──────────────────────────────────────────────*/
+.giftcards{
+  display:grid;
+  grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
+  gap:40px;
+  align-items:center;
+}
+
+.giftcards-text{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.giftcards-list{
+  margin:0;
+  padding-left:18px;
+  list-style:disc;
+}
+
+.giftcards-list li{
+  margin-bottom:4px;
+}
+
+.giftcards-note{
+  margin:10px 0 0;
+  font-size:1em;
+  color:var(--muted);
+}
+
+.giftcards-img img{
+  width:100%;
+  display:block;
+  border-radius:18px;
+  object-fit:cover;
+}
+
+/* versione mobile */
+body.mobile-view .giftcards{
+  grid-template-columns:1fr;
+  gap:24px;
+}
+body.mobile-view .giftcards-img img{
   border-radius:14px;
 }
 
