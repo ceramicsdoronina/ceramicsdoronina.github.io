@@ -51,7 +51,16 @@ const messages = {
     },
     footer: {
       made: "Сайт создан на GitHub Pages"
-    }
+    },
+   workshops: {
+     title: "Мастер-классы",
+     lead: "Камерные занятия по работе с глиной в мастерской в Генуе.",
+     item1: "Базовые техники ручной лепки и работа с высокотемпературной глиной.",
+     item2: "Создание вазы или интерьерного объекта в духе ваби-саби.",
+     item3: "Небольшие группы и внимательное сопровождение каждого участника.",
+     note: "Чтобы узнать расписание ближайших мастер-классов или организовать частное занятие, напишите мне.",
+     cta: "Написать для записи"
+   }
   },
 
   it: {
@@ -102,6 +111,15 @@ const messages = {
     },
     footer: {
       made: "Realizzato con GitHub Pages"
+    },
+    workshops: {
+      title: "Masterclass",
+      lead: "Incontri dal vivo e piccoli gruppi di lavoro con l’argilla nel laboratorio a Genova.",
+      item1: "Tecniche base di modellazione a mano e uso di argille ad alta temperatura.",
+      item2: "Creazione di un vaso o oggetto per interni nello stile wabi-sabi.",
+      item3: "Gruppi raccolti, attenzione personale ad ogni partecipante.",
+      note: "Per il calendario aggiornato o per organizzare una masterclass privata, scrivimi.",
+      cta: "Scrivi per iscriverti"
     }
   },
 
@@ -153,6 +171,15 @@ const messages = {
     },
     footer: {
       made: "Made with GitHub Pages"
+    },
+    workshops: {
+      title: "Workshops",
+      lead: "Intimate ceramic workshops in the studio in Genoa, in small groups.",
+      item1: "Fundamentals of hand-building and working with high-fire clay.",
+      item2: "Creating a vase or interior object in a wabi-sabi inspired style.",
+      item3: "Small groups and individual guidance for each participant.",
+      note: "For the updated schedule or to organise a private workshop, feel free to contact me.",
+      cta: "Write to join"
     }
   }
 };
