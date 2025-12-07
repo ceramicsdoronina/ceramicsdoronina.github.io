@@ -186,14 +186,8 @@ async function buildCatalogue(){
   const lang = getInitialLang();
   const items = await loadCSV("catalogue/vasi.csv");
 
-  // Ordinamento: prima non venduti, poi venduti (accettiamo "si", "sì", "yes")
-  items.sort((a,b)=>{
-    const av = (a.venduto||"").trim().toLowerCase();
-    const bv = (b.venduto||"").trim().toLowerCase();
-    const aSold = (av==="si" || av==="sì" || av==="yes");
-    const bSold = (bv==="si" || bv==="sì" || bv==="yes");
-    return (aSold === bSold) ? 0 : (aSold ? 1 : -1);
-  });
+  // Ordinamento: prima non venduti, poi venduti
+  items.sort((a,b)=> (a.venduto==="si") - (b.venduto==="si"));
 
   const grid = document.getElementById("catalogue-grid");
   const modalRoot = document.getElementById("modal-container");
@@ -211,10 +205,8 @@ async function buildCatalogue(){
     const short = vase[`short_${lang}`] && vase[`short_${lang}`] !== "-" ? vase[`short_${lang}`] : vase.short_ru;
     const long  = vase[`long_${lang}`]  && vase[`long_${lang}`]  !== "-" ? vase[`long_${lang}`]  : vase.long_ru;
 
-    const vendutoVal = (vase.venduto || "").trim().toLowerCase();
-    const sold = (vendutoVal === "si" || vendutoVal === "sì" || vendutoVal === "yes");
+    const sold = (vase.venduto || "").trim().toLowerCase() === "si";
 
-    // immagine principale per la card: sempre img1 (anche se venduto)
     const img1 = vase.img1 && vase.img1 !== "-" ? `images/catalogue/${vase.img1}` : "images/placeholder.jpg";
 
     const priceOldStr = vase.price_old && vase.price_old !== "-" ? vase.price_old : null;
@@ -235,14 +227,12 @@ async function buildCatalogue(){
     let cardStatusBlock = "";
 
     if (sold){
-      // vaso venduto: nessun prezzo, solo etichetta
       cardStatusBlock = `
         <div class="card-sold">
           ${messages[lang].status.sold}
         </div>
       `;
     } else if (priceNewStr){
-      // vaso disponibile con eventuale sconto
       let discountBlock = "";
       if (discount){
         discountBlock = `<span class="discount-badge">-${discount}%</span>`;
@@ -368,8 +358,7 @@ async function buildCatalogue(){
               </div>
               <div class="modal-gallery-controls">
                 <button data-gallery-prev>←</button>
-                <!-- FIX: attributo corretto data-gallery-counter -->
-                <span data-gallery-counter>${imgs.length ? `1 / ${imgs.length}` : ""}</span>
+                <span data-gallery-counter">1 / ${imgs.length}</span>
                 <button data-gallery-next>→</button>
               </div>
             </div>
@@ -392,23 +381,19 @@ async function buildCatalogue(){
    MODALI + GALLERY
 ============================================================ */
 function initModals(){
-  // apertura modale
   document.querySelectorAll("[data-modal-target]").forEach(el=>{
     el.addEventListener("click", ()=>{
       const id = el.dataset.modalTarget;
-      const modal = document.getElementById(id);
-      if (modal) modal.classList.add("open");
+      document.getElementById(id)?.classList.add("open");
     });
   });
 
-  // chiusura modale
   document.querySelectorAll("[data-modal-close]").forEach(btn=>{
     btn.addEventListener("click", ()=>{
-      btn.closest(".modal")?.classList.remove("open");
+      btn.closest(".modal").classList.remove("open");
     });
   });
 
-  // chiusura cliccando sullo sfondo
   document.querySelectorAll(".modal").forEach(modal=>{
     modal.addEventListener("click", e=>{
       if (e.target === modal) modal.classList.remove("open");
@@ -418,8 +403,6 @@ function initModals(){
     if (!main) return;
 
     const slides = [...main.querySelectorAll("img[data-slide]")];
-    if (!slides.length) return;
-
     let index = 0;
     const counter = modal.querySelector("[data-gallery-counter]");
 
@@ -464,11 +447,8 @@ function initAccordion(){
 window.appInit = function(){
   const lang = getInitialLang();
   applyTranslations(lang);
-
-  // sincronizza select lingua all'avvio
   const sel = document.getElementById("language-selector");
   if (sel) sel.value = lang;
-
   initViewToggle();
   initMobileNav();
   buildCatalogue();
