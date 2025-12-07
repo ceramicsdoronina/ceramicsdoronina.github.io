@@ -10,7 +10,7 @@
   --white:#fafafa;
 
   /* Buttons */
-  --btn-primary:#7d0f0f;
+  --btn-primary:#111827;
   --btn-primary-text:#ffffff;
 
   /* Borders */
@@ -18,26 +18,36 @@
 
   /* Modal background */
   --modal-bg:rgba(15,23,42,.65);
+
+  /* Discount */
+  --discount:#b88a4a;
 }
 
-/* Reset */
+/* ─────────────────────────────────────────────
+   RESET & BASE
+──────────────────────────────────────────────*/
 *{box-sizing:border-box;}
 html,body{
   margin:0;
   padding:0;
   background:var(--bg);
-  font-family:Inter,system-ui,sans-serif;
   color:var(--text);
+  font-family:"Cormorant Garamond", serif;
+  font-size:18px;
+  line-height:1.5;
 }
 img{max-width:100%;display:block;}
 a{text-decoration:none;color:inherit;}
+button{font-family:inherit;}
 
-/* Layout container */
 .container{
   max-width:1200px;
   margin:0 auto;
   padding:0 20px;
 }
+
+/* Utility */
+.muted{color:var(--muted);}
 
 /* ─────────────────────────────────────────────
    NAVBAR
@@ -46,7 +56,7 @@ header{
   position:sticky;
   top:0;
   z-index:50;
-  background:rgba(255,255,255,.85);
+  background:rgba(255,255,255,.9);
   backdrop-filter:saturate(180%) blur(14px);
   border-bottom:1px solid var(--border);
 }
@@ -56,6 +66,7 @@ header{
   justify-content:space-between;
   align-items:center;
   padding:18px 0;
+  position:relative;
 }
 
 .brand{
@@ -71,10 +82,17 @@ header{
 }
 
 .brand h1{
-  font-family:"Cormorant Garamond",serif;
-  font-size:26px;
-  letter-spacing:.18em;
   margin:0;
+  font-family:"Cormorant Garamond", serif;
+  font-size:22px;
+  letter-spacing:.18em;
+}
+
+/* menu principale in Inter per leggibilità */
+nav,
+nav a,
+.lang select{
+  font-family:Inter,system-ui,sans-serif;
 }
 
 nav ul{
@@ -96,14 +114,19 @@ nav a:hover{
 .lang select{
   border:1px solid var(--border);
   background:#fafafa;
-  border-radius:999px;
+  border-radius:8px;
   padding:6px 10px;
   font-size:14px;
-  font-family:inherit;
+}
+
+/* hamburger – sarà visibile solo in mobile-view */
+.nav-toggle-btn,
+#nav-toggle{
+  display:none;
 }
 
 /* ─────────────────────────────────────────────
-   HERO FULLSCREEN (DESKTOP)
+   HERO FULLSCREEN
 ──────────────────────────────────────────────*/
 .hero{
   position:relative;
@@ -115,7 +138,7 @@ nav a:hover{
 }
 
 .hero-landing{
-  background:url('images/banner.jpg') center/cover no-repeat;
+  background:url('images/bannerAnna.jpg') center/cover no-repeat;
 }
 
 .hero::before{
@@ -137,12 +160,13 @@ nav a:hover{
 }
 
 .hero-logo{
-  font-family:"Cormorant Garamond",serif;
+  font-family:"Cormorant Garamond", serif;
   font-size:clamp(64px,9vw,140px);
   letter-spacing:0.22em;
   font-weight:400;
   margin:0 0 20px;
   color:var(--white);
+  text-transform:uppercase;
 }
 
 .hero-tagline{
@@ -152,7 +176,6 @@ nav a:hover{
   font-size:18px;
 }
 
-/* FRECCIA SOTTO LA FRASE, CENTRATA */
 .hero-scroll{
   display:flex;
   align-items:center;
@@ -163,9 +186,38 @@ nav a:hover{
   border:1px solid var(--white);
   font-size:24px;
   color:var(--white);
-  margin:40px auto 0 auto;    /* sotto al testo, centrata */
-  position:relative;
+
+  /* CENTRATA sotto il sottotitolo */
+  margin:40px auto 0 auto;     /* distanziata dal testo */
+  position:relative;           /* NON assoluta */
 }
+
+/* MOBILE HERO */
+body.mobile-view .hero{
+  min-height:60vh;
+  align-items:flex-end;
+  padding-bottom:32px;
+}
+body.mobile-view .hero-landing{
+  background-position:center top;
+}
+body.mobile-view .hero-logo{
+  font-size:clamp(34px,9vw,52px);
+  letter-spacing:0.13em;
+  margin-bottom:8px;
+}
+body.mobile-view .hero-tagline{
+  font-size:13px;
+  max-width:90%;
+}
+
+body.mobile-view .hero-scroll{
+  width:40px;
+  height:40px;
+  font-size:18px;
+  margin:28px auto 0 auto;   /* più vicino al testo su mobile */
+}
+
 
 /* ─────────────────────────────────────────────
    SECTION / ABOUT
@@ -177,14 +229,16 @@ nav a:hover{
 .section h3{
   font-family:"Cormorant Garamond",serif;
   font-size:36px;
-  margin-bottom:12px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  margin:0 0 12px;
 }
 
 .section .lead{
   color:var(--muted);
 }
 
-/* ABOUT DUE COLONNE */
+/* layout due colonne */
 .about{
   display:grid;
   grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
@@ -203,29 +257,123 @@ nav a:hover{
   width:100%;
   display:block;
   border-radius:18px;
-  object-fit:cover;
 }
 
 .about-text-top h3{
   margin-top:0;
 }
-
 .about-text-top p,
 .about-text-bottom p{
   margin:0 0 10px;
 }
 
-/* PULSANTI OBLUNGHI CON FRECCIA */
+/* CTA pill – in Inter per look più “UI” */
 .about-cta{
   display:flex;
-  flex-direction:column;
-  gap:16px;
-  margin:24px 0 4px;
+  flex-direction:column;      /* in colonna */
+  align-items:flex-start;
+  gap:12px;
+  margin:18px 0 4px;
 }
 
-/* bottone principale */
+/* workshops */
+.workshops{
+  display:grid;
+  grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
+  gap:40px;
+  align-items:center;
+}
+
+.workshops-text{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.workshops-list{
+  margin:0;
+  padding-left:18px;
+  list-style:disc;
+}
+
+.workshops-list li{
+  margin-bottom:4px;
+}
+
+.workshops-note{
+  margin:10px 0 0;
+  font-size:1em;          /* uguale al testo normale */
+  color:var(--muted);
+}
+
+.workshops-img img{
+  width:100%;
+  display:block;
+  border-radius:18px;
+  object-fit:cover;
+}
+
+/* versione mobile */
+body.mobile-view .workshops{
+  grid-template-columns:1fr;
+  gap:24px;
+}
+
+body.mobile-view .workshops-img img{
+  border-radius:14px;
+}
+
+/* ─────────────────────────────────────────────
+   GIFT CARDS
+──────────────────────────────────────────────*/
+.giftcards{
+  display:grid;
+  grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
+  gap:40px;
+  align-items:center;
+}
+
+.giftcards-text{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.giftcards-list{
+  margin:0;
+  padding-left:18px;
+  list-style:disc;
+}
+
+.giftcards-list li{
+  margin-bottom:4px;
+}
+
+.giftcards-note{
+  margin:10px 0 0;
+  font-size:1em;
+  color:var(--muted);
+}
+
+.giftcards-img img{
+  width:100%;
+  display:block;
+  border-radius:18px;
+  object-fit:cover;
+}
+
+/* versione mobile */
+body.mobile-view .giftcards{
+  grid-template-columns:1fr;
+  gap:24px;
+}
+body.mobile-view .giftcards-img img{
+  border-radius:14px;
+}
+
+/* pill buttons */
 .pill-btn{
-  width:340px;                       /* lunghezza fissa */
+  width:340px;
   padding:10px 18px;
   border:1px solid var(--text);
   border-radius:999px;
@@ -234,45 +382,87 @@ nav a:hover{
 
   display:flex;
   align-items:center;
-  justify-content:flex-start;        /* testo a sinistra */
+  justify-content:flex-start;
   gap:12px;
 
   font-family:Inter,system-ui,sans-serif;
   font-size:16px;
 
-  box-shadow:0 4px 12px rgba(0,0,0,.06);
-  transition:.2s ease-in-out;
+  box-shadow:0 6px 18px rgba(0,0,0,.06);
+  transition:box-shadow .2s ease, transform .2s ease, background-color .2s ease;
 }
 
 .pill-btn:hover{
-  box-shadow:0 6px 18px rgba(0,0,0,.12);
+  box-shadow:0 10px 26px rgba(0,0,0,.10);
+  transform:translateY(-1px);
   background:#fdfdfd;
 }
 
 .pill-text{
-  font-family:"Cormorant Garamond",serif;
+  font-family:"Cormorant Garamond", serif;
   font-size:20px;
+  font-weight:400;
 }
 
-/* linea + freccia */
 .pill-arrow{
   flex:1;
-  position:relative;
-  height:1px;
-  background:#d1d5db;                /* grigio chiaro */
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  min-width:0;
 }
+
+.pill-arrow::before{
+  content:"";
+  display:block;
+  height:1px;
+  width:130px;
+  background:#d1d5db;
+  margin-right:6px;
+}
+
 .pill-arrow::after{
   content:"→";
-  position:absolute;
-  right:0;
-  top:50%;
-  transform:translateY(-50%);
+  font-family:Inter,system-ui,sans-serif;
+  font-size:16px;
+  color:#9ca3af;
+}
+
+/* MOBILE ABOUT */
+body.mobile-view .section{
+  padding:40px 0;
+}
+body.mobile-view .section h3{
+  font-size:26px;
+  margin-bottom:8px;
+}
+body.mobile-view .section .lead{
+  font-size:13px;
+}
+body.mobile-view .about{
+  grid-template-columns:1fr;
+  gap:24px;
+}
+body.mobile-view .about-col{
+  gap:16px;
+}
+body.mobile-view .about-img-secondary{
+  order:2;
+}
+body.mobile-view .about-cta{
+  margin:12px 0 0;
+}
+body.mobile-view .pill-btn{
+  width:100%;
+  max-width:340px;
+  font-size:14px;
+}
+body.mobile-view .pill-text{
   font-size:18px;
-  color:#9ca3af;                     /* freccia grigia */
 }
 
 /* ─────────────────────────────────────────────
-   CATALOG GRID
+   CATALOG HEADER
 ──────────────────────────────────────────────*/
 .catalogue-header{
   display:flex;
@@ -297,6 +487,22 @@ nav a:hover{
   line-height:1.5;
 }
 
+/* mobile header */
+body.mobile-view .catalogue-header{
+  flex-direction:column;
+  align-items:flex-start;
+  gap:4px;
+  margin-bottom:18px;
+}
+body.mobile-view .catalogue-header .lead{
+  text-align:left;
+  max-width:100%;
+  font-size:13px;
+}
+
+/* ─────────────────────────────────────────────
+   CATALOG GRID
+──────────────────────────────────────────────*/
 .catalogue-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -305,17 +511,16 @@ nav a:hover{
 
 .card{
   border:1px solid var(--border);
-  border-radius:24px;
+  border-radius:16px;
   overflow:hidden;
   display:flex;
   flex-direction:column;
-  background:#ffffff;
+  background:#fff;
 }
 
-/* immagine singola nel catalogo */
+/* immagine singola */
 .media-single{
   width:100%;
-  height:auto;
   cursor:pointer;
   aspect-ratio:4/3;
   overflow:hidden;
@@ -326,62 +531,76 @@ nav a:hover{
   object-fit:cover;
 }
 
-/* mini-griglia nella card (se usata) */
-.media-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:2px;
-  cursor:pointer;
-  aspect-ratio:4/3;
-}
-.media-grid img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
 .card .body{
-  padding:22px;
+  padding:16px;
 }
-
 .card h4{
-  margin:0 0 8px;
+  margin:0 0 4px;
+  font-size:18px;
   font-family:"Cormorant Garamond",serif;
-  font-size:22px;
 }
-
 .card p{
-  margin:0 0 6px;
-}
-
-/* PREZZI NELLA CARD */
-.card .price-row{
-  display:flex;
-  align-items:baseline;
-  gap:8px;
-  margin-top:6px;
-}
-
-.card .price-current{
-  font-size:20px;
-  font-weight:600;
-  color:#b91c1c;         /* rosso per prezzo scontato / corrente */
-}
-
-.card .price-old{
-  font-size:16px;
+  margin:0 0 8px;
   color:var(--muted);
-  text-decoration:line-through;
+  font-size:16px;
 }
 
-.card .price-discount{
-  font-size:14px;
+/* Prezzi in catalogo – in Inter */
+.card-price{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:6px;
+  margin:4px 0 10px;
+  font-family:Inter,system-ui,sans-serif;
+}
+
+.old-price{
+  text-decoration:line-through;
+  color:var(--muted);
+  font-size:13px;
+}
+
+.new-price{
+  font-size:18px;
+  font-weight:700;
   color:#b91c1c;
 }
 
-/* bottone "Vedi foto" – rosso */
+/* Badge “Venduto / Sold out” riutilizzabile */
+.sold-badge{
+  display:inline-block;
+  padding:3px 10px;
+  border-radius:999px;
+  border:1px solid #7d0f0f;
+  color:#7d0f0f;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-size:11px;
+  font-weight:600;
+  font-family:Inter,system-ui,sans-serif;
+  background:rgba(125,15,15,0.02);
+}
+.sold-badge-modal{
+  margin-left:auto;
+}
+
+/* Badge sconto */
+.discount-badge{
+  padding:3px 8px;
+  border-radius:999px;
+  border:1px solid var(--discount);
+  color:var(--discount);
+  font-size:12px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  font-family:Inter,system-ui,sans-serif;
+}
+
+/* Bottone “View photos” – in Inter */
 .buy{
-  background:#b91c1c;
+  background:#b91c1c;         /* rosso */
   padding:10px;
   text-align:center;
   color:white;
@@ -391,10 +610,42 @@ nav a:hover{
   border:none;
   font-size:14px;
   font-family:Inter,system-ui,sans-serif;
-  transition:.2s ease-in-out;
 }
 .buy:hover{
   background:#7f1d1d;
+}
+
+/* MOBILE CATALOG GRID */
+body.mobile-view .catalogue-grid{
+  grid-template-columns:1fr;
+  gap:18px;
+}
+body.mobile-view .card{
+  border-radius:14px;
+}
+body.mobile-view .media-single{
+  aspect-ratio:4/3;
+}
+body.mobile-view .card .body{
+  padding:12px 14px 14px;
+}
+body.mobile-view .card h4{
+  font-size:16px;
+}
+body.mobile-view .card p{
+  font-size:13px;
+}
+body.mobile-view .buy{
+  font-size:13px;
+  padding:9px;
+}
+
+/* Responsive general fallback */
+@media (max-width:960px){
+  .catalogue-grid{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:640px){
+  .catalogue-grid{grid-template-columns:1fr;}
 }
 
 /* ─────────────────────────────────────────────
@@ -434,19 +685,23 @@ nav a:hover{
   align-items:center;
   padding:14px 20px;
   border-bottom:1px solid var(--border);
+  gap:12px;
 }
-
+.modal-header h4{
+  margin:0;
+  font-family:"Cormorant Garamond",serif;
+}
 .modal-header button{
   background:none;
   border:none;
   font-size:24px;
+  cursor:pointer;
 }
 
 .modal-body{
   padding:0;
   overflow-y:auto;
 }
-
 .modal-body-inner{
   display:flex;
   gap:24px;
@@ -464,57 +719,35 @@ nav a:hover{
   font-family:"Cormorant Garamond",serif;
   margin:0 0 4px;
 }
-.vase-rating{
-  font-size:18px;
-  color:#a22;
-}
 
 .vase-price-row{
   display:flex;
   align-items:center;
-  gap:12px;
-  margin:18px 0;
-}
-.vase-price{
-  font-size:26px;
-  font-weight:700;
-  color:#b91c1c;          /* rosso anche nel popup */
-}
-.vase-discount{
-  background:#fee2e2;
-  color:#b91c1c;
-  padding:4px 6px;
-  border-radius:6px;
-  font-size:13px;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:10px 0 18px;
+  font-family:Inter,system-ui,sans-serif;
 }
 .vase-old-price{
   text-decoration:line-through;
   color:var(--muted);
+  font-size:15px;
+}
+.vase-price{
+  font-size:24px;
+  font-weight:700;
+  color:#b91c1c;
 }
 
-/* Buttons */
-.vase-actions{
-  display:flex;
-  gap:12px;
-  margin-bottom:20px;
-}
-.vase-btn-primary{
-  background:var(--btn-primary);
-  color:white;
-  padding:12px 18px;
-  border-radius:10px;
-  border:none;
-  font-size:15px;
-  cursor:pointer;
-}
-.vase-btn-outline{
-  border:1px solid var(--btn-primary);
-  color:var(--btn-primary);
-  padding:12px 18px;
-  border-radius:10px;
-  background:none;
-  font-size:15px;
-  cursor:pointer;
+/* Stato venduto in modale */
+.vase-status-sold{
+  margin:10px 0 18px;
+  font-weight:700;
+  font-size:18px;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  color:#7d0f0f;
+  font-family:Inter,system-ui,sans-serif;
 }
 
 /* Accordion */
@@ -528,16 +761,18 @@ nav a:hover{
   cursor:pointer;
   background:none;
   border:none;
+  font-family:Inter,system-ui,sans-serif;
 }
 .accordion-panel{
   display:none;
   padding:10px 0 20px;
+  font-size:16px;
 }
 .accordion-panel.active{
   display:block;
 }
 
-.vase-specs dl{
+.accordion-panel dl{
   display:grid;
   grid-template-columns:120px auto;
   gap:6px 12px;
@@ -548,7 +783,6 @@ nav a:hover{
 .modal-gallery{
   flex:1;
 }
-
 .modal-gallery-main{
   position:relative;
   aspect-ratio:3/2;
@@ -567,17 +801,13 @@ nav a:hover{
 .modal-gallery-main img.active{
   opacity:1;
 }
-.modal-gallery-counter{
-  margin-top:8px;
-  font-size:14px;
-  color:var(--muted);
-  text-align:center;
-}
 
 .modal-gallery-controls{
   display:flex;
   justify-content:space-between;
+  align-items:center;
   margin-top:8px;
+  gap:8px;
 }
 .modal-gallery-controls button{
   border:1px solid var(--border);
@@ -585,82 +815,45 @@ nav a:hover{
   border-radius:8px;
   padding:4px 10px;
   font-size:18px;
+  cursor:pointer;
+  font-family:Inter,system-ui,sans-serif;
 }
-
-/* ─────────────────────────────────────────────
-   WORKSHOPS
-──────────────────────────────────────────────*/
-.workshops{
-  display:grid;
-  grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
-  gap:40px;
-  align-items:center;
-}
-
-.workshops-text{
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-
-.workshops-list{
-  margin:0;
-  padding-left:18px;
-  list-style:disc;
-}
-.workshops-list li{
-  margin-bottom:4px;
-}
-
-.workshops-note{
-  margin:10px 0 0;
-  font-size:1em;
+.modal-gallery-controls span{
+  font-size:13px;
   color:var(--muted);
+  font-family:Inter,system-ui,sans-serif;
 }
 
-.workshops-img img{
+/* MOBILE MODAL */
+body.mobile-view .modal-dialog{
+  max-width:100%;
   width:100%;
-  display:block;
-  border-radius:18px;
-  object-fit:cover;
+  height:100%;
+  max-height:100vh;
+  border-radius:0;
 }
-
-/* ─────────────────────────────────────────────
-   GIFT CARDS
-──────────────────────────────────────────────*/
-.giftcards{
-  display:grid;
-  grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
-  gap:40px;
-  align-items:center;
-}
-
-.giftcards-text{
-  display:flex;
+body.mobile-view .modal-body-inner{
   flex-direction:column;
-  gap:14px;
+  gap:16px;
+  padding:16px;
 }
-
-.giftcards-list{
-  margin:0;
-  padding-left:18px;
-  list-style:disc;
+body.mobile-view .vase-title{
+  font-size:20px;
 }
-.giftcards-list li{
-  margin-bottom:4px;
+body.mobile-view .vase-price-row{
+  margin:12px 0;
 }
-
-.giftcards-note{
-  margin:10px 0 0;
-  font-size:1em;
-  color:var(--muted);
+body.mobile-view .vase-price{
+  font-size:22px;
 }
-
-.giftcards-img img{
-  width:100%;
-  display:block;
-  border-radius:18px;
-  object-fit:cover;
+body.mobile-view .accordion-header{
+  font-size:14px;
+}
+body.mobile-view .accordion-panel{
+  font-size:13px;
+}
+body.mobile-view .modal-gallery-main{
+  aspect-ratio:4/3;
 }
 
 /* ─────────────────────────────────────────────
@@ -671,11 +864,21 @@ nav a:hover{
   grid-template-columns:repeat(3,1fr);
   gap:20px;
 }
-
 .contact-item{
   border:1px solid var(--border);
   border-radius:14px;
   padding:14px;
+}
+.contact-item strong{
+  font-family:Inter,system-ui,sans-serif;
+}
+body.mobile-view .contact-list{
+  grid-template-columns:1fr;
+  gap:12px;
+}
+body.mobile-view .contact-item{
+  padding:10px 12px;
+  font-size:13px;
 }
 
 /* ─────────────────────────────────────────────
@@ -687,6 +890,11 @@ footer{
   font-size:14px;
   color:var(--muted);
   text-align:center;
+  font-family:Inter,system-ui,sans-serif;
+}
+body.mobile-view footer{
+  padding:18px 0;
+  font-size:12px;
 }
 
 /* ─────────────────────────────────────────────
@@ -698,7 +906,6 @@ footer{
   right:16px;
   z-index:2000;
 }
-
 .view-toggle button{
   background:#111;
   color:white;
@@ -708,127 +915,30 @@ footer{
   border:none;
   cursor:pointer;
   opacity:.85;
+  font-family:Inter,system-ui,sans-serif;
 }
 .view-toggle button:hover{
   opacity:1;
 }
 
 /* ─────────────────────────────────────────────
-   MOBILE HERO & LAYOUT
+   NAV MOBILE: HAMBURGER + DROPDOWN
 ──────────────────────────────────────────────*/
-body.mobile-view .hero{
-  min-height:60vh;
-  align-items:flex-end;
-  padding-bottom:40px;
+/* MOBILE: rendi la barra fissa */
+body.mobile-view header{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:2000;
+  background:rgba(255,255,255,.9);
+  backdrop-filter:saturate(180%) blur(14px);
 }
-body.mobile-view .hero-overlay{
-  padding:0 16px 0;
-}
-body.mobile-view .hero-logo{
-  font-size:clamp(38px,10vw,58px);
-  letter-spacing:0.14em;
-  margin-bottom:10px;
-}
-body.mobile-view .hero-tagline{
-  font-size:13px;
-  max-width:90%;
+/* MOBILE: spazio sotto la barra fissa */
+body.mobile-view main{
+  padding-top:72px; /* puoi aumentare o diminuire se necessario */
 }
 
-/* freccia sotto il testo anche su mobile */
-body.mobile-view .hero-scroll{
-  width:40px;
-  height:40px;
-  font-size:18px;
-  margin:28px auto 0 auto;
-}
-
-/* ABOUT mobile */
-body.mobile-view .about{
-  grid-template-columns:1fr;
-  gap:24px;
-}
-body.mobile-view .about-col{
-  gap:16px;
-}
-body.mobile-view .about-img-secondary{
-  order:2;
-}
-body.mobile-view .about-img-main img,
-body.mobile-view .about-img-secondary img{
-  border-radius:14px;
-}
-body.mobile-view .about-cta{
-  margin:12px 0 0;
-}
-body.mobile-view .pill-btn{
-  width:100%;
-  font-size:14px;
-  padding:8px 14px;
-}
-
-/* CATALOG mobile */
-body.mobile-view .catalogue-header{
-  flex-direction:column;
-  align-items:flex-start;
-  gap:4px;
-  margin-bottom:18px;
-}
-body.mobile-view .catalogue-header .lead{
-  text-align:left;
-  max-width:100%;
-  font-size:13px;
-}
-
-body.mobile-view .catalogue-grid{
-  grid-template-columns:1fr;
-  gap:18px;
-}
-body.mobile-view .card{
-  border-radius:14px;
-}
-body.mobile-view .card .body{
-  padding:16px 18px 18px;
-}
-body.mobile-view .card h4{
-  font-size:18px;
-}
-
-/* WORKSHOPS / GIFT mobile */
-body.mobile-view .workshops,
-body.mobile-view .giftcards{
-  grid-template-columns:1fr;
-  gap:24px;
-}
-body.mobile-view .workshops-img img,
-body.mobile-view .giftcards-img img{
-  border-radius:14px;
-}
-
-/* CONTACT mobile */
-body.mobile-view .contact-list{
-  grid-template-columns:1fr;
-  gap:12px;
-}
-body.mobile-view .contact-item{
-  padding:10px 12px;
-  font-size:13px;
-}
-body.mobile-view footer{
-  padding:18px 0;
-  font-size:12px;
-}
-
-/* NAV MOBILE: HAMBURGER + DROPDOWN */
-.nav{
-  position:relative;
-}
-
-/* di default (desktop) l'hamburger non si vede */
-.nav-toggle-btn{
-  display:none;
-}
-
-/* in mobile-view visibile */
 body.mobile-view .nav-toggle-btn,
 body.mobile-view #nav-toggle{
   display:inline-flex;
@@ -874,42 +984,5 @@ body.mobile-view nav a{
 /* mobile base font */
 body.mobile-view{
   font-size:14px;
-}
-
-/* ─────────────────────────────────────────────
-   BUTTON ADD TO CART
-──────────────────────────────────────────────*/
-.add-cart{
-  background:#111827;
-  color:white;
-  padding:10px;
-  text-align:center;
-  border-radius:12px;
-  margin-top:6px;
-  cursor:pointer;
-  border:none;
-  font-size:14px;
-  font-family:Inter,system-ui,sans-serif;
-  transition:.2s ease;
-}
-.add-cart:hover{
-  background:#000000;
-}
-
-/* ─────────────────────────────────────────────
-   MOBILE FIXED HEADER + MAIN OFFSET
-──────────────────────────────────────────────*/
-body.mobile-view header{
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  z-index:2000;
-  background:rgba(255,255,255,.9);
-  backdrop-filter:saturate(180%) blur(14px);
-}
-
-body.mobile-view main{
-  padding-top:72px;
 }
 
