@@ -177,15 +177,19 @@ nav a:hover{
 }
 
 .hero-scroll{
-  margin-top:40px;
-  width:50px;height:50px;
   display:flex;
   align-items:center;
   justify-content:center;
+  width:50px;
+  height:50px;
   border-radius:50%;
   border:1px solid var(--white);
   font-size:24px;
   color:var(--white);
+
+  /* CENTRATA sotto il sottotitolo */
+  margin:40px auto 0 auto;     /* distanziata dal testo */
+  position:relative;           /* NON assoluta */
 }
 
 /* MOBILE HERO */
@@ -206,12 +210,14 @@ body.mobile-view .hero-tagline{
   font-size:13px;
   max-width:90%;
 }
+
 body.mobile-view .hero-scroll{
-  margin-top:20px;
-  width:36px;
-  height:36px;
+  width:40px;
+  height:40px;
   font-size:18px;
+  margin:28px auto 0 auto;   /* più vicino al testo su mobile */
 }
+
 
 /* ─────────────────────────────────────────────
    SECTION / ABOUT
