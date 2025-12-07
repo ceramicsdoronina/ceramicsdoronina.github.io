@@ -594,7 +594,7 @@ body.mobile-view .catalogue-header .lead{
 
 /* Bottone “View photos” – in Inter */
 .buy{
-  background:var(--brand);
+  background:#b91c1c;         /* rosso */
   padding:10px;
   text-align:center;
   color:white;
@@ -604,6 +604,9 @@ body.mobile-view .catalogue-header .lead{
   border:none;
   font-size:14px;
   font-family:Inter,system-ui,sans-serif;
+}
+.buy:hover{
+  background:#7f1d1d;
 }
 
 /* MOBILE CATALOG GRID */
