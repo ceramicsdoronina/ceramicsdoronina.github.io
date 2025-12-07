@@ -285,7 +285,18 @@ body.mobile-view .hero-scroll{
 
   font-family:Inter,system-ui,sans-serif;
   font-size:16px;
+
+  /* nuova ombra soft */
+  box-shadow:0 6px 18px rgba(0,0,0,.06);
+  transition:box-shadow .2s ease, transform .2s ease, background-color .2s ease;
 }
+
+.pill-btn:hover{
+  box-shadow:0 10px 26px rgba(0,0,0,.10);
+  transform:translateY(-1px);
+  background:#fdfdfd;
+}
+
 
 .pill-text{
   font-family:"Cormorant Garamond", serif;
