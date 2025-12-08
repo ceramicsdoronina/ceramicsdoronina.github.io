@@ -115,7 +115,7 @@ nav a:hover{
 }
 
 .hero-landing{
-  background:url('images/banner-anna.jpg') center/cover no-repeat;
+  background:url('images/banner.jpg') center/cover no-repeat;
 }
 
 .hero::before{

@@ -9,7 +9,7 @@ const messages = {
       about: "О бренде",
       catalogue: "Каталог",
       workshops: "Мастер-классы",
-      giftcards:"Подарочные сертификаты",
+      giftcards: "Подарочные сертификаты",
       contact: "Контакты"
     },
     hero: {
@@ -22,13 +22,14 @@ const messages = {
       btnCatalogue: "Каталог",
       btnWorkshops: "Мастер-классы",
       btnGiftCards: "Подарочные сертификаты",
-      text1: "Мои вазы — это не просто формы, а предметы, которые меняют атмосферу дома, заряжают энергией и становятся визуальной опорой.",
-      text2: "В каждой работе — высокотемпературная глина, тактильные текстуры, бисерная вышивка и сочетание неровных форм с ощущением роскоши."
+      text1: "Мои вазы — это не просто формы, а предметы, которые меняют атмосферу дома.",
+      text2: "В каждой работе — высокотемпературная глина, тактильные текстуры, бисерная вышивка и сочетание несовершенных форм с ощущением роскоши."
     },
     catalogue: {
       title: "Каталог",
-      lead: "Каждое изделие — это уникальная эмоция для вашего пространства.",
+      lead: "Каждое изделие — это уникальная эмоция для вашего пространства",
       viewPhotos: "Смотреть фото",
+      addToCart: "Добавить в корзину",
       spec: {
         height: "Высота",
         diameter: "Диаметр",
@@ -41,35 +42,33 @@ const messages = {
       description: "Описание",
       characteristics: "Характеристики",
       delivery: "Доставка",
-      deliveryText: "Мы бережно упаковываем и отправляем изделия по всему миру из Лигурии."
+      deliveryText: "Отправляем по всему миру из Лигурии, надёжно упаковывая каждое изделие."
+    },
+    workshops: {
+      title: "Мастер-классы",
+      lead: "Керамические мастер-классы в маленьких группах в атмосфере внимания и спокойствия.",
+      list1: "Индивидуальные и групповые занятия в студии в Генуе.",
+      list2: "Формы, тактильные поверхности, работа с глазурями и декором.",
+      list3: "Формат для компаний и частных мероприятий по запросу.",
+      note: "За актуальным расписанием и для организации частного мастер-класса напишите мне."
+    },
+    giftcards: {
+      title: "Подарочные сертификаты",
+      lead: "Подарите эмоцию прикосновения к глине или выбор керамического объекта для дома.",
+      list1: "Сертификат на участие в мастер-классе.",
+      list2: "Сертификат на готовое изделие или персональный заказ.",
+      list3: "Электронный формат или оформленная карточка, готовая к вручению.",
+      note: "Напишите мне, чтобы подобрать формат сертификата под ваш запрос."
     },
     status: {
       sold: "Продано"
     },
     contact: {
       title: "Контакты",
-      address: "Адрес мастерской:"
+      address: "Мастерская:"
     },
     footer: {
-      made: "Сайт создан на GitHub Pages"
-    },
-    workshops: {
-      title: "Мастер-классы",
-      lead: "Камерные занятия по работе с глиной в мастерской в Генуе.",
-      item1: "Базовые техники ручной лепки и работа с высокотемпературной глиной.",
-      item2: "Создание вазы или интерьерного объекта в духе ваби-саби.",
-      item3: "Небольшие группы и внимательное сопровождение каждого участника.",
-      note: "Чтобы узнать расписание ближайших мастер-классов или организовать частное занятие, напишите мне.",
-      cta: "Написать для записи"
-    },
-    giftcards: {
-      title: "Подарочные сертификаты",
-      lead: "Нежный способ подарить керамику или мастер-класс: человек сам выбирает то, что ему откликается.",
-      item1: "Гибкий формат: сертификат на определённую сумму или на конкретное изделие.",
-      item2: "Возможность подарить участие в мастер-классе в мастерской в Генуе.",
-      item3: "Цифровой сертификат с персональным посланием, отправленный по e-mail.",
-      note: "Напишите мне, чтобы подобрать сумму, формат и текст подарка.",
-      cta: "Написать о подарочном сертификате"
+      made: "Сайт на GitHub Pages"
     }
   },
 
@@ -79,7 +78,7 @@ const messages = {
       about: "Il brand",
       catalogue: "Catalogo",
       workshops: "Masterclass",
-      giftcards:"Gift Card",
+      giftcards: "Gift Card",
       contact: "Contatti"
     },
     hero: {
@@ -88,17 +87,18 @@ const messages = {
     about: {
       title: "Il brand",
       intro1: "Mi chiamo Anna e creo ceramiche d’interni come oggetti d’arte che sostengono, ispirano e diventano parte del tuo spazio personale di forza.",
-      intro2: "Credo che gli oggetti con cui viviamo influenzino profondamente il nostro stato interiore.",
+      intro2: "Credo che gli oggetti con cui viviamo influenzino il nostro stato interiore.",
       btnCatalogue: "Catalogo",
       btnWorkshops: "Masterclass",
       btnGiftCards: "Gift Card",
-      text1: "I miei vasi non sono solo forme, ma oggetti che trasformano l’atmosfera della casa e creano un punto focale visivo.",
-      text2: "In ogni pezzo ci sono argille ad alta temperatura, texture tattili, ricami di perle e l’unione di forme imperfette con una sensazione di lusso."
+      text1: "I miei vasi non sono solo forme, ma oggetti che trasformano l’atmosfera della casa.",
+      text2: "In ogni pezzo ci sono argille ad alta temperatura, superfici tattili, ricami di perle e l’unione di forme imperfette con una sensazione di lusso."
     },
     catalogue: {
       title: "Catalogo",
       lead: "Ogni pezzo è un’emozione unica per il tuo spazio.",
       viewPhotos: "Vedi foto",
+      addToCart: "Aggiungi al carrello",
       spec: {
         height: "Altezza",
         diameter: "Diametro",
@@ -113,6 +113,22 @@ const messages = {
       delivery: "Spedizione",
       deliveryText: "Spediamo in tutto il mondo dalla Liguria, con imballaggio protettivo."
     },
+    workshops: {
+      title: "Masterclass",
+      lead: "Workshop di ceramica in piccoli gruppi, in un’atmosfera di cura e tranquillità.",
+      list1: "Percorsi individuali e di gruppo nel mio studio a Genova.",
+      list2: "Forme, superfici tattili, lavoro con smalti e decorazioni.",
+      list3: "Format per aziende e eventi privati su richiesta.",
+      note: "Per il calendario aggiornato o per organizzare una masterclass privata, scrivimi."
+    },
+    giftcards: {
+      title: "Gift Card",
+      lead: "Regala l’emozione di lavorare con l’argilla o di scegliere un oggetto in ceramica per la casa.",
+      list1: "Buono per partecipare a una masterclass.",
+      list2: "Buono per un pezzo finito o per una commissione su misura.",
+      list3: "Formato digitale o card stampata pronta da regalare.",
+      note: "Scrivimi per trovare insieme il formato di gift card più adatto."
+    },
     status: {
       sold: "Venduto"
     },
@@ -122,24 +138,6 @@ const messages = {
     },
     footer: {
       made: "Realizzato con GitHub Pages"
-    },
-    workshops: {
-      title: "Masterclass",
-      lead: "Incontri dal vivo e piccoli gruppi di lavoro con l’argilla nel laboratorio a Genova.",
-      item1: "Tecniche base di modellazione a mano e uso di argille ad alta temperatura.",
-      item2: "Creazione di un vaso o oggetto per interni nello stile wabi-sabi.",
-      item3: "Gruppi raccolti, attenzione personale ad ogni partecipante.",
-      note: "Per il calendario aggiornato o per organizzare una masterclass privata, scrivimi.",
-      cta: "Scrivi per iscriverti"
-    },
-    giftcards: {
-      title: "Gift Card",
-      lead: "Un modo delicato per regalare arte e presenza: il destinatario sceglie il vaso o il workshop che sente più suo.",
-      item1: "Formati flessibili: voucher per un importo specifico o per un singolo pezzo.",
-      item2: "Possibilità di abbinare la gift card a una masterclass nel laboratorio a Genova.",
-      item3: "Gift card digitale con messaggio personalizzato, inviata via email.",
-      note: "Scrivimi per scegliere insieme l’importo, la formula e il testo personale del tuo regalo.",
-      cta: "Scrivi per una Gift Card"
     }
   },
 
@@ -148,27 +146,28 @@ const messages = {
       home: "Home",
       about: "About",
       catalogue: "Catalogue",
-      workshops: "Workshops",
-      giftcards:"Gift Cards",
+      workshops: "Masterclass",
+      giftcards: "Gift Cards",
       contact: "Contact"
     },
     hero: {
-      tagline: "Tactile interior ceramics with bead embroidery that turns your home into a place of strength and inspiration."
+      tagline: "Tactile interior ceramics with pearl embroidery that turns your home into a place of strength and inspiration."
     },
     about: {
       title: "About the brand",
-      intro1: "My name is Anna and I create interior ceramics as art objects that support, inspire, and become part of your personal space of strength.",
-      intro2: "I believe the objects we live with shape our inner state.",
+      intro1: "My name is Anna, and I create interior ceramics as art objects that support, inspire, and become part of your personal space of strength.",
+      intro2: "I believe that the objects we live with influence our inner state.",
       btnCatalogue: "Catalogue",
-      btnWorkshops: "Workshops",
+      btnWorkshops: "Masterclass",
       btnGiftCards: "Gift Cards",
-      text1: "My vases are not just shapes, but pieces that transform the atmosphere of your home.",
-      text2: "Each work combines high-fire clays, tactile textures, bead embroidery and a sense of quiet luxury."
+      text1: "My vases are not just shapes, but objects that transform the atmosphere of a home.",
+      text2: "Each piece combines high-temperature clays, tactile textures, bead embroidery, and the meeting of imperfect forms with a sense of luxury."
     },
     catalogue: {
       title: "Catalogue",
       lead: "Each piece is a unique emotion for your space.",
       viewPhotos: "View photos",
+      addToCart: "Add to cart",
       spec: {
         height: "Height",
         diameter: "Diameter",
@@ -181,7 +180,23 @@ const messages = {
       description: "Description",
       characteristics: "Characteristics",
       delivery: "Shipping",
-      deliveryText: "We carefully pack and ship worldwide from Liguria, Italy."
+      deliveryText: "We ship worldwide from Liguria, Italy."
+    },
+    workshops: {
+      title: "Masterclass",
+      lead: "Ceramic workshops in small groups, in a calm and attentive atmosphere.",
+      list1: "Individual and group sessions in my studio in Genoa.",
+      list2: "Forms, tactile surfaces, working with glazes and decoration.",
+      list3: "Formats for companies and private events upon request.",
+      note: "For the updated calendar or to organise a private masterclass, write to me."
+    },
+    giftcards: {
+      title: "Gift Cards",
+      lead: "Offer the emotion of working with clay or choosing a ceramic object for the home.",
+      list1: "Voucher for attending a masterclass.",
+      list2: "Voucher for a finished piece or a bespoke commission.",
+      list3: "Digital format or printed card ready to gift.",
+      note: "Write to me to find the most suitable gift card format for you."
     },
     status: {
       sold: "Sold out"
@@ -192,229 +207,184 @@ const messages = {
     },
     footer: {
       made: "Made with GitHub Pages"
-    },
-    workshops: {
-      title: "Workshops",
-      lead: "Intimate ceramic workshops in the studio in Genoa, in small groups.",
-      item1: "Fundamentals of hand-building and working with high-fire clay.",
-      item2: "Creating a vase or interior object in a wabi-sabi inspired style.",
-      item3: "Small groups and individual guidance for each participant.",
-      note: "For the updated schedule or to organise a private workshop, feel free to contact me.",
-      cta: "Write to join"
-    },
-    giftcards: {
-      title: "Gift Cards",
-      lead: "A gentle way to gift art and presence: the recipient chooses the vase or workshop that resonates most.",
-      item1: "Flexible formats: a voucher for a specific amount or for a particular piece.",
-      item2: "You can also gift a place in a workshop in the studio in Genoa.",
-      item3: "Digital gift card with a personalised message, sent via email.",
-      note: "Write to me to define the amount, format, and personal text for your gift.",
-      cta: "Write about a Gift Card"
     }
   }
 };
 
-let currentLang = null;
-
 /* ============================================================
-   TRADUZIONI
+   STATO LINGUA + VISTA (desktop/mobile)
 ============================================================ */
 
-function applyTranslations(lang){
-  document.querySelectorAll("[data-i18n]").forEach(el=>{
-    const keys = el.dataset.i18n.split(".");
-    let value = messages[lang];
-    for (const k of keys){
-      if (value && value[k] != null) value = value[k];
-    }
-    if (typeof value === "string"){
-      el.textContent = value;
-    }
-  });
-}
+let currentLang = "it";
+let viewMode = "desktop"; // "desktop" | "mobile"
 
-function getInitialLang(){
-  const saved = localStorage.getItem("lang");
+/* ------------------------------------------------------------
+   rileva lingua preferita
+------------------------------------------------------------ */
+function detectInitialLang(){
+  const saved = localStorage.getItem("cd_lang");
   if (saved && messages[saved]) return saved;
-  const browser = (navigator.language || "ru").slice(0,2);
+
+  const browser = (navigator.language || navigator.userLanguage || "it").slice(0,2);
   if (messages[browser]) return browser;
-  return "ru";
+
+  return "it";
 }
 
-function setLang(lang){
-  if (!messages[lang]) lang = "ru";
-  currentLang = lang;
-  localStorage.setItem("lang", lang);
+/* ------------------------------------------------------------
+   applica lingua a tutti i data-i18n
+------------------------------------------------------------ */
+function applyTranslations(lang){
+  const dict = messages[lang];
+  if (!dict) return;
+
   document.documentElement.lang = lang;
 
-  const sel = document.getElementById("language-selector");
-  if (sel) sel.value = lang;
-
-  applyTranslations(lang);
-  buildCatalogue();  // ricostruisce il catalogo nella nuova lingua
-}
-
-/* ============================================================
-   MENU MOBILE
-============================================================ */
-
-function initMobileNav(){
-  const btn = document.getElementById("nav-toggle");
-  if (!btn) return;
-
-  btn.addEventListener("click", ()=>{
-    document.body.classList.toggle("nav-open");
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const path = el.getAttribute("data-i18n").split(".");
+    let cur = dict;
+    for (const p of path){
+      cur = cur && cur[p];
+    }
+    if (typeof cur === "string"){
+      el.textContent = cur;
+    }
   });
 
-  document.querySelectorAll("nav a").forEach(a=>{
-    a.addEventListener("click", ()=>{
-      document.body.classList.remove("nav-open");
-    });
-  });
-}
-
-/* ============================================================
-   TOGGLE DESKTOP / MOBILE VIEW
-============================================================ */
-
-function initViewToggle(){
-  const btn = document.getElementById("view-toggle-btn");
-  if (!btn) return;
-
-  const syncLabel = () => {
-    btn.textContent = document.body.classList.contains("mobile-view")
-      ? "Desktop"
-      : "Mobile";
-  };
-
-  if (window.innerWidth < 768){
-    document.body.classList.add("mobile-view");
+  // aggiorna il selettore lingua (se presente)
+  const langSelect = document.getElementById("language-selector");
+  if (langSelect){
+    langSelect.value = lang;
   }
-  syncLabel();
+}
 
-  btn.addEventListener("click", ()=>{
-    document.body.classList.toggle("mobile-view");
-    syncLabel();
-  });
+/* ------------------------------------------------------------
+   cambia lingua
+------------------------------------------------------------ */
+function setLanguage(lang){
+  if (!messages[lang]) return;
+  currentLang = lang;
+  localStorage.setItem("cd_lang", lang);
+  applyTranslations(lang);
+  // ricarica il catalogo se esiste
+  if (window.__catalogueData){
+    renderCatalogue(window.__catalogueData, currentLang);
+  }
 }
 
 /* ============================================================
-   CSV Loader
+   IMPORT CSV VASI
 ============================================================ */
 
-async function loadCSV(url){
-  const res = await fetch(url);
+async function loadCsv(){
+  const res = await fetch("catalogue/vasi.csv", { cache: "no-store" });
   if (!res.ok){
-    console.error("Errore nel caricamento CSV:", url, res.status);
+    console.error("Impossibile caricare vasi.csv");
     return [];
   }
+
   const text = await res.text();
-  const rows = text.split(/\r?\n/).map(r=>r.trim()).filter(r=>r.length>0);
-  if (!rows.length) return [];
 
-  const headers = rows[0].split(",").map(h=>h.trim());
+  // righe non vuote
+  const rows = text.trim().split(/\r?\n/).filter(r => r.trim().length > 0);
+  if (rows.length < 2) return [];
 
-  return rows.slice(1).map(row=>{
-    const cols = row.split(",");
+  // rilevo automaticamente il separatore: virgola o punto-e-virgola
+  const firstLine = rows[0];
+  const delimiter = (firstLine.includes(";") && !firstLine.includes(",")) ? ";" : ",";
+
+  const header = firstLine.split(delimiter).map(h => h.trim());
+
+  return rows.slice(1).map(line => {
+    const cols = line.split(delimiter).map(c => c.trim());
     const obj = {};
-    headers.forEach((h,i)=>{
-      obj[h] = (cols[i] && cols[i].trim()) || "-";
+    header.forEach((h, i) => {
+      obj[h] = cols[i] ?? "";
     });
     return obj;
   });
 }
 
 /* ============================================================
-   COSTRUZIONE CATALOGO + MODALI
+   RENDER CATALOGO
 ============================================================ */
+function renderCatalogue(items, lang){
+  const grid = document.getElementById("catalogue-grid");
+  const modalRoot = document.getElementById("modal-container");
 
-async function buildCatalogue(){
-  const lang = currentLang || getInitialLang();
-  const items = await loadCSV("catalogue/vasi.csv");
-  if (!items.length) return;
+  if (!grid){
+    console.warn("catalogue-grid non trovato nel DOM");
+    return;
+  }
 
-  // Ordinamento: prima non venduti, poi venduti
+  // ordina: prima non venduti, poi venduti
   items.sort((a,b)=>{
-    const av = (a.venduto || "").trim().toLowerCase();
-    const bv = (b.venduto || "").trim().toLowerCase();
-    const aSold = (av === "si" || av === "sì" || av === "yes");
-    const bSold = (bv === "si" || bv === "sì" || bv === "yes");
+    const aSold = (a.venduto || "").trim().toLowerCase() === "si";
+    const bSold = (b.venduto || "").trim().toLowerCase() === "si";
     if (aSold === bSold) return 0;
     return aSold ? 1 : -1;
   });
 
-  const grid = document.getElementById("catalogue-grid");
-  if (!grid){
-    console.warn("catalogue-grid non trovato");
-    return;
-  }
-
-  let modalRoot = document.getElementById("modal-container");
-  if (!modalRoot){
-    modalRoot = document.createElement("div");
-    modalRoot.id = "modal-container";
-    document.body.appendChild(modalRoot);
-  }
-
   grid.innerHTML = "";
-  modalRoot.innerHTML = "";
+  if (modalRoot) modalRoot.innerHTML = "";
 
-  items.forEach(vase => {
-    const langSafe = lang in messages ? lang : "ru";
+  items.forEach(vase=>{
+    const name  = vase[`name_${lang}`]  && vase[`name_${lang}`]  !== "-" ? vase[`name_${lang}`]  : vase.name_ru;
+    const short = vase[`short_${lang}`] && vase[`short_${lang}`] !== "-" ? vase[`short_${lang}`] : vase.short_ru;
+    const long  = vase[`long_${lang}`]  && vase[`long_${lang}`]  !== "-" ? vase[`long_${lang}`]  : vase.long_ru;
 
-    const name  = (vase[`name_${langSafe}`]  && vase[`name_${langSafe}`]  !== "-")
-      ? vase[`name_${langSafe}`]
-      : vase.name_ru || "";
+    const sold = (vase.venduto || "").trim().toLowerCase() === "si";
 
-    const short = (vase[`short_${langSafe}`] && vase[`short_${langSafe}`] !== "-")
-      ? vase[`short_${langSafe}`]
-      : vase.short_ru || "";
+    const img1 = vase.img1 && vase.img1 !== "-" ? `images/catalogue/${vase.img1}` : "images/placeholder.jpg";
 
-    const long  = (vase[`long_${langSafe}`]  && vase[`long_${langSafe}`]  !== "-")
-      ? vase[`long_${langSafe}`]
-      : vase.long_ru || "";
+    const priceOldStr = vase.price_old && vase.price_old !== "-" ? vase.price_old : null;
+    const priceNewStr = vase.price_new && vase.price_new !== "-" ? vase.price_new : null;
 
-    const vendutoVal = (vase.venduto || "").trim().toLowerCase();
-    const sold = (vendutoVal === "si" || vendutoVal === "sì" || vendutoVal === "yes");
-
-    // immagine principale per la card: sempre img1, anche se venduto
-    const img1Name = (vase.img1 || "").trim();
-    const img1 = img1Name && img1Name !== "-"
-      ? `images/catalogue/${img1Name}`
-      : "images/placeholder.jpg";
-
-    const priceOldStr = (vase.price_old && vase.price_old !== "-") ? vase.price_old : null;
-    const priceNewStr = (vase.price_new && vase.price_new !== "-") ? vase.price_new : null;
-
-    // calcolo sconto %
+    // Calcolo sconto in % se possibile
     let discount = null;
     if (!sold && priceOldStr && priceNewStr){
       const oldNum = parseFloat(String(priceOldStr).replace(",", "."));
       const newNum = parseFloat(String(priceNewStr).replace(",", "."));
       if (!isNaN(oldNum) && !isNaN(newNum) && oldNum > newNum){
         discount = Math.round((1 - newNum/oldNum)*100);
-        if (discount <= 0) discount = null;
       }
     }
 
-    /* ---------- CARD CATALOGO ---------- */
-
-    let priceBlock = "";
+    let cardStatusBlock = "";
     if (sold){
-      priceBlock = `
-        <div class="card-price">
-          <span class="sold-badge">${messages[langSafe].status.sold}</span>
-        </div>
+      cardStatusBlock = `
+        <p class="card-status card-status-sold">
+          ${messages[lang].status.sold}
+        </p>
       `;
     } else if (priceNewStr){
-      priceBlock = `
-        <div class="card-price">
-          ${priceOldStr ? `<span class="old-price">${priceOldStr}€</span>` : ""}
-          <span class="new-price">${priceNewStr}€</span>
-          ${discount ? `<span class="discount-badge">-${discount}%</span>` : ""}
-        </div>
-      `;
+      // blocco prezzi nella card
+      const discountBlock = discount !== null
+        ? `<span class="price-discount">-${discount}%</span>`
+        : "";
+      if (priceOldStr){
+        cardStatusBlock = `
+          <div class="card-price">
+            <span class="price-old">${priceOldStr}€</span>
+            <span class="price-current">${priceNewStr}€</span>
+            ${discountBlock}
+          </div>
+        `;
+      } else {
+        cardStatusBlock = `
+          <div class="card-price">
+            <span class="price-current">${priceNewStr}€</span>
+            ${discountBlock}
+          </div>
+        `;
+      }
     }
+
+    const addCartHtml = !sold
+      ? `<button class="add-cart" data-id="${vase.id}">
+          ${messages[lang].catalogue.addToCart}
+        </button>`
+      : "";
 
     const card = document.createElement("article");
     card.className = "card";
@@ -422,121 +392,129 @@ async function buildCatalogue(){
     card.innerHTML = `
       <div class="media media-single" data-modal-target="modal-${vase.id}">
         <img src="${img1}" alt="${name}">
-        ${sold ? `<div class="sold-badge">${messages[langSafe].status.sold}</div>` : ""}
       </div>
       <div class="body">
         <h4>${name}</h4>
         <p>${short}</p>
-        ${priceBlock}
+        ${cardStatusBlock}
         <button class="buy" data-modal-target="modal-${vase.id}">
-          ${messages[langSafe].catalogue.viewPhotos}
+          ${messages[lang].catalogue.viewPhotos}
         </button>
+        ${addCartHtml}
       </div>
     `;
 
     grid.appendChild(card);
 
-    /* ---------- IMMAGINI PER MODALE ---------- */
-
+    /* ---------- IMMAGINI MODALE ---------- */
     const imgs = [
-      vase.img1, vase.img2, vase.img3,
-      vase.img4, vase.img5, vase.img6
-    ]
-      .map(x => (x || "").trim())
-      .filter(x => x && x !== "-");
+      vase.img1,vase.img2,vase.img3,
+      vase.img4,vase.img5,vase.img6
+    ].filter(x=>x && x !== "-")
+     .map(fn=>`images/catalogue/${fn}`);
 
-    const galleryHTML = imgs.map((img,i)=>`
-      <img src="images/catalogue/${img}" data-slide="${i}" class="${i === 0 ? "active" : ""}">
-    `).join("");
-
-    /* ---------- BLOCCO PREZZO IN MODALE ---------- */
-
-    let modalPriceBlock = "";
-    if (sold){
-      modalPriceBlock = `
-        <div class="vase-status-sold">
-          ${messages[langSafe].status.sold}
-        </div>
-      `;
-    } else if (priceNewStr){
-      modalPriceBlock = `
-        <div class="vase-price-row">
-          ${priceOldStr ? `<span class="vase-old-price">${priceOldStr}€</span>` : ""}
-          <span class="vase-price">${priceNewStr}€</span>
-          ${discount ? `<span class="vase-discount">-${discount}%</span>` : ""}
-        </div>
-      `;
-    }
-
-    /* ---------- MODALE ---------- */
+    if (!modalRoot) return;
 
     const modal = document.createElement("div");
     modal.className = "modal";
     modal.id = `modal-${vase.id}`;
 
+    let priceBlock = "";
+    if (sold){
+      priceBlock = `
+        <div class="vase-price-row">
+          <span class="vase-price">${messages[lang].status.sold}</span>
+        </div>
+      `;
+    } else if (priceNewStr){
+      const discountBlock = discount !== null
+        ? `<span class="vase-discount">-${discount}%</span>`
+        : "";
+      if (priceOldStr){
+        priceBlock = `
+          <div class="vase-price-row">
+            <span class="vase-old-price">${priceOldStr}€</span>
+            <span class="vase-price">${priceNewStr}€</span>
+            ${discountBlock}
+          </div>
+        `;
+      } else {
+        priceBlock = `
+          <div class="vase-price-row">
+            <span class="vase-price">${priceNewStr}€</span>
+            ${discountBlock}
+          </div>
+        `;
+      }
+    }
+
+    const spec = messages[lang].catalogue.spec;
+
+    const galleryImgsHtml = imgs.map((src,idx)=>`
+      <img src="${src}" alt="${name} ${idx+1}" data-index="${idx}" class="${idx===0?"active":""}">
+    `).join("");
+
     modal.innerHTML = `
       <div class="modal-dialog">
         <div class="modal-header">
-          <h4>${name}</h4>
-          ${sold ? `<span class="sold-badge sold-badge-modal">${messages[langSafe].status.sold}</span>` : ""}
-          <button data-modal-close>×</button>
+          <h2 class="vase-title">${name}</h2>
+          <button type="button" data-modal-close>×</button>
         </div>
-
         <div class="modal-body">
           <div class="modal-body-inner">
-
             <div class="vase-detail-panel">
-              <h2 class="vase-title">${name}</h2>
-              <p>${short}</p>
+              <h3 class="vase-subtitle">${short}</h3>
+              ${priceBlock}
+              <div class="vase-actions">
+                <button class="vase-btn-primary">${messages[lang].catalogue.viewPhotos}</button>
+                <button class="vase-btn-outline">${messages[lang].catalogue.title}</button>
+              </div>
 
-              ${modalPriceBlock}
+              <button class="accordion-header" data-acc-target="desc-${vase.id}">
+                <span>${messages[lang].detail.description}</span>
+                <span>›</span>
+              </button>
+              <div class="accordion-panel" id="desc-${vase.id}">
+                <p>${long}</p>
+              </div>
 
-              <div class="accordion">
-
-                <button class="accordion-header">
-                  ${messages[langSafe].detail.description}
-                  <span>›</span>
-                </button>
-                <div class="accordion-panel">
-                  ${long}
-                </div>
-
-                <button class="accordion-header">
-                  ${messages[langSafe].detail.characteristics}
-                  <span>›</span>
-                </button>
-                <div class="accordion-panel">
+              <button class="accordion-header" data-acc-target="spec-${vase.id}">
+                <span>${messages[lang].detail.characteristics}</span>
+                <span>›</span>
+              </button>
+              <div class="accordion-panel" id="spec-${vase.id}">
+                <div class="vase-specs">
                   <dl>
-                    <dt>${messages[langSafe].catalogue.spec.height}</dt><dd>${vase.height || "-"}</dd>
-                    <dt>${messages[langSafe].catalogue.spec.diameter}</dt><dd>${vase.diameter || "-"}</dd>
-                    <dt>${messages[langSafe].catalogue.spec.material}</dt><dd>${vase.material || "-"}</dd>
-                    <dt>${messages[langSafe].catalogue.spec.technique}</dt><dd>${vase.technique || "-"}</dd>
-                    <dt>${messages[langSafe].catalogue.spec.finish}</dt><dd>${vase.finish || "-"}</dd>
+                    ${vase.height && vase.height !== "-" ? `<dt>${spec.height}</dt><dd>${vase.height}</dd>` : ""}
+                    ${vase.diameter && vase.diameter !== "-" ? `<dt>${spec.diameter}</dt><dd>${vase.diameter}</dd>` : ""}
+                    ${vase.material && vase.material !== "-" ? `<dt>${spec.material}</dt><dd>${vase.material}</dd>` : ""}
+                    ${vase.technique && vase.technique !== "-" ? `<dt>${spec.technique}</dt><dd>${vase.technique}</dd>` : ""}
+                    ${vase.finish && vase.finish !== "-" ? `<dt>${spec.finish}</dt><dd>${vase.finish}</dd>` : ""}
                   </dl>
                 </div>
+              </div>
 
-                <button class="accordion-header">
-                  ${messages[langSafe].detail.delivery}
-                  <span>›</span>
-                </button>
-                <div class="accordion-panel">
-                  ${messages[langSafe].detail.deliveryText}
-                </div>
-
+              <button class="accordion-header" data-acc-target="del-${vase.id}">
+                <span>${messages[lang].detail.delivery}</span>
+                <span>›</span>
+              </button>
+              <div class="accordion-panel" id="del-${vase.id}">
+                <p>${messages[lang].detail.deliveryText}</p>
               </div>
             </div>
 
             <div class="modal-gallery">
               <div class="modal-gallery-main">
-                ${galleryHTML}
+                ${galleryImgsHtml}
               </div>
-              <div class="modal-gallery-controls">
-                <button data-gallery-prev>←</button>
-                <span data-gallery-counter></span>
-                <button data-gallery-next>→</button>
+              <div class="modal-gallery-counter" data-gallery-counter="${vase.id}">
+                1 / ${imgs.length}
+              </div>
+              <div class="modal-gallery-controls" data-gallery-controls="${vase.id}">
+                <button type="button" data-gallery-prev>←</button>
+                <button type="button" data-gallery-next>→</button>
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -546,114 +524,159 @@ async function buildCatalogue(){
   });
 
   initModals();
-  initAccordion();
+  initAccordions();
+  initGalleries();
 }
 
 /* ============================================================
    MODALI + GALLERY
 ============================================================ */
-
 function initModals(){
-  // apertura modale (immagine + bottone "Vedi foto")
   document.querySelectorAll("[data-modal-target]").forEach(el=>{
     el.addEventListener("click", ()=>{
       const id = el.dataset.modalTarget;
-      const modal = document.getElementById(id);
-      if (modal) modal.classList.add("open");
+      document.getElementById(id)?.classList.add("open");
     });
   });
 
-  // chiusura con bottone ×
   document.querySelectorAll("[data-modal-close]").forEach(btn=>{
     btn.addEventListener("click", ()=>{
-      const modal = btn.closest(".modal");
-      if (modal) modal.classList.remove("open");
+      btn.closest(".modal")?.classList.remove("open");
     });
   });
 
-  // per ogni modale, gestiamo click sullo sfondo + gallery
-  document.querySelectorAll(".modal").forEach(modal=>{
-    // chiusura cliccando sullo sfondo
-    modal.addEventListener("click", e=>{
-      if (e.target === modal) modal.classList.remove("open");
+  document.addEventListener("click", e=>{
+    if (e.target.classList.contains("modal")){
+      e.target.classList.remove("open");
+    }
+  });
+}
+
+/* ------------------------------------------------------------
+   ACCORDION
+------------------------------------------------------------ */
+function initAccordions(){
+  document.querySelectorAll(".accordion-header").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const targetId = btn.dataset.accTarget;
+      const panel = document.getElementById(targetId);
+      if (!panel) return;
+      const isOpen = panel.classList.contains("active");
+      document.querySelectorAll(".accordion-panel").forEach(p=>p.classList.remove("active"));
+      if (!isOpen) panel.classList.add("active");
     });
+  });
+}
 
-    const main = modal.querySelector(".modal-gallery-main");
-    if (!main) return;
-
-    const slides = [...main.querySelectorAll("img[data-slide]")];
-    if (!slides.length) return;
-
+/* ------------------------------------------------------------
+   GALLERIA NEL MODALE
+------------------------------------------------------------ */
+function initGalleries(){
+  document.querySelectorAll(".modal").forEach(modal=>{
+    const imgs = Array.from(modal.querySelectorAll(".modal-gallery-main img"));
+    if (!imgs.length) return;
     let index = 0;
-    const counter = modal.querySelector("[data-gallery-counter]");
 
-    const update = ()=>{
-      slides.forEach((img,i)=>{
+    const counterEl = modal.querySelector("[data-gallery-counter]");
+    const controls = modal.querySelector("[data-gallery-controls]");
+    if (!controls) return;
+
+    function updateGallery(newIndex){
+      if (newIndex < 0) newIndex = imgs.length - 1;
+      if (newIndex >= imgs.length) newIndex = 0;
+      index = newIndex;
+      imgs.forEach((img,i)=>{
         img.classList.toggle("active", i === index);
       });
-      if (counter){
-        counter.textContent = `${index+1} / ${slides.length}`;
+      if (counterEl){
+        counterEl.textContent = `${index+1} / ${imgs.length}`;
       }
-    };
-
-    update(); // inizializza a "1 / N"
-
-    const prevBtn = modal.querySelector("[data-gallery-prev]");
-    const nextBtn = modal.querySelector("[data-gallery-next]");
-
-    if (prevBtn){
-      prevBtn.addEventListener("click", e=>{
-        e.stopPropagation();
-        index = (index - 1 + slides.length) % slides.length;
-        update();
-      });
     }
 
-    if (nextBtn){
-      nextBtn.addEventListener("click", e=>{
-        e.stopPropagation();
-        index = (index + 1) % slides.length;
-        update();
-      });
-    }
-  });
-}
-
-/* ============================================================
-   ACCORDION
-============================================================ */
-
-function initAccordion(){
-  document.querySelectorAll(".accordion").forEach(acc=>{
-    acc.querySelectorAll(".accordion-header").forEach(h=>{
-      h.addEventListener("click", ()=>{
-        const panel = h.nextElementSibling;
-        const open = panel.classList.contains("active");
-        acc.querySelectorAll(".accordion-panel").forEach(p=>p.classList.remove("active"));
-        if (!open) panel.classList.add("active");
-      });
+    controls.querySelector("[data-gallery-prev]").addEventListener("click", ()=>{
+      updateGallery(index - 1);
+    });
+    controls.querySelector("[data-gallery-next]").addEventListener("click", ()=>{
+      updateGallery(index + 1);
     });
   });
 }
 
 /* ============================================================
-   INIT SITO
+   NAVBAR MOBILE – HAMBURGER
 ============================================================ */
-
-window.appInit = function(){
-  const lang = getInitialLang();
-  setLang(lang);          // setLang applica traduzioni e costruisce il catalogo
-  initViewToggle();
-  initMobileNav();
-};
+function initNavbarToggle(){
+  const body = document.body;
+  const toggle = document.getElementById("nav-toggle");
+  if (!toggle) return;
+  toggle.addEventListener("click", ()=>{
+    const isOpen = body.classList.toggle("nav-open");
+    toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  });
+}
 
 /* ============================================================
-   CAMBIO LINGUA DAL SELECT
+   VIEW MODE TOGGLE (Desktop/Mobile)
 ============================================================ */
-
-document.addEventListener("change", e=>{
-  if (e.target && e.target.id === "language-selector"){
-    setLang(e.target.value);
+function setViewMode(mode){
+  viewMode = mode;
+  if (mode === "mobile"){
+    document.body.classList.add("mobile-view");
+  } else {
+    document.body.classList.remove("mobile-view");
   }
-});
+  localStorage.setItem("cd_view", mode);
+}
+
+function initViewToggle(){
+  const saved = localStorage.getItem("cd_view");
+  if (saved === "mobile" || saved === "desktop"){
+    setViewMode(saved);
+  }
+
+  const btnDesktop = document.getElementById("view-desktop");
+  const btnMobile  = document.getElementById("view-mobile");
+
+  if (btnDesktop){
+    btnDesktop.addEventListener("click", ()=>{
+      setViewMode("desktop");
+    });
+  }
+  if (btnMobile){
+    btnMobile.addEventListener("click", ()=>{
+      setViewMode("mobile");
+    });
+  }
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+async function appInit(){
+  currentLang = detectInitialLang();
+  applyTranslations(currentLang);
+
+  // selettore lingua
+  const langSelect = document.getElementById("language-selector");
+  if (langSelect){
+    langSelect.value = currentLang;
+    langSelect.addEventListener("change", e=>{
+      setLanguage(e.target.value);
+    });
+  }
+
+  // carica CSV e renderizza catalogo
+  try{
+    const items = await loadCsv();
+    window.__catalogueData = items;
+    renderCatalogue(items, currentLang);
+  }catch(err){
+    console.error("Errore nel caricamento del catalogo", err);
+  }
+
+  initNavbarToggle();
+  initViewToggle();
+}
+
+document.addEventListener("DOMContentLoaded", appInit);
 
