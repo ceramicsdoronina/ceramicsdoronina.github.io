@@ -28,9 +28,8 @@ const messages = {
     catalogue: {
       title: "Каталог",
       lead: "Каждое изделие — это уникальная эмоция для вашего пространства",
-      // BOTTONI CARD
-      addToCart: "Купить",        // bottone pieno rosso
-      viewPhotos: "Подробнее",    // bottone bianco bordo rosso
+      viewPhotos: "Смотреть фото",
+      addToCart: "Добавить в корзину",
       spec: {
         height: "Высота",
         diameter: "Диаметр",
@@ -98,8 +97,8 @@ const messages = {
     catalogue: {
       title: "Catalogo",
       lead: "Ogni pezzo è un’emozione unica per il tuo spazio.",
-      addToCart: "Compra",      // rosso pieno
-      viewPhotos: "Dettagli",   // bianco bordo rosso
+      viewPhotos: "Vedi foto",
+      addToCart: "Aggiungi al carrello",
       spec: {
         height: "Altezza",
         diameter: "Diametro",
@@ -119,7 +118,7 @@ const messages = {
       lead: "Workshop di ceramica in piccoli gruppi, in un’atmosfera di cura e tranquillità.",
       list1: "Percorsi individuali e di gruppo nel mio studio a Genova.",
       list2: "Forme, superfici tattili, lavoro con smalti e decorazioni.",
-      list3: "Format per aziende ed eventi privati su richiesta.",
+      list3: "Format per aziende e eventi privati su richiesta.",
       note: "Per il calendario aggiornato o per organizzare una masterclass privata, scrivimi."
     },
     giftcards: {
@@ -167,8 +166,8 @@ const messages = {
     catalogue: {
       title: "Catalogue",
       lead: "Each piece is a unique emotion for your space.",
-      addToCart: "Buy",
-      viewPhotos: "Details",
+      viewPhotos: "View photos",
+      addToCart: "Add to cart",
       spec: {
         height: "Height",
         diameter: "Diameter",
@@ -219,16 +218,22 @@ const messages = {
 let currentLang = "it";
 let viewMode = "desktop"; // "desktop" | "mobile"
 
+/* ------------------------------------------------------------
+   rileva lingua preferita
+------------------------------------------------------------ */
 function detectInitialLang(){
   const saved = localStorage.getItem("cd_lang");
   if (saved && messages[saved]) return saved;
 
   const browser = (navigator.language || navigator.userLanguage || "it").slice(0,2);
   if (messages[browser]) return browser;
+
   return "it";
 }
 
-/* applica testo a tutti i data-i18n */
+/* ------------------------------------------------------------
+   applica lingua a tutti i data-i18n
+------------------------------------------------------------ */
 function applyTranslations(lang){
   const dict = messages[lang];
   if (!dict) return;
@@ -246,17 +251,22 @@ function applyTranslations(lang){
     }
   });
 
+  // aggiorna il selettore lingua (se presente)
   const langSelect = document.getElementById("language-selector");
   if (langSelect){
     langSelect.value = lang;
   }
 }
 
+/* ------------------------------------------------------------
+   cambia lingua
+------------------------------------------------------------ */
 function setLanguage(lang){
   if (!messages[lang]) return;
   currentLang = lang;
   localStorage.setItem("cd_lang", lang);
   applyTranslations(lang);
+  // ricarica il catalogo se esiste
   if (window.__catalogueData){
     renderCatalogue(window.__catalogueData, currentLang);
   }
@@ -274,9 +284,12 @@ async function loadCsv(){
   }
 
   const text = await res.text();
+
+  // righe non vuote
   const rows = text.trim().split(/\r?\n/).filter(r => r.trim().length > 0);
   if (rows.length < 2) return [];
 
+  // rilevo automaticamente il separatore: virgola o punto-e-virgola
   const firstLine = rows[0];
   const delimiter = (firstLine.includes(";") && !firstLine.includes(",")) ? ";" : ",";
 
@@ -285,7 +298,9 @@ async function loadCsv(){
   return rows.slice(1).map(line => {
     const cols = line.split(delimiter).map(c => c.trim());
     const obj = {};
-    header.forEach((h,i)=>{ obj[h] = cols[i] ?? ""; });
+    header.forEach((h, i) => {
+      obj[h] = cols[i] ?? "";
+    });
     return obj;
   });
 }
@@ -296,12 +311,13 @@ async function loadCsv(){
 function renderCatalogue(items, lang){
   const grid = document.getElementById("catalogue-grid");
   const modalRoot = document.getElementById("modal-container");
+
   if (!grid){
     console.warn("catalogue-grid non trovato nel DOM");
     return;
   }
 
-  // ordina: prima non venduti
+  // ordina: prima non venduti, poi venduti
   items.sort((a,b)=>{
     const aSold = (a.venduto || "").trim().toLowerCase() === "si";
     const bSold = (b.venduto || "").trim().toLowerCase() === "si";
@@ -324,6 +340,7 @@ function renderCatalogue(items, lang){
     const priceOldStr = vase.price_old && vase.price_old !== "-" ? vase.price_old : null;
     const priceNewStr = vase.price_new && vase.price_new !== "-" ? vase.price_new : null;
 
+    // Calcolo sconto in % se possibile
     let discount = null;
     if (!sold && priceOldStr && priceNewStr){
       const oldNum = parseFloat(String(priceOldStr).replace(",", "."));
@@ -341,6 +358,7 @@ function renderCatalogue(items, lang){
         </p>
       `;
     } else if (priceNewStr){
+      // blocco prezzi nella card
       const discountBlock = discount !== null
         ? `<span class="price-discount">-${discount}%</span>`
         : "";
@@ -362,28 +380,11 @@ function renderCatalogue(items, lang){
       }
     }
 
-    const primaryLabel   = messages[lang].catalogue.addToCart;
-    const secondaryLabel = messages[lang].catalogue.viewPhotos;
-
-    let actionsHtml = "";
-    if (sold){
-      actionsHtml = `
-        <div class="card-actions">
-          <button class="card-btn secondary" data-modal-target="modal-${vase.id}">
-            ${secondaryLabel}
-          </button>
-        </div>`;
-    } else {
-      actionsHtml = `
-        <div class="card-actions">
-          <button class="card-btn primary" data-modal-target="modal-${vase.id}">
-            ${primaryLabel}
-          </button>
-          <button class="card-btn secondary" data-modal-target="modal-${vase.id}">
-            ${secondaryLabel}
-          </button>
-        </div>`;
-    }
+    const addCartHtml = !sold
+      ? `<button class="add-cart" data-id="${vase.id}">
+          ${messages[lang].catalogue.addToCart}
+        </button>`
+      : "";
 
     const card = document.createElement("article");
     card.className = "card";
@@ -396,20 +397,23 @@ function renderCatalogue(items, lang){
         <h4>${name}</h4>
         <p>${short}</p>
         ${cardStatusBlock}
-        ${actionsHtml}
+        <button class="buy" data-modal-target="modal-${vase.id}">
+          ${messages[lang].catalogue.viewPhotos}
+        </button>
+        ${addCartHtml}
       </div>
     `;
 
     grid.appendChild(card);
 
-    /* ---------- MODALE ---------- */
-    if (!modalRoot) return;
-
+    /* ---------- IMMAGINI MODALE ---------- */
     const imgs = [
       vase.img1,vase.img2,vase.img3,
       vase.img4,vase.img5,vase.img6
     ].filter(x=>x && x !== "-")
      .map(fn=>`images/catalogue/${fn}`);
+
+    if (!modalRoot) return;
 
     const modal = document.createElement("div");
     modal.className = "modal";
@@ -462,8 +466,8 @@ function renderCatalogue(items, lang){
               <h3 class="vase-subtitle">${short}</h3>
               ${priceBlock}
               <div class="vase-actions">
-                <button class="vase-btn-primary">${primaryLabel}</button>
-                <button class="vase-btn-outline">${secondaryLabel}</button>
+                <button class="vase-btn-primary">${messages[lang].catalogue.viewPhotos}</button>
+                <button class="vase-btn-outline">${messages[lang].catalogue.title}</button>
               </div>
 
               <button class="accordion-header" data-acc-target="desc-${vase.id}">
@@ -548,6 +552,9 @@ function initModals(){
   });
 }
 
+/* ------------------------------------------------------------
+   ACCORDION
+------------------------------------------------------------ */
 function initAccordions(){
   document.querySelectorAll(".accordion-header").forEach(btn=>{
     btn.addEventListener("click", ()=>{
@@ -561,6 +568,9 @@ function initAccordions(){
   });
 }
 
+/* ------------------------------------------------------------
+   GALLERIA NEL MODALE
+------------------------------------------------------------ */
 function initGalleries(){
   document.querySelectorAll(".modal").forEach(modal=>{
     const imgs = Array.from(modal.querySelectorAll(".modal-gallery-main img"));
@@ -628,10 +638,14 @@ function initViewToggle(){
   const btnMobile  = document.getElementById("view-mobile");
 
   if (btnDesktop){
-    btnDesktop.addEventListener("click", ()=> setViewMode("desktop"));
+    btnDesktop.addEventListener("click", ()=>{
+      setViewMode("desktop");
+    });
   }
   if (btnMobile){
-    btnMobile.addEventListener("click", ()=> setViewMode("mobile"));
+    btnMobile.addEventListener("click", ()=>{
+      setViewMode("mobile");
+    });
   }
 }
 
@@ -642,6 +656,7 @@ async function appInit(){
   currentLang = detectInitialLang();
   applyTranslations(currentLang);
 
+  // selettore lingua
   const langSelect = document.getElementById("language-selector");
   if (langSelect){
     langSelect.value = currentLang;
@@ -650,6 +665,7 @@ async function appInit(){
     });
   }
 
+  // carica CSV e renderizza catalogo
   try{
     const items = await loadCsv();
     window.__catalogueData = items;

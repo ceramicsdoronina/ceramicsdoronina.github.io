@@ -9,10 +9,14 @@
   --accent:#c8b9a6;
   --white:#fafafa;
 
+  /* Buttons */
   --btn-primary:#7d0f0f;
   --btn-primary-text:#ffffff;
 
+  /* Borders */
   --border:#e5e5e5;
+
+  /* Modal background */
   --modal-bg:rgba(15,23,42,.65);
 }
 
@@ -28,6 +32,7 @@ html,body{
 img{max-width:100%;display:block;}
 a{text-decoration:none;color:inherit;}
 
+/* Layout container */
 .container{
   max-width:1200px;
   margin:0 auto;
@@ -51,7 +56,6 @@ header{
   justify-content:space-between;
   align-items:center;
   padding:18px 0;
-  position:relative;
 }
 
 .brand{
@@ -99,7 +103,7 @@ nav a:hover{
 }
 
 /* ─────────────────────────────────────────────
-   HERO
+   HERO FULLSCREEN (DESKTOP)
 ──────────────────────────────────────────────*/
 .hero{
   position:relative;
@@ -148,7 +152,7 @@ nav a:hover{
   font-size:18px;
 }
 
-/* freccia sotto la frase */
+/* FRECCIA SOTTO LA FRASE, CENTRATA */
 .hero-scroll{
   display:flex;
   align-items:center;
@@ -159,7 +163,8 @@ nav a:hover{
   border:1px solid var(--white);
   font-size:24px;
   color:var(--white);
-  margin:40px auto 0 auto;
+  margin:40px auto 0 auto;    /* sotto al testo, centrata */
+  position:relative;
 }
 
 /* ─────────────────────────────────────────────
@@ -201,7 +206,16 @@ nav a:hover{
   object-fit:cover;
 }
 
-/* CTA verticali con freccia */
+.about-text-top h3{
+  margin-top:0;
+}
+
+.about-text-top p,
+.about-text-bottom p{
+  margin:0 0 10px;
+}
+
+/* PULSANTI OBLUNGHI CON FRECCIA */
 .about-cta{
   display:flex;
   flex-direction:column;
@@ -209,16 +223,18 @@ nav a:hover{
   margin:24px 0 4px;
 }
 
+/* bottone principale */
 .pill-btn{
-  width:340px;
+  width:340px;                       /* lunghezza fissa */
   padding:10px 18px;
   border:1px solid var(--text);
   border-radius:999px;
-  background:#fff;
+  background:transparent;
   cursor:pointer;
 
   display:flex;
   align-items:center;
+  justify-content:flex-start;        /* testo a sinistra */
   gap:12px;
 
   font-family:Inter,system-ui,sans-serif;
@@ -238,11 +254,12 @@ nav a:hover{
   font-size:20px;
 }
 
+/* linea + freccia */
 .pill-arrow{
   flex:1;
   position:relative;
   height:1px;
-  background:#d1d5db;
+  background:#d1d5db;                /* grigio chiaro */
 }
 .pill-arrow::after{
   content:"→";
@@ -251,11 +268,11 @@ nav a:hover{
   top:50%;
   transform:translateY(-50%);
   font-size:18px;
-  color:#9ca3af;
+  color:#9ca3af;                     /* freccia grigia */
 }
 
 /* ─────────────────────────────────────────────
-   CATALOG
+   CATALOG GRID
 ──────────────────────────────────────────────*/
 .catalogue-header{
   display:flex;
@@ -295,13 +312,29 @@ nav a:hover{
   background:#ffffff;
 }
 
+/* immagine singola nel catalogo */
 .media-single{
   width:100%;
+  height:auto;
+  cursor:pointer;
   aspect-ratio:4/3;
   overflow:hidden;
-  cursor:pointer;
 }
 .media-single img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* mini-griglia nella card (se usata) */
+.media-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:2px;
+  cursor:pointer;
+  aspect-ratio:4/3;
+}
+.media-grid img{
   width:100%;
   height:100%;
   object-fit:cover;
@@ -321,72 +354,51 @@ nav a:hover{
   margin:0 0 6px;
 }
 
-/* prezzi nella card */
-.card-price{
+/* PREZZI NELLA CARD */
+.card .price-row{
   display:flex;
   align-items:baseline;
   gap:8px;
   margin-top:6px;
 }
 
-.price-current{
+.card .price-current{
   font-size:20px;
   font-weight:600;
-  color:#b91c1c;
+  color:#b91c1c;         /* rosso per prezzo scontato / corrente */
 }
-.price-old{
+
+.card .price-old{
   font-size:16px;
   color:var(--muted);
   text-decoration:line-through;
 }
-.price-discount{
+
+.card .price-discount{
   font-size:14px;
   color:#b91c1c;
 }
 
-/* stato venduto */
-.card-status-sold{
-  margin-top:8px;
-  font-weight:600;
-}
-
-/* BOTTONI CARD: COMPRA / DETTAGLI */
-.card-actions{
-  margin-top:12px;
-  display:flex;
-  gap:8px;
-}
-
-.card-btn{
-  flex:1;
-  padding:10px 12px;
+/* bottone "Vedi foto" – rosso */
+.buy{
+  background:#b91c1c;
+  padding:10px;
+  text-align:center;
+  color:white;
   border-radius:12px;
+  margin-top:8px;
+  cursor:pointer;
+  border:none;
   font-size:14px;
   font-family:Inter,system-ui,sans-serif;
-  cursor:pointer;
   transition:.2s ease-in-out;
 }
-
-.card-btn.primary{
-  background:var(--btn-primary);
-  color:#fff;
-  border:1px solid var(--btn-primary);
-}
-.card-btn.primary:hover{
+.buy:hover{
   background:#7f1d1d;
 }
 
-.card-btn.secondary{
-  background:#fff;
-  color:var(--btn-primary);
-  border:1px solid var(--btn-primary);
-}
-.card-btn.secondary:hover{
-  background:#fef2f2;
-}
-
 /* ─────────────────────────────────────────────
-   MODAL
+   MODAL VASE DETAIL
 ──────────────────────────────────────────────*/
 .modal{
   position:fixed;
@@ -441,6 +453,7 @@ nav a:hover{
   padding:20px;
 }
 
+/* VASE LEFT PANEL */
 .vase-detail-panel{
   flex:1;
   min-width:280px;
@@ -450,6 +463,10 @@ nav a:hover{
   font-size:28px;
   font-family:"Cormorant Garamond",serif;
   margin:0 0 4px;
+}
+.vase-rating{
+  font-size:18px;
+  color:#a22;
 }
 
 .vase-price-row{
@@ -461,11 +478,7 @@ nav a:hover{
 .vase-price{
   font-size:26px;
   font-weight:700;
-  color:#b91c1c;
-}
-.vase-old-price{
-  text-decoration:line-through;
-  color:var(--muted);
+  color:#b91c1c;          /* rosso anche nel popup */
 }
 .vase-discount{
   background:#fee2e2;
@@ -474,7 +487,12 @@ nav a:hover{
   border-radius:6px;
   font-size:13px;
 }
+.vase-old-price{
+  text-decoration:line-through;
+  color:var(--muted);
+}
 
+/* Buttons */
 .vase-actions{
   display:flex;
   gap:12px;
@@ -499,7 +517,7 @@ nav a:hover{
   cursor:pointer;
 }
 
-/* accordion */
+/* Accordion */
 .accordion-header{
   width:100%;
   padding:12px 0;
@@ -526,7 +544,7 @@ nav a:hover{
   margin:0;
 }
 
-/* gallery nel modale */
+/* Right column: gallery */
 .modal-gallery{
   flex:1;
 }
@@ -549,7 +567,6 @@ nav a:hover{
 .modal-gallery-main img.active{
   opacity:1;
 }
-
 .modal-gallery-counter{
   margin-top:8px;
   font-size:14px;
@@ -571,11 +588,46 @@ nav a:hover{
 }
 
 /* ─────────────────────────────────────────────
-   WORKSHOPS / GIFTCARDS / CONTACT / FOOTER
-   (resto invariato rispetto alla tua versione)
+   WORKSHOPS
 ──────────────────────────────────────────────*/
+.workshops{
+  display:grid;
+  grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
+  gap:40px;
+  align-items:center;
+}
 
-.workshops,
+.workshops-text{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.workshops-list{
+  margin:0;
+  padding-left:18px;
+  list-style:disc;
+}
+.workshops-list li{
+  margin-bottom:4px;
+}
+
+.workshops-note{
+  margin:10px 0 0;
+  font-size:1em;
+  color:var(--muted);
+}
+
+.workshops-img img{
+  width:100%;
+  display:block;
+  border-radius:18px;
+  object-fit:cover;
+}
+
+/* ─────────────────────────────────────────────
+   GIFT CARDS
+──────────────────────────────────────────────*/
 .giftcards{
   display:grid;
   grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
@@ -583,32 +635,27 @@ nav a:hover{
   align-items:center;
 }
 
-.workshops-text,
 .giftcards-text{
   display:flex;
   flex-direction:column;
   gap:14px;
 }
 
-.workshops-list,
 .giftcards-list{
   margin:0;
   padding-left:18px;
   list-style:disc;
 }
-.workshops-list li,
 .giftcards-list li{
   margin-bottom:4px;
 }
 
-.workshops-note,
 .giftcards-note{
   margin:10px 0 0;
   font-size:1em;
   color:var(--muted);
 }
 
-.workshops-img img,
 .giftcards-img img{
   width:100%;
   display:block;
@@ -616,17 +663,24 @@ nav a:hover{
   object-fit:cover;
 }
 
+/* ─────────────────────────────────────────────
+   CONTACT
+──────────────────────────────────────────────*/
 .contact-list{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:20px;
 }
+
 .contact-item{
   border:1px solid var(--border);
   border-radius:14px;
   padding:14px;
 }
 
+/* ─────────────────────────────────────────────
+   FOOTER
+──────────────────────────────────────────────*/
 footer{
   border-top:1px solid var(--border);
   padding:30px 0;
@@ -636,7 +690,7 @@ footer{
 }
 
 /* ─────────────────────────────────────────────
-   VIEW MODE TOGGLE
+   VIEW MODE TOGGLE BUTTON
 ──────────────────────────────────────────────*/
 .view-toggle{
   position:fixed;
@@ -644,6 +698,7 @@ footer{
   right:16px;
   z-index:2000;
 }
+
 .view-toggle button{
   background:#111;
   color:white;
@@ -659,69 +714,8 @@ footer{
 }
 
 /* ─────────────────────────────────────────────
-   MOBILE
+   MOBILE HERO & LAYOUT
 ──────────────────────────────────────────────*/
-body.mobile-view{
-  font-size:14px;
-}
-
-/* header fisso su mobile */
-body.mobile-view header{
-  position:fixed;
-  top:0;
-  left:0;
-  right:0;
-  z-index:2000;
-  background:rgba(255,255,255,.9);
-  backdrop-filter:saturate(180%) blur(14px);
-}
-body.mobile-view main{
-  padding-top:72px;
-}
-
-/* hamburger mobile */
-.nav-toggle-btn{
-  display:none;
-}
-body.mobile-view .nav-toggle-btn,
-body.mobile-view #nav-toggle{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  margin-left:8px;
-  width:32px;
-  height:32px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background:#ffffff;
-  font-size:18px;
-  padding:0;
-  cursor:pointer;
-}
-
-/* menu a discesa mobile */
-body.mobile-view nav ul{
-  position:absolute;
-  top:100%;
-  right:0;
-  left:0;
-  background:#ffffff;
-  border-bottom:1px solid var(--border);
-  flex-direction:column;
-  align-items:flex-start;
-  padding:10px 20px 14px;
-  gap:10px;
-  display:none;
-}
-body.mobile-view.nav-open nav ul{
-  display:flex;
-}
-body.mobile-view nav a{
-  font-size:14px;
-  padding:4px 0;
-}
-
-/* hero mobile */
 body.mobile-view .hero{
   min-height:60vh;
   align-items:flex-end;
@@ -739,6 +733,8 @@ body.mobile-view .hero-tagline{
   font-size:13px;
   max-width:90%;
 }
+
+/* freccia sotto il testo anche su mobile */
 body.mobile-view .hero-scroll{
   width:40px;
   height:40px;
@@ -746,20 +742,19 @@ body.mobile-view .hero-scroll{
   margin:28px auto 0 auto;
 }
 
-/* layout mobile per le varie sezioni */
-body.mobile-view .about,
-body.mobile-view .workshops,
-body.mobile-view .giftcards{
+/* ABOUT mobile */
+body.mobile-view .about{
   grid-template-columns:1fr;
   gap:24px;
 }
 body.mobile-view .about-col{
   gap:16px;
 }
+body.mobile-view .about-img-secondary{
+  order:2;
+}
 body.mobile-view .about-img-main img,
-body.mobile-view .about-img-secondary img,
-body.mobile-view .workshops-img img,
-body.mobile-view .giftcards-img img{
+body.mobile-view .about-img-secondary img{
   border-radius:14px;
 }
 body.mobile-view .about-cta{
@@ -771,6 +766,7 @@ body.mobile-view .pill-btn{
   padding:8px 14px;
 }
 
+/* CATALOG mobile */
 body.mobile-view .catalogue-header{
   flex-direction:column;
   align-items:flex-start;
@@ -782,6 +778,7 @@ body.mobile-view .catalogue-header .lead{
   max-width:100%;
   font-size:13px;
 }
+
 body.mobile-view .catalogue-grid{
   grid-template-columns:1fr;
   gap:18px;
@@ -796,6 +793,18 @@ body.mobile-view .card h4{
   font-size:18px;
 }
 
+/* WORKSHOPS / GIFT mobile */
+body.mobile-view .workshops,
+body.mobile-view .giftcards{
+  grid-template-columns:1fr;
+  gap:24px;
+}
+body.mobile-view .workshops-img img,
+body.mobile-view .giftcards-img img{
+  border-radius:14px;
+}
+
+/* CONTACT mobile */
 body.mobile-view .contact-list{
   grid-template-columns:1fr;
   gap:12px;
@@ -807,5 +816,100 @@ body.mobile-view .contact-item{
 body.mobile-view footer{
   padding:18px 0;
   font-size:12px;
+}
+
+/* NAV MOBILE: HAMBURGER + DROPDOWN */
+.nav{
+  position:relative;
+}
+
+/* di default (desktop) l'hamburger non si vede */
+.nav-toggle-btn{
+  display:none;
+}
+
+/* in mobile-view visibile */
+body.mobile-view .nav-toggle-btn,
+body.mobile-view #nav-toggle{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-left:8px;
+  width:32px;
+  height:32px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:#ffffff;
+  font-size:18px;
+  padding:0;
+  cursor:pointer;
+}
+
+/* dropdown del menu */
+body.mobile-view nav ul{
+  position:absolute;
+  top:100%;
+  right:0;
+  left:0;
+  background:#ffffff;
+  border-bottom:1px solid var(--border);
+  flex-direction:column;
+  align-items:flex-start;
+  padding:10px 20px 14px;
+  gap:10px;
+  display:none;
+}
+
+/* quando il menu è aperto */
+body.mobile-view.nav-open nav ul{
+  display:flex;
+}
+
+/* link più piccoli */
+body.mobile-view nav a{
+  font-size:14px;
+  padding:4px 0;
+}
+
+/* mobile base font */
+body.mobile-view{
+  font-size:14px;
+}
+
+/* ─────────────────────────────────────────────
+   BUTTON ADD TO CART
+──────────────────────────────────────────────*/
+.add-cart{
+  background:#111827;
+  color:white;
+  padding:10px;
+  text-align:center;
+  border-radius:12px;
+  margin-top:6px;
+  cursor:pointer;
+  border:none;
+  font-size:14px;
+  font-family:Inter,system-ui,sans-serif;
+  transition:.2s ease;
+}
+.add-cart:hover{
+  background:#000000;
+}
+
+/* ─────────────────────────────────────────────
+   MOBILE FIXED HEADER + MAIN OFFSET
+──────────────────────────────────────────────*/
+body.mobile-view header{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:2000;
+  background:rgba(255,255,255,.9);
+  backdrop-filter:saturate(180%) blur(14px);
+}
+
+body.mobile-view main{
+  padding-top:72px;
 }
 
