@@ -1,0 +1,221 @@
+/* ============================================================
+   LINGUE – dizionario di traduzione
+============================================================ */
+
+const messages = {
+  ru: {
+    nav: {
+      home: "Главная",
+      about: "О бренде",
+      catalogue: "Каталог",
+      workshops: "Мастер-классы",
+      giftcards: "Подарочные сертификаты",
+      contact: "Контакты"
+    },
+    hero: {
+      tagline: "Тактильная интерьерная керамика с бисерной вышивкой, которая превратит ваш дом в место силы и вдохновения."
+    },
+    about: {
+      title: "О бренде",
+      intro1: "Меня зовут Анна, и я создаю интерьерную керамику как объект искусства, который поддерживает, вдохновляет и становится частью вашего личного пространства силы.",
+      intro2: "Я верю, что предметы, с которыми мы живём, влияют на наше состояние.",
+      btnCatalogue: "Каталог",
+      btnWorkshops: "Мастер-классы",
+      btnGiftCards: "Подарочные сертификаты",
+      text1: "Мои вазы — это не просто формы, а предметы, которые меняют атмосферу дома.",
+      text2: "В каждой работе — высокотемпературная глина, тактильные текстуры, бисерная вышивка и сочетание несовершенных форм с ощущением роскоши."
+    },
+    catalogue: {
+      title: "Каталог",
+      lead: "Каждое изделие — это уникальная эмоция для вашего пространства",
+      // BOTTONI CARD
+      addToCart: "Купить",        // bottone pieno rosso
+      viewPhotos: "Подробнее",    // bottone bianco bordo rosso
+      spec: {
+        height: "Высота",
+        diameter: "Диаметр",
+        material: "Материал",
+        technique: "Техника",
+        finish: "Покрытие"
+      }
+    },
+    detail: {
+      description: "Описание",
+      characteristics: "Характеристики",
+      delivery: "Доставка",
+      deliveryText: "Отправляем по всему миру из Лигурии, надёжно упаковывая каждое изделие."
+    },
+    workshops: {
+      title: "Мастер-классы",
+      lead: "Керамические мастер-классы в маленьких группах в атмосфере внимания и спокойствия.",
+      list1: "Индивидуальные и групповые занятия в студии в Генуе.",
+      list2: "Формы, тактильные поверхности, работа с глазурями и декором.",
+      list3: "Формат для компаний и частных мероприятий по запросу.",
+      note: "За актуальным расписанием и для организации частного мастер-класса напишите мне.",
+      cta: "Написать, чтобы записаться"
+    },
+    giftcards: {
+      title: "Подарочные сертификаты",
+      lead: "Подарите эмоцию прикосновения к глине или выбор керамического объекта для дома.",
+      list1: "Сертификат на участие в мастер-классе.",
+      list2: "Сертификат на готовое изделие или персональный заказ.",
+      list3: "Электронный формат или оформленная карточка, готовая к вручению.",
+      note: "Напишите мне, чтобы подобрать формат сертификата под ваш запрос.",
+      cta: "Написать насчёт сертификата"
+    },
+    status: {
+      sold: "Продано"
+    },
+    contact: {
+      title: "Контакты",
+      address: "Мастерская:"
+    },
+    footer: {
+      made: "Сайт на GitHub Pages"
+    }
+  },
+
+  it: {
+    nav: {
+      home: "Home",
+      about: "Il brand",
+      catalogue: "Catalogo",
+      workshops: "Masterclass",
+      giftcards: "Gift Card",
+      contact: "Contatti"
+    },
+    hero: {
+      tagline: "Ceramica tattile da interno con ricami di perle che trasforma la tua casa in un luogo di forza e ispirazione."
+    },
+    about: {
+      title: "Il brand",
+      intro1: "Mi chiamo Anna e creo ceramiche d’interni come oggetti d’arte che sostengono, ispirano e diventano parte del tuo spazio personale di forza.",
+      intro2: "Credo che gli oggetti con cui viviamo influenzino il nostro stato interiore.",
+      btnCatalogue: "Catalogo",
+      btnWorkshops: "Masterclass",
+      btnGiftCards: "Gift Card",
+      text1: "I miei vasi non sono solo forme, ma oggetti che trasformano l’atmosfera della casa.",
+      text2: "In ogni pezzo ci sono argille ad alta temperatura, superfici tattili, ricami di perle e l’unione di forme imperfette con una sensazione di lusso."
+    },
+    catalogue: {
+      title: "Catalogo",
+      lead: "Ogni pezzo è un’emozione unica per il tuo spazio.",
+      addToCart: "Compra",      // rosso pieno
+      viewPhotos: "Dettagli",   // bianco bordo rosso
+      spec: {
+        height: "Altezza",
+        diameter: "Diametro",
+        material: "Materiale",
+        technique: "Tecnica",
+        finish: "Finitura"
+      }
+    },
+    detail: {
+      description: "Descrizione",
+      characteristics: "Caratteristiche",
+      delivery: "Spedizione",
+      deliveryText: "Spediamo in tutto il mondo dalla Liguria, con imballaggio protettivo."
+    },
+    workshops: {
+      title: "Masterclass",
+      lead: "Workshop di ceramica in piccoli gruppi, in un’atmosfera di cura e tranquillità.",
+      list1: "Percorsi individuali e di gruppo nel mio studio a Genova.",
+      list2: "Forme, superfici tattili, lavoro con smalti e decorazioni.",
+      list3: "Format per aziende ed eventi privati su richiesta.",
+      note: "Per il calendario aggiornato o per organizzare una masterclass privata, scrivimi.",
+      cta: "Scrivimi per iscriverti"
+    },
+    giftcards: {
+      title: "Gift Card",
+      lead: "Regala l’emozione di lavorare con l’argilla o di scegliere un oggetto in ceramica per la casa.",
+      list1: "Buono per partecipare a una masterclass.",
+      list2: "Buono per un pezzo finito o per una commissione su misura.",
+      list3: "Formato digitale o card stampata pronta da regalare.",
+      note: "Scrivimi per trovare insieme il formato di gift card più adatto.",
+      cta: "Scrivimi per una Gift Card"
+    },
+    status: {
+      sold: "Venduto"
+    },
+    contact: {
+      title: "Contatti",
+      address: "Studio:"
+    },
+    footer: {
+      made: "Realizzato con GitHub Pages"
+    }
+  },
+
+  en: {
+    nav: {
+      home: "Home",
+      about: "About",
+      catalogue: "Catalogue",
+      workshops: "Masterclass",
+      giftcards: "Gift Cards",
+      contact: "Contact"
+    },
+    hero: {
+      tagline: "Tactile interior ceramics with pearl embroidery that turns your home into a place of strength and inspiration."
+    },
+    about: {
+      title: "About the brand",
+      intro1: "My name is Anna, and I create interior ceramics as art objects that support, inspire, and become part of your personal space of strength.",
+      intro2: "I believe that the objects we live with influence our inner state.",
+      btnCatalogue: "Catalogue",
+      btnWorkshops: "Masterclass",
+      btnGiftCards: "Gift Cards",
+      text1: "My vases are not just shapes, but objects that transform the atmosphere of a home.",
+      text2: "Each piece combines high-temperature clays, tactile textures, bead embroidery, and the meeting of imperfect forms with a sense of luxury."
+    },
+    catalogue: {
+      title: "Catalogue",
+      lead: "Each piece is a unique emotion for your space.",
+      addToCart: "Buy",
+      viewPhotos: "Details",
+      spec: {
+        height: "Height",
+        diameter: "Diameter",
+        material: "Material",
+        technique: "Technique",
+        finish: "Finish"
+      }
+    },
+    detail: {
+      description: "Description",
+      characteristics: "Characteristics",
+      delivery: "Shipping",
+      deliveryText: "We ship worldwide from Liguria, Italy."
+    },
+    workshops: {
+      title: "Masterclass",
+      lead: "Ceramic workshops in small groups, in a calm and attentive atmosphere.",
+      list1: "Individual and group sessions in my studio in Genoa.",
+      list2: "Forms, tactile surfaces, working with glazes and decoration.",
+      list3: "Formats for companies and private events upon request.",
+      note: "For the updated calendar or to organise a private masterclass, write to me.",
+      cta: "Write me to join"
+    },
+    giftcards: {
+      title: "Gift Cards",
+      lead: "Offer the emotion of working with clay or choosing a ceramic object for the home.",
+      list1: "Voucher for attending a masterclass.",
+      list2: "Voucher for a finished piece or a bespoke commission.",
+      list3: "Digital format or printed card ready to gift.",
+      note: "Write to me to find the most suitable gift card format for you.",
+      cta: "Write for a Gift Card"
+    },
+    status: {
+      sold: "Sold out"
+    },
+    contact: {
+      title: "Contact",
+      address: "Studio address:"
+    },
+    footer: {
+      made: "Made with GitHub Pages"
+    }
+  }
+};
+
+
