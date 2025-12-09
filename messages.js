@@ -218,4 +218,5 @@ const messages = {
   }
 };
 
+window.messages = messages;
 
