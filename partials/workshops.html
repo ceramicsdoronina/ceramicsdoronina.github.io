@@ -1,4 +1,5 @@
 <section id="workshops" class="section">
+  <!-- BLOCCO TESTO + FOTO INTRO MASTERCLASS -->
   <div class="container workshops">
 
     <div class="workshops-text">
@@ -30,10 +31,22 @@
     </div>
 
     <div class="workshops-img">
-      <!-- Metti una foto dei workshop in questa posizione -->
       <img src="images/workshop.jpg" alt="Workshop di ceramica nel laboratorio">
     </div>
 
+  </div><!-- /container.workshops -->
+
+  <!-- BLOCCO MASTERCLASS DINAMICHE DA masterclass.csv -->
+  <div class="container">
+    <div class="catalogue-header">
+      <h3 data-i18n="workshops.scheduleTitle">Upcoming masterclasses</h3>
+      <p class="lead" data-i18n="workshops.scheduleLead">
+        Choose a date and write to me to join a small group masterclass in my studio in Genoa.
+      </p>
+    </div>
+
+    <!-- qui masterclass.js inserisce le card -->
+    <div id="masterclass-grid" class="catalogue-grid"></div>
   </div>
 </section>
 
