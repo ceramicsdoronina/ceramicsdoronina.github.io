@@ -986,4 +986,11 @@ body.mobile-view footer{
     display:none;
   }
 }
+/* ─────────────────────────────────────────────
+   CORREZIONE: Titolo masterclass NON in maiuscolo
+──────────────────────────────────────────────*/
+#workshops h3[data-i18n="workshops.scheduleTitle"] {
+    text-transform: none !important;
+    margin-top: 32px; /* ← aggiunge spazio sopra il titolo */
+}
 

@@ -46,7 +46,9 @@ const messages = {
       deliveryText: "Отправляем по всему миру из Лигурии, надёжно упаковывая каждое изделие."
     },
     workshops: {
-      title: "Мастер-классы",
+      title: "МАСТЕР-КЛАССЫ",
+      scheduleTitle: "Ближайшие мастер-классы",
+      scheduleLead: "Выберите дату и напишите мне, чтобы присоединиться к мастер-классу в небольших группах в моей студии в Генуе.",
       lead: "Керамические мастер-классы в маленьких группах в атмосфере внимания и спокойствия.",
       list1: "Индивидуальные и групповые занятия в студии в Генуе.",
       list2: "Формы, тактильные поверхности, работа с глазурями и декором.",
@@ -80,7 +82,7 @@ const messages = {
       home: "Home",
       about: "Il brand",
       catalogue: "Catalogo",
-      workshops: "Masterclass",
+      workshops: "Workshop",
       giftcards: "Gift Card",
       contact: "Contatti"
     },
@@ -117,7 +119,9 @@ const messages = {
       deliveryText: "Spediamo in tutto il mondo dalla Liguria, con imballaggio protettivo."
     },
     workshops: {
-      title: "Masterclass",
+      title: "WORKSHOP",
+      scheduleTitle: "Workshop in programma",
+      scheduleLead: "Scegli una data e scrivimi per partecipare a una masterclass in piccoli gruppi nel mio studio a Genova.",
       lead: "Workshop di ceramica in piccoli gruppi, in un’atmosfera di cura e tranquillità.",
       list1: "Percorsi individuali e di gruppo nel mio studio a Genova.",
       list2: "Forme, superfici tattili, lavoro con smalti e decorazioni.",
@@ -126,7 +130,7 @@ const messages = {
       cta: "Scrivimi per iscriverti"
     },
     giftcards: {
-      title: "Gift Card",
+      title: "GIFT CARD",
       lead: "Regala l’emozione di lavorare con l’argilla o di scegliere un oggetto in ceramica per la casa.",
       list1: "Buono per partecipare a una masterclass.",
       list2: "Buono per un pezzo finito o per una commissione su misura.",
@@ -188,7 +192,9 @@ const messages = {
       deliveryText: "We ship worldwide from Liguria, Italy."
     },
     workshops: {
-      title: "Masterclass",
+      title: "WORKSHOPS",
+      scheduleTitle: "Upcoming workshops",
+      scheduleLead: "Choose a date and write to me to join a small group masterclass in my studio in Genoa.",
       lead: "Ceramic workshops in small groups, in a calm and attentive atmosphere.",
       list1: "Individual and group sessions in my studio in Genoa.",
       list2: "Forms, tactile surfaces, working with glazes and decoration.",
@@ -197,7 +203,7 @@ const messages = {
       cta: "Write me to join"
     },
     giftcards: {
-      title: "Gift Cards",
+      title: "GIFT CARDS",
       lead: "Offer the emotion of working with clay or choosing a ceramic object for the home.",
       list1: "Voucher for attending a masterclass.",
       list2: "Voucher for a finished piece or a bespoke commission.",
