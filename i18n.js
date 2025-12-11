@@ -29,15 +29,26 @@
   }
 
   function setLanguage(lang) {
-    if (!messages[lang]) return;
-    currentLang = lang;
-    localStorage.setItem("cd_lang", lang);
-    applyTranslations(lang);
+      if (!messages[lang]) return;
 
-    if (window.__catalogueData && window.CD && CD.catalogue) {
-      CD.catalogue.render(window.__catalogueData, lang);
-    }
+      currentLang = lang;
+      localStorage.setItem("cd_lang", lang);
+
+      // 1) prima ricostruisco le parti dinamiche nella nuova lingua
+      if (window.__catalogueData && window.CD && CD.catalogue) {
+        CD.catalogue.render(window.__catalogueData, lang);
+        CD.catalogue.initBehaviour();  // se serve per modali/gallerie
+      }
+
+      if (window.__masterclassData && window.CD && CD.masterclass) {
+        CD.masterclass.render(window.__masterclassData, lang);
+        // se usi una initBehaviour anche per le masterclass la puoi chiamare qui
+      }
+
+      // 2) solo alla fine applico le traduzioni a TUTTI i data-i18n
+      applyTranslations(lang);
   }
+
 
   function initLanguage() {
     currentLang = detectInitialLang();
