@@ -84,11 +84,15 @@
           <h4>${name}</h4>
           <p>${shortText}</p>
           ${metaHtml}
-          <div class="card-actions">
-            <button class="card-btn primary" data-modal-target="mc-modal-${mc.id}">
-              ${ctaLabel}
-            </button>
-          </div>
+            <div class="card-actions">
+              <button
+                class="card-btn primary"
+                data-modal-target="mc-modal-${mc.id}"
+                data-i18n="workshops.cta"
+              >
+                Scrivimi per iscriverti
+              </button>
+            </div>
         </div>
       `;
       grid.appendChild(card);
@@ -112,12 +116,13 @@
                 <h3 class="vase-subtitle">${shortText}</h3>
                 ${metaHtml}
                 <div class="vase-actions">
-                  <a
-                    class="vase-btn-primary"
-                    href="mailto:ceramist.doronina@gmail.com?subject=Masterclass: ${encodeURIComponent(name)}"
-                  >
-                    ${ctaLabel}
-                  </a>
+                   <a
+                     class="vase-btn-primary"
+                     href="mailto:ceramist.doronina@gmail.com?subject=Masterclass: ${encodeURIComponent(name)}"
+                     data-i18n="workshops.cta"
+                   >
+                     Scrivimi per iscriverti
+                   </a>
                 </div>
                 <div class="accordion-panel active">
                   <p>${longText}</p>
