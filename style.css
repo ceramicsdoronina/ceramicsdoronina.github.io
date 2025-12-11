@@ -994,3 +994,22 @@ body.mobile-view footer{
     margin-top: 32px; /* ← aggiunge spazio sopra il titolo */
 }
 
+/* Logo imaging */
+.brand-link {
+  display: flex;
+  align-items: center;
+}
+
+.brand-img {
+  height: 40px;     /* puoi aumentare/diminuire 38–50px */
+  width: auto;
+  display: block;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .brand-img {
+    height: 30px;
+  }
+}
+
