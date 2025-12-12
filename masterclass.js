@@ -40,6 +40,9 @@
     const ctaLabel = msgs && msgs.workshops && msgs.workshops.cta
       ? msgs.workshops.cta
       : "Write to join";
+    const detailsLabel = msgs && msgs.workshops && msgs.workshops.details
+      ? msgs.workshops.details
+      : "Details";
 
     grid.innerHTML = "";
     if (modalRoot) modalRoot.innerHTML = "";
@@ -76,6 +79,10 @@
       // CARD
       const card = document.createElement("article");
       card.className = "card";
+
+      const mailtoHref =
+        `mailto:ceramist.doronina@gmail.com?subject=Masterclass: ${encodeURIComponent(name)}`;
+
       card.innerHTML = `
         <div class="media media-single" data-modal-target="mc-modal-${mc.id}">
           <img src="${img}" alt="${name}">
@@ -84,17 +91,25 @@
           <h4>${name}</h4>
           <p>${shortText}</p>
           ${metaHtml}
-            <div class="card-actions">
-              <button
-                class="card-btn primary"
-                data-modal-target="mc-modal-${mc.id}"
-                data-i18n="workshops.cta"
-              >
-                Scrivimi per iscriverti
-              </button>
-            </div>
+          <div class="card-actions">
+            <a
+              class="card-btn primary"
+              href="${mailtoHref}"
+              data-i18n="workshops.cta"
+            >
+              ${ctaLabel}
+            </a>
+            <button
+              class="card-btn secondary"
+              data-modal-target="mc-modal-${mc.id}"
+              data-i18n="workshops.details"
+            >
+              ${detailsLabel}
+            </button>
+          </div>
         </div>
       `;
+
       grid.appendChild(card);
 
       // POPUP
@@ -140,6 +155,29 @@
       `;
 
       modalRoot.appendChild(modal);
+    });
+    initModals();
+  }
+
+  function initModals() {
+    document.querySelectorAll("[data-modal-target]").forEach(el => {
+      el.addEventListener("click", () => {
+        const id = el.dataset.modalTarget;
+        const m = document.getElementById(id);
+        if (m) m.classList.add("open");
+      });
+    });
+
+    document.querySelectorAll("[data-modal-close]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        btn.closest(".modal")?.classList.remove("open");
+      });
+    });
+
+    document.addEventListener("click", e => {
+      if (e.target.classList?.contains("modal")) {
+        e.target.classList.remove("open");
+      }
     });
   }
 

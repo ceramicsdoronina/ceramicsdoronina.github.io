@@ -53,6 +53,7 @@ const messages = {
       list1: "Индивидуальные и групповые занятия в студии в Генуе.",
       list2: "Формы, тактильные поверхности, работа с глазурями и декором.",
       list3: "Формат для компаний и частных мероприятий по запросу.",
+      details: "Подробнее",
       note: "За актуальным расписанием и для организации частного мастер-класса напишите мне.",
       cta: "Написать, чтобы записаться"
     },
@@ -127,6 +128,7 @@ const messages = {
       list2: "Forme, superfici tattili, lavoro con smalti e decorazioni.",
       list3: "Format per aziende ed eventi privati su richiesta.",
       note: "Per il calendario aggiornato o per organizzare una masterclass privata, scrivimi.",
+      details: "Dettagli",
       cta: "Scrivimi per iscriverti"
     },
     giftcards: {
@@ -200,6 +202,7 @@ const messages = {
       list2: "Forms, tactile surfaces, working with glazes and decoration.",
       list3: "Formats for companies and private events upon request.",
       note: "For the updated calendar or to organise a private masterclass, write to me.",
+      details: "Details",
       cta: "Write me to join"
     },
     giftcards: {
