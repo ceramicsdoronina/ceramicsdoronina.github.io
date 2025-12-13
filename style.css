@@ -1013,3 +1013,10 @@ body.mobile-view footer{
   }
 }
 
+.giftcards-title {
+  text-transform: none;
+}
+.catalogue-header .giftcards-title {
+  text-transform: none;
+}
+
