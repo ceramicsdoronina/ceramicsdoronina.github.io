@@ -6,13 +6,15 @@ async function appInit() {
 
   try {
     // carica in parallelo catalogo vasi e masterclass
-    const [catalogueItems, masterclassItems] = await Promise.all([
+    const [catalogueItems, masterclassItems, certificatiItems] = await Promise.all([
       CD.catalogue.loadCsv(),
-      CD.masterclass ? CD.masterclass.loadCsv() : Promise.resolve([])
+      CD.masterclass ? CD.masterclass.loadCsv() : Promise.resolve([]),
+      CD.certificati ? CD.certificati.loadCsv() : Promise.resolve([])
     ]);
 
     window.__catalogueData   = catalogueItems;
     window.__masterclassData = masterclassItems;
+    window.__certificatiData = certificatiItems;
 
     // vasi
     CD.catalogue.render(catalogueItems, currentLang);
@@ -20,6 +22,10 @@ async function appInit() {
     // masterclass
     if (CD.masterclass && masterclassItems.length) {
       CD.masterclass.render(masterclassItems, currentLang);
+    }
+
+    if (CD.certificati && certificatiItems.length) {
+      CD.certificati.render(certificatiItems, currentLang);
     }
 
     // inizializza modali / accordion / gallery

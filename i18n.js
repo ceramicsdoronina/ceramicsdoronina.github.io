@@ -45,6 +45,10 @@
         // se usi una initBehaviour anche per le masterclass la puoi chiamare qui
       }
 
+      if (window.__certificatiData && window.CD && CD.certificati) {
+        CD.certificati.render(window.__certificatiData, lang);
+      }
+
       // 2) solo alla fine applico le traduzioni a TUTTI i data-i18n
       applyTranslations(lang);
   }

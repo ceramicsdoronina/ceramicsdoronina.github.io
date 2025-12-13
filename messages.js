@@ -58,12 +58,17 @@ const messages = {
       cta: "Написать, чтобы записаться"
     },
     giftcards: {
-      title: "Подарочные сертификаты",
+      title: "ПОДАРОЧНЫЕ СЕРТИФИКАТЫ",
       lead: "Подарите эмоцию прикосновения к глине или выбор керамического объекта для дома.",
       list1: "Сертификат на участие в мастер-классе.",
       list2: "Сертификат на готовое изделие или персональный заказ.",
       list3: "Электронный формат или оформленная карточка, готовая к вручению.",
       note: "Напишите мне, чтобы подобрать формат сертификата под ваш запрос.",
+      cardsTitle: "Подарочные сертификаты",
+      cardsLead: "Выберите номинал и напишите мне, чтобы оформить сертификат.",
+      buy: "Купить",
+      details: "Подробнее",
+      modalTitle: "Подарочный сертификат",
       cta: "Написать насчёт сертификата"
     },
     status: {
@@ -132,13 +137,18 @@ const messages = {
       cta: "Scrivimi per iscriverti"
     },
     giftcards: {
-      title: "GIFT CARD",
+      title: "CARTE REGALO",
       lead: "Regala l’emozione di lavorare con l’argilla o di scegliere un oggetto in ceramica per la casa.",
       list1: "Buono per partecipare a una masterclass.",
       list2: "Buono per un pezzo finito o per una commissione su misura.",
-      list3: "Formato digitale o card stampata pronta da regalare.",
-      note: "Scrivimi per trovare insieme il formato di gift card più adatto.",
-      cta: "Scrivimi per una Gift Card"
+      list3: "Formato digitale o stampata pronta da regalare.",
+      note: "Scrivimi per trovare insieme il formato di carta regalo più adatto.",
+      cardsTitle: "Gift Card",
+      cardsLead: "Scegli l’importo e richiedi la carta regalo.",
+      buy: "Compra",
+      details: "Dettagli",
+      modalTitle: "Carte regalo",
+      cta: "Scrivimi per una carta regaolo"
     },
     status: {
       sold: "Venduto"
@@ -212,6 +222,11 @@ const messages = {
       list2: "Voucher for a finished piece or a bespoke commission.",
       list3: "Digital format or printed card ready to gift.",
       note: "Write to me to find the most suitable gift card format for you.",
+      cardsTitle: "Gift Cards",
+      cardsLead: "Choose an amount and request a gift card.",
+      buy: "Buy",
+      details: "Details",
+      modalTitle: "Gift Card",
       cta: "Write for a Gift Card"
     },
     status: {
