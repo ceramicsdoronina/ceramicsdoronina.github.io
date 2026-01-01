@@ -115,6 +115,7 @@ nav a:hover{
 }
 
 .hero::before{
+  z-index: 1;
   content:"";
   position:absolute;
   inset:0;
@@ -127,9 +128,6 @@ nav a:hover{
 }
 
 .hero-overlay{
-  position:relative;
-  text-align:center;
-  padding:0 20px;
   z-index: 2;
 }
 
@@ -882,7 +880,8 @@ body.mobile-view footer{
     min-height:60vh;
     align-items:flex-end;
     padding-bottom:40px;
-  }
+    overflow: hidden;  
+}
 
   .hero-overlay{
     padding:0 16px 0;
@@ -1022,9 +1021,9 @@ body.mobile-view footer{
 }
 
 .hero-video-wrapper {
-  position: relative;
-  width: 100%;
-  height: 100vh;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   overflow: hidden;
 }
 
