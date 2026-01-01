@@ -1,10 +1,50 @@
 <main id="home" class="hero hero-landing">
+
+  <!-- Video hero -->
+  <div class="hero-video-wrapper">
+
+    <video
+      class="hero-video desktop-only"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata">
+      <source src="videos/hero-desktop.mp4" type="video/mp4">
+    </video>
+
+    <video
+      class="hero-video mobile-only"
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata">
+      <source src="videos/hero-mobile.mp4" type="video/mp4">
+    </video>
+
+  </div>
+
+  <!-- Overlay contenuti -->
   <div class="hero-overlay">
+
+    <!-- H1 SEO (visivamente nascosto, ma semanticamente corretto) -->
+    <h1 class="visually-hidden" data-i18n="hero.h1">
+      Ceramica artistica contemporanea fatta a mano – Ceramics Doronina
+    </h1>
+
+    <!-- Logo / titolo visivo -->
     <h2 class="hero-logo">DORONINA</h2>
+
+    <!-- Tagline visiva -->
     <p class="hero-tagline" data-i18n="hero.tagline">
       Тактильная интерьерная керамика с бисерной вышивкой, которая превратит ваш дом в место силы и вдохновения
     </p>
-    <a href="#about" class="hero-scroll">↓</a>
-  </div>
-</main>
 
+    <a href="#about" class="hero-scroll" aria-label="Scorri alla sezione Chi siamo">
+      ↓
+    </a>
+
+  </div>
+
+</main>

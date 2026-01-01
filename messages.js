@@ -13,6 +13,11 @@ const messages = {
       contact: "Контакты"
     },
     hero: {
+  	h1: {
+    		it: "Ceramica artistica contemporanea fatta a mano – Ceramics Doronina",
+    		en: "Handmade contemporary artistic ceramics – Ceramics Doronina",
+    		ru: "Современная художественная керамика ручной работы – Ceramics Doronina"
+  	},
       tagline: "Тактильная интерьерная керамика с бисерной вышивкой, которая превратит ваш дом в место силы и вдохновения."
     },
     about: {

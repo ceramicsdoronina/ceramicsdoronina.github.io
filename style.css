@@ -130,6 +130,7 @@ nav a:hover{
   position:relative;
   text-align:center;
   padding:0 20px;
+  z-index: 2;
 }
 
 .hero-logo{
@@ -1020,3 +1021,42 @@ body.mobile-view footer{
   text-transform: none;
 }
 
+.hero-video-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.hero-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* visibilità */
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: block;
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
