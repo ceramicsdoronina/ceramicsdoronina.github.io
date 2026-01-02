@@ -1,11 +1,73 @@
 <section id="contact" class="section">
-  <div class="container">
-    <h3 data-i18n="contact.title">Контакты</h3>
+  <div class="container contact">
+
+    <h3 data-i18n="contact.title">Contatti</h3>
+
     <div class="contact-list">
-      <div class="contact-item"><strong>Email:</strong> <a href="mailto:ceramist.doronina@gmail.com">ceramist.doronina@gmail.com</a></div>
-      <div class="contact-item"><strong>Instagram:</strong> <a href="https://instagram.com/ceramicsdoronina">@ceramicsdoronina</a></div>
-      <div class="contact-item"><strong data-i18n="contact.address">Адрес мастерской:</strong> Genova, Italy</div>
+      <!-- Email (left) -->
+      <a class="contact-item"
+         href="mailto:ceramist.doronina@gmail.com"
+         style="text-align:center;">
+        <span style="white-space:nowrap;">
+          <strong data-i18n="contact.emailLabel">Email:</strong>
+          <span>ceramist.doronina@gmail.com</span>
+        </span>
+      </a>
+
+      <!-- WhatsApp (center) -->
+      <a class="contact-item contact-item--center"
+         href="https://wa.me/393806836745"
+         target="_blank" rel="noopener"
+         style="text-align:center;">
+        <span style="white-space:nowrap;">
+          <strong data-i18n="contact.whatsappLabel">WhatsApp:</strong>
+          <span>+39 380 683 6745</span>
+        </span>
+      </a>
+
+      <!-- Instagram (right) -->
+      <a class="contact-item"
+         href="https://instagram.com/ceramicsdoronina"
+         target="_blank" rel="noopener"
+         style="text-align:center;">
+        <span style="white-space:nowrap;">
+          <strong data-i18n="contact.instagramLabel">Instagram:</strong>
+          <span>@ceramicsdoronina</span>
+        </span>
+      </a>
     </div>
+
+    <div class="contact-studio" style="text-align:center;">
+      <!-- riga studio cliccabile -->
+      <a class="contact-maplink"
+         href="https://maps.app.goo.gl/DEw15dcPELNibQ2n9"
+         target="_blank" rel="noopener"
+         style="text-decoration:none; color:inherit;">
+        <strong data-i18n="contact.studioLabel">Studio:</strong>
+        <span data-i18n="contact.address">Via San Lorenzo 7/5 Sc. Dx, 16123 Genova</span>
+        <span data-i18n="contact.countrySuffix"></span>
+      </a>
+
+      <p class="contact-open">
+        <a class="contact-openlink"
+           href="https://maps.app.goo.gl/DEw15dcPELNibQ2n9"
+           target="_blank" rel="noopener"
+           data-i18n="contact.openMaps">
+          Apri in Google Maps
+        </a>
+      </p>
+
+      <div class="contact-map">
+        <iframe
+          src="https://www.google.com/maps?q=Via%20San%20Lorenzo%207%2F5%20Sc.%20Dx%2C%2016123%20Genova&output=embed"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen
+          title="Studio map">
+        </iframe>
+      </div>
+    </div>
+
   </div>
 </section>
 

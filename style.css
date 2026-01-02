@@ -644,11 +644,167 @@ nav a:hover{
   grid-template-columns:repeat(3,1fr);
   gap:20px;
 }
+
 .contact-item{
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:14px;
+  border: none;              /* ← niente bottone */
+  border-radius: 0;
+  padding: 0;
+
+  font-size: 16px;           /* ← dimensione originale */
+  line-height: 1.6;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  background: transparent;
 }
+
+.contact-item--center {
+  justify-content: center;
+  text-align: center;
+}
+
+.contact-link:hover{
+  background: rgba(0,0,0,0.02);
+}
+
+.contact-value{
+  font-weight: 400;
+}
+
+.contact-studio{
+  margin-top: 28px;
+  text-align: center;
+}
+
+.contact-studio-line{
+  font-size: 22px;
+  line-height: 1.35;
+  margin: 0 0 10px 0;
+}
+
+.contact-maplink{
+  text-decoration: none;
+  text-underline-offset: 4px;
+  color: inherit;
+}
+
+.contact-open{
+  margin: 0 0 16px 0;
+}
+
+.contact-openlink{
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  color: inherit;
+}
+
+.contact-map{
+  margin: 0 auto;
+  max-width: 980px;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.contact-map iframe{
+  width: 100%;
+  height: 420px;
+  border: 0;
+}
+
+
+/* CONTATTI */
+
+.contact-container {
+  text-align: left;
+}
+
+.contact-row {
+  display: flex;
+  gap: 1.5rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+
+.contact-box {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 0; /* angoli retti come richiesto */
+  white-space: nowrap;
+}
+
+.contact-box strong {
+  margin-right: 0.25rem;
+}
+
+/* Studio centrato */
+.contact-studio {
+  margin-top: 3rem;
+  text-align: center;
+}
+
+.contact-studio-line {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.contact-map-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.contact-map iframe {
+  width: 100%;
+  max-width: 700px;
+  height: 280px;
+  border: 0;
+  margin: 0 auto;
+  display: block;
+}
+
+/* === CONTACT: force 3 items on one row (desktop) === */
+.contact-cards{
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 32px;
+  flex-wrap: nowrap;
+}
+
+.contact-card{
+  flex: 1 1 0;
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  white-space: nowrap;     /* keeps "Email: xxx" on one line */
+}
+
+/* Link look like text (optional, but usually nicer) */
+.contact-card a{
+  text-decoration: none;
+}
+
+.contact-address a:hover,
+.contact-map a:hover {
+  opacity: 0.7;
+}
+
+/* Mobile: stack */
+@media (max-width: 768px){
+  .contact-cards{
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .contact-card{
+    white-space: normal;
+  }
+}
+
 
 footer{
   border-top:1px solid var(--border);
@@ -823,6 +979,9 @@ body.mobile-view .contact-list{
   grid-template-columns:1fr;
   gap:12px;
 }
+body.mobile-view .contact-map iframe{
+  height: 320px;
+}
 body.mobile-view .contact-item{
   padding:10px 12px;
   font-size:13px;
@@ -905,7 +1064,7 @@ body.mobile-view footer{
     align-items:flex-end;
     padding-bottom:40px;
     overflow: hidden;  
-}
+  }
 
   .hero-overlay{
     padding:0 16px 0;

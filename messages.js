@@ -81,7 +81,13 @@ const messages = {
     },
     contact: {
       title: "Контакты",
-      address: "Мастерская:"
+      emailLabel: "Email:",
+      instagramLabel: "Instagram:",
+      whatsappLabel: "WhatsApp:",
+      whatsappCta: "Написать",
+      studioTitle: "Мастерская:",
+      studioAddress: "Via San Lorenzo 7/5 Sc. Dx, 16123 Genova, Италия",
+      openInMaps: "Открыть в Google Maps"
     },
     footer: {
       made: "Сайт на GitHub Pages"
@@ -160,7 +166,13 @@ const messages = {
     },
     contact: {
       title: "Contatti",
-      address: "Studio:"
+      emailLabel: "Email:",
+      instagramLabel: "Instagram:",
+      whatsappLabel: "WhatsApp:",
+      whatsappCta: "Scrivimi",
+      studioTitle: "Studio:",
+      studioAddress: "Via San Lorenzo 7/5 Sc. Dx, 16123 Genova",
+      openInMaps: "Apri in Google Maps"
     },
     footer: {
       made: "Realizzato con GitHub Pages"
@@ -239,7 +251,13 @@ const messages = {
     },
     contact: {
       title: "Contact",
-      address: "Studio address:"
+      emailLabel: "Email:",
+      instagramLabel: "Instagram:",
+      whatsappLabel: "WhatsApp:",
+      whatsappCta: "Write me",
+      studioTitle: "Studio:",
+      studioAddress: "Via San Lorenzo 7/5 Sc. Dx, 16123 Genoa, Italy",
+      openInMaps: "Open in Google Maps"
     },
     footer: {
       made: "Made with GitHub Pages"
