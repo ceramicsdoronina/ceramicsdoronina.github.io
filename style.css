@@ -205,7 +205,7 @@ nav a:hover{
 .about-img-secondary img{
   width:100%;
   display:block;
-  border-radius:18px;
+  border-radius:0;
   object-fit:cover;
 }
 
@@ -313,7 +313,7 @@ nav a:hover{
 
 .card{
   border:1px solid var(--border);
-  border-radius:24px;
+  border-radius:0;
   overflow:hidden;
   display:flex;
   flex-direction:column;
@@ -558,7 +558,7 @@ nav a:hover{
   position:relative;
   aspect-ratio:3/2;
   overflow:hidden;
-  border-radius:12px;
+  border-radius:0;
 }
 .modal-gallery-main img{
   position:absolute;
@@ -635,7 +635,7 @@ nav a:hover{
 .giftcards-img img{
   width:100%;
   display:block;
-  border-radius:18px;
+  border-radius:0;
   object-fit:cover;
 }
 
@@ -783,7 +783,7 @@ body.mobile-view .about-img-main img,
 body.mobile-view .about-img-secondary img,
 body.mobile-view .workshops-img img,
 body.mobile-view .giftcards-img img{
-  border-radius:14px;
+  border-radius:0;
 }
 body.mobile-view .about-cta{
   margin:12px 0 0;
@@ -810,7 +810,7 @@ body.mobile-view .catalogue-grid{
   gap:18px;
 }
 body.mobile-view .card{
-  border-radius:14px;
+  border-radius:0;
 }
 body.mobile-view .card .body{
   padding:16px 18px 18px;
@@ -945,7 +945,7 @@ body.mobile-view footer{
   .about-img-secondary img,
   .workshops-img img,
   .giftcards-img img{
-    border-radius:14px;
+    border-radius:0;
   }
 
   .about-cta{
@@ -978,7 +978,7 @@ body.mobile-view footer{
   }
 
   .card{
-    border-radius:14px;
+    border-radius:0;
   }
 
   .card .body{
