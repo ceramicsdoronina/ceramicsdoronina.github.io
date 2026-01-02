@@ -1013,6 +1013,11 @@ body.mobile-view footer{
   .view-toggle{
     display:none;
   }
+  @media (max-width: 768px){
+    .about-col-right{
+      padding-top: 0 !important;
+    }
+  }
 }
 /* ─────────────────────────────────────────────
    CORREZIONE: Titolo masterclass NON in maiuscolo
