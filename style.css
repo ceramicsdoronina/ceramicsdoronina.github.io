@@ -397,6 +397,7 @@ nav a:hover{
   background:var(--btn-primary);
   color:#fff;
   border:1px solid var(--btn-primary);
+  text-align:center;   
 }
 .card-btn.primary:hover{
   background:#7f1d1d;
