@@ -16,13 +16,17 @@
   --modal-bg:rgba(15,23,42,.65);
 }
 
+body {
+  font-family: "Noto Serif Display", serif;
+}
+
+
 /* Reset */
 *{box-sizing:border-box;}
 html,body{
   margin:0;
   padding:0;
   background:var(--bg);
-  font-family:Inter,system-ui,sans-serif;
   color:var(--text);
 }
 img{max-width:100%;display:block;}
@@ -67,7 +71,6 @@ header{
 }
 
 .brand h1{
-  font-family:"Cormorant Garamond",serif;
   font-size:26px;
   letter-spacing:.18em;
   margin:0;
@@ -129,10 +132,12 @@ nav a:hover{
 
 .hero-overlay{
   z-index: 2;
+  text-align: center;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .hero-logo{
-  font-family:"Cormorant Garamond",serif;
   font-size:clamp(64px,9vw,140px);
   letter-spacing:0.22em;
   font-weight:400;
@@ -169,7 +174,6 @@ nav a:hover{
 }
 
 .section h3{
-  font-family:"Cormorant Garamond",serif;
   font-size:36px;
   margin-bottom:12px;
 }
@@ -225,7 +229,6 @@ nav a:hover{
   align-items:center;
   gap:12px;
 
-  font-family:Inter,system-ui,sans-serif;
   font-size:16px;
 
   box-shadow:0 4px 12px rgba(0,0,0,.06);
@@ -238,7 +241,6 @@ nav a:hover{
 }
 
 .pill-text{
-  font-family:"Cormorant Garamond",serif;
   font-size:20px;
 }
 
@@ -268,7 +270,6 @@ nav a:hover{
   left: 20px;
   z-index: 2;
 
-  font-family: "Cormorant Garamond", serif;
   font-size: 28px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -292,10 +293,8 @@ nav a:hover{
 }
 .catalogue-header h3{
   margin:0;
-  font-family:"Cormorant Garamond",serif;
   font-size:40px;
   letter-spacing:.12em;
-  text-transform:uppercase;
 }
 .catalogue-header .lead{
   margin:0;
@@ -339,7 +338,6 @@ nav a:hover{
 
 .card h4{
   margin:0 0 8px;
-  font-family:"Cormorant Garamond",serif;
   font-size:22px;
 }
 
@@ -388,7 +386,6 @@ nav a:hover{
   padding:10px 12px;
   border-radius:12px;
   font-size:14px;
-  font-family:Inter,system-ui,sans-serif;
   cursor:pointer;
   transition:.2s ease-in-out;
 }
@@ -475,7 +472,6 @@ nav a:hover{
 
 .vase-title{
   font-size:28px;
-  font-family:"Cormorant Garamond",serif;
   margin:0 0 4px;
 }
 
