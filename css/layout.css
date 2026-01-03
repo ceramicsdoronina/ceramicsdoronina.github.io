@@ -1,0 +1,43 @@
+/* ─────────────────────────────────────────────
+   LAYOUT
+──────────────────────────────────────────────*/
+.container{
+  max-width:1200px;
+  margin:0 auto;
+  padding:0 20px;
+}
+
+.section{
+  padding:70px 0;
+}
+
+.section h3{
+  font-size:36px;
+  margin-bottom:12px;
+}
+
+.section .lead{
+  color:var(--muted);
+}
+
+/* view toggle */
+.view-toggle{
+  position:fixed;
+  bottom:16px;
+  right:16px;
+  z-index:2000;
+}
+.view-toggle button{
+  background:#111;
+  color:white;
+  padding:8px 12px;
+  font-size:12px;
+  border-radius:12px;
+  border:none;
+  cursor:pointer;
+  opacity:.85;
+}
+.view-toggle button:hover{
+  opacity:1;
+}
+

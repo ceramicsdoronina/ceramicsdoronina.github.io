@@ -1,0 +1,263 @@
+/* ─────────────────────────────────────────────
+   CATALOGUE
+──────────────────────────────────────────────*/
+.catalogue-header{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:32px;
+  margin-bottom:28px;
+}
+.catalogue-header h3{
+  margin:0;
+  font-size:40px;
+  letter-spacing:.12em;
+}
+.catalogue-header .lead{
+  margin:0;
+  max-width:460px;
+  text-align:right;
+  color:var(--muted);
+  font-size:15px;
+  line-height:1.5;
+}
+
+.catalogue-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:24px;
+}
+
+.card{
+  border:1px solid var(--border);
+  border-radius:0;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  background:#ffffff;
+}
+
+/* PORTRAIT nelle card (prima era 4/3) */
+.media-single{
+  width:100%;
+  aspect-ratio:3/4;
+  overflow:hidden;
+  cursor:pointer;
+}
+.media-single img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.card .body{ padding:22px; }
+
+.card h4{
+  margin:0 0 8px;
+  font-size:22px;
+}
+.card p{ margin:0 0 6px; }
+
+/* prezzi */
+.card-price{
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+  margin-top:6px;
+}
+.price-current{
+  font-size:20px;
+  font-weight:600;
+  color:#b91c1c;
+}
+.price-old{
+  font-size:16px;
+  color:var(--muted);
+  text-decoration:line-through;
+}
+.price-discount{
+  font-size:14px;
+  color:#b91c1c;
+}
+.card-status-sold{
+  margin-top:8px;
+  font-weight:600;
+}
+
+/* ─────────────────────────────────────────────
+   MODAL
+──────────────────────────────────────────────*/
+.modal{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--modal-bg);
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
+  z-index:999;
+}
+.modal.open{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.modal-dialog{
+  background:white;
+  border-radius:20px;
+  max-width:950px;
+  width:92%;
+  max-height:92vh;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 20px;
+  border-bottom:1px solid var(--border);
+}
+.modal-header button{
+  background:none;
+  border:none;
+  font-size:24px;
+}
+
+.modal-body{
+  padding:0;
+  overflow-y:auto;
+}
+
+.modal-body-inner{
+  display:flex;
+  gap:24px;
+  padding:20px;
+}
+
+.vase-detail-panel{
+  flex:1;
+  min-width:280px;
+}
+
+.vase-title{
+  font-size:28px;
+  margin:0 0 4px;
+}
+
+.vase-price-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:18px 0;
+}
+.vase-price{
+  font-size:26px;
+  font-weight:700;
+  color:#b91c1c;
+}
+.vase-old-price{
+  text-decoration:line-through;
+  color:var(--muted);
+}
+.vase-discount{
+  background:#fee2e2;
+  color:#b91c1c;
+  padding:4px 6px;
+  border-radius:6px;
+  font-size:13px;
+}
+
+.vase-actions{
+  display:flex;
+  gap:12px;
+  margin-bottom:20px;
+}
+.vase-btn-primary{
+  background:var(--btn-primary);
+  color:white;
+  padding:12px 18px;
+  border-radius:10px;
+  border:none;
+  font-size:15px;
+  cursor:pointer;
+}
+.vase-btn-outline{
+  border:1px solid var(--btn-primary);
+  color:var(--btn-primary);
+  padding:12px 18px;
+  border-radius:10px;
+  background:none;
+  font-size:15px;
+  cursor:pointer;
+}
+
+/* accordion */
+.accordion-header{
+  width:100%;
+  padding:12px 0;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  font-weight:600;
+  cursor:pointer;
+  background:none;
+  border:none;
+}
+.accordion-panel{
+  display:none;
+  padding:10px 0 20px;
+}
+.accordion-panel.active{ display:block; }
+
+.vase-specs dl{
+  display:grid;
+  grid-template-columns:120px auto;
+  gap:6px 12px;
+  margin:0;
+}
+
+/* gallery nel modale */
+.modal-gallery{ flex:1; }
+
+/* PORTRAIT nel modale + contain per non tagliare l’opera */
+.modal-gallery-main{
+  position:relative;
+  aspect-ratio:3/4;
+  overflow:hidden;
+  border-radius:0;
+  background:#fff;
+}
+.modal-gallery-main img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  opacity:0;
+  transition:.25s;
+}
+.modal-gallery-main img.active{ opacity:1; }
+
+.modal-gallery-counter{
+  margin-top:8px;
+  font-size:14px;
+  color:var(--muted);
+  text-align:center;
+}
+.modal-gallery-controls{
+  display:flex;
+  justify-content:space-between;
+  margin-top:8px;
+}
+.modal-gallery-controls button{
+  border:1px solid var(--border);
+  background:white;
+  border-radius:8px;
+  padding:4px 10px;
+  font-size:18px;
+}

@@ -1,0 +1,237 @@
+/* ─────────────────────────────────────────────
+   HERO
+──────────────────────────────────────────────*/
+.hero{
+  position:relative;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--white);
+}
+
+.hero-landing{
+  background:url('images/banner-anna.jpg') center/cover no-repeat;
+}
+
+.hero::before{
+  z-index:1;
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    to bottom,
+    rgba(0,0,0,.45),
+    rgba(0,0,0,.25),
+    rgba(0,0,0,.55)
+  );
+}
+
+.hero-overlay{
+  z-index:2;
+  text-align:center;
+  width:100%;
+  margin:0 auto;
+}
+
+.hero-logo{
+  font-size:clamp(64px,9vw,140px);
+  letter-spacing:0.22em;
+  font-weight:400;
+  margin:0 0 20px;
+  color:var(--white);
+}
+
+.hero-tagline{
+  max-width:740px;
+  margin:0 auto;
+  line-height:1.4;
+  font-size:18px;
+}
+
+.hero-scroll{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  border:1px solid var(--white);
+  font-size:24px;
+  color:var(--white);
+  margin:40px auto 0 auto;
+}
+
+/* video wrapper */
+.hero-video-wrapper{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  overflow:hidden;
+}
+.hero-video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.desktop-only{ display:block; }
+.mobile-only{ display:none; }
+@media (max-width: 768px){
+  .desktop-only{ display:none; }
+  .mobile-only{ display:block; }
+}
+
+/* ─────────────────────────────────────────────
+   ABOUT
+──────────────────────────────────────────────*/
+.about{
+  display:grid;
+  grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
+  gap:40px;
+  align-items:flex-start;
+}
+.about-col{
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+}
+.about-col-right{
+  padding-top:6.2rem;
+}
+
+.about-img-main{
+  position:relative;
+}
+.about-img-main img,
+.about-img-secondary img{
+  width:100%;
+  border-radius:0;
+  object-fit:cover;
+}
+
+.about-img-title{
+  position:absolute;
+  top:20px;
+  left:20px;
+  z-index:2;
+  font-size:28px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  color:white;
+  margin:0;
+  text-shadow:0 2px 12px rgba(0,0,0,0.45);
+}
+
+/* ─────────────────────────────────────────────
+   WORKSHOPS / GIFTCARDS
+──────────────────────────────────────────────*/
+.workshops,
+.giftcards{
+  display:grid;
+  grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
+  gap:40px;
+  align-items:center;
+}
+
+.workshops-text,
+.giftcards-text{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.workshops-list,
+.giftcards-list{
+  margin:0;
+  padding-left:18px;
+  list-style:disc;
+}
+.workshops-list li,
+.giftcards-list li{
+  margin-bottom:4px;
+}
+
+.workshops-note,
+.giftcards-note{
+  margin:10px 0 0;
+  font-size:1em;
+  color:var(--muted);
+}
+
+.workshops-img img,
+.giftcards-img img{
+  width:100%;
+  border-radius:0;
+  object-fit:cover;
+}
+
+/* ─────────────────────────────────────────────
+   CONTACT  (pulito: UNA sola versione)
+──────────────────────────────────────────────*/
+.contact-list{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+
+/* qui l’aspetto “come testo” (non bottone) */
+.contact-item{
+  border:none;
+  border-radius:0;
+  padding:0;
+  font-size:16px;
+  line-height:1.6;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  background:transparent;
+}
+
+/* centra SOLO WhatsApp se usi la classe */
+.contact-item--center{
+  justify-content:center;
+  text-align:center;
+}
+
+.contact-studio{
+  margin-top:28px;
+  text-align:center;
+}
+.contact-studio-line{
+  font-size:22px;
+  line-height:1.35;
+  margin:0 0 10px 0;
+}
+
+.contact-maplink{ text-decoration:none; color:inherit; }
+
+.contact-open{
+  margin:0 0 16px 0;
+}
+.contact-openlink{
+  text-decoration:underline;
+  text-underline-offset:4px;
+  color:inherit;
+}
+
+.contact-map{
+  margin:0 auto;
+  max-width:980px;
+  border:0;
+  border-radius:0;
+  overflow:hidden;
+}
+.contact-map iframe{
+  width:100%;
+  height:420px;
+  border:0;
+}
+
+/* ─────────────────────────────────────────────
+   FIX: masterclass title not uppercase
+──────────────────────────────────────────────*/
+#workshops h3[data-i18n="workshops.scheduleTitle"]{
+  text-transform:none !important;
+  margin-top:32px;
+}
+
