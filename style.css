@@ -1197,7 +1197,9 @@ body.mobile-view footer{
 /* Mobile */
 @media (max-width: 768px) {
   .brand-img {
-    height: 30px;
+      width: 80px;      /* ← scegli tu la dimensione */
+      height: auto;      /* mantiene le proporzioni */
+      display: block;
   }
 }
 
