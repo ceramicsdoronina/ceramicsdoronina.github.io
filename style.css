@@ -1194,15 +1194,6 @@ body.mobile-view footer{
   display: block;
 }
 
-/* Mobile */
-@media (max-width: 768px) {
-  .brand-img {
-      width: 80px;      /* ← scegli tu la dimensione */
-      height: auto;      /* mantiene le proporzioni */
-      display: block;
-  }
-}
-
 .giftcards-title {
   text-transform: none;
 }
@@ -1249,3 +1240,13 @@ body.mobile-view footer{
   height: 1px;
   overflow: hidden;
 }
+
+/* Mobile */
+@media (max-width: 768px) {
+  .brand-img {
+      width: 80px;      /* ← scegli tu la dimensione */
+      height: auto;      /* mantiene le proporzioni */
+      display: block;
+  }
+}
+
