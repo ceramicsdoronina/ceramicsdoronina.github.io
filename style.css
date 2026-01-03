@@ -1189,8 +1189,8 @@ body.mobile-view footer{
 }
 
 .brand-img {
-  height: 40px;     /* puoi aumentare/diminuire 38–50px */
-  width: auto;
+  width: 180px;
+  height: auto;
   display: block;
 }
 
