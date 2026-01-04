@@ -24,6 +24,36 @@
   <link rel="stylesheet" href="css/mobile.css">
 </head>
 <body>
+<div id="debug-console" style="position:fixed; bottom:0; left:0; right:0; background:black; color:lime; font-family:monospace; font-size:11px; padding:10px; max-height:200px; overflow-y:auto; z-index:99999; display:none;"></div>
+
+<script>
+// Console visibile su schermo
+const debugDiv = document.getElementById('debug-console');
+debugDiv.style.display = 'block';
+
+const originalLog = console.log;
+const originalError = console.error;
+const originalWarn = console.warn;
+
+console.log = function(...args) {
+  originalLog.apply(console, args);
+  debugDiv.innerHTML += '<div style="color:lime">' + args.join(' ') + '</div>';
+  debugDiv.scrollTop = debugDiv.scrollHeight;
+};
+
+console.error = function(...args) {
+  originalError.apply(console, args);
+  debugDiv.innerHTML += '<div style="color:red">❌ ' + args.join(' ') + '</div>';
+  debugDiv.scrollTop = debugDiv.scrollHeight;
+};
+
+console.warn = function(...args) {
+  originalWarn.apply(console, args);
+  debugDiv.innerHTML += '<div style="color:yellow">⚠️ ' + args.join(' ') + '</div>';
+  debugDiv.scrollTop = debugDiv.scrollHeight;
+};
+</script>
+
 
   <!-- Navbar -->
   <div id="import-navbar"></div>

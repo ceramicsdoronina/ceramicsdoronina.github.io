@@ -1,13 +1,19 @@
 // app.js
 async function appInit() {
+  console.log("[APP] Inizializzazione app...");
+
   // lingua
   CD.i18n.initLanguage();
   const currentLang = CD.i18n.getCurrentLang();
+
+  console.log("[APP] Lingua corrente:", currentLang);
 
   try {
     // carica in parallelo catalogo vasi e masterclass
     const [catalogueItems, masterclassItems, certificatiItems] = await Promise.all([
       CD.catalogue.loadCsv(),
+      console.log("[APP] Catalogo caricato:", catalogueData.length, "items");
+
       CD.masterclass ? CD.masterclass.loadCsv() : Promise.resolve([]),
       CD.certificati ? CD.certificati.loadCsv() : Promise.resolve([])
     ]);
