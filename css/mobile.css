@@ -375,3 +375,48 @@ body.mobile-view .about-col-right{
   }
 }
 
+/* ─────────────────────────────────────────────
+   FIX: niente scroll orizzontale (spazio bianco a destra)
+──────────────────────────────────────────────*/
+html, body{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
+
+body{
+  position:relative;
+}
+
+/* spesso il colpevole è qualche wrapper o sezione */
+main, header, footer, section, .container{
+  max-width:100%;
+  overflow-x:hidden;
+}
+
+/* immagini/video/iframe non devono mai sforare */
+img, video, iframe, svg{
+  max-width:100%;
+  height:auto;
+}
+
+/* prevenzione: testi lunghi o link */
+p, h1, h2, h3, h4, a, li{
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+@media (max-width: 1024px){
+  nav ul{
+    box-sizing:border-box;
+    width:100%;
+    max-width:100%;
+  }
+}
+@media (max-width: 1024px){
+  nav ul{
+    box-sizing:border-box;
+    width:100%;
+    max-width:100%;
+  }
+}
+
