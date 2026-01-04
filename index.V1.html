@@ -53,6 +53,35 @@ console.warn = function(...args) {
   debugDiv.scrollTop = debugDiv.scrollHeight;
 };
 </script>
+<script>
+  setTimeout(() => {
+    console.log("=== TEST CSS MODALE ===");
+    
+    const sheets = Array.from(document.styleSheets);
+    const catalogueSheet = sheets.find(s => s.href && s.href.includes('catalogue.css'));
+    console.log('catalogue.css caricato?', catalogueSheet ? '✅ SI' : '❌ NO');
+    
+    const btn = document.querySelector('[data-modal-target]');
+    if (btn) {
+      console.log('Clic automatico su bottone dettagli...');
+      btn.click();
+      
+      setTimeout(() => {
+        const modal = document.querySelector('.modal.open');
+        if (modal) {
+          const styles = window.getComputedStyle(modal);
+          console.log('STILI MODALE:');
+          console.log('  opacity:', styles.opacity);
+          console.log('  display:', styles.display);
+          console.log('  z-index:', styles.zIndex);
+          console.log('  position:', styles.position);
+        } else {
+          console.log('❌ Modale NON trovato');
+        }
+      }, 500);
+    }
+  }, 2000);
+  </script>
 
   <!-- Navbar -->
   <div id="import-navbar"></div>
