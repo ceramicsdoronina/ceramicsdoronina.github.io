@@ -35,14 +35,6 @@
     }
   }
 
-  function pickFieldByLang(vase, baseKey, lang) {
-    // baseKey: "material" | "technique" | "finish"
-    // colonne: material / material-en / material-ru (stesso schema per technique e finish)
-    if (lang === "en") return (vase[`${baseKey}-en`] || "").trim();
-    if (lang === "ru") return (vase[`${baseKey}-ru`] || "").trim();
-    return (vase[baseKey] || "").trim(); // it (default)
-  }
-
   // Rende il catalogo nella griglia e crea i modali
   function render(items, lang) {
     const grid = document.getElementById("catalogue-grid");
@@ -242,18 +234,9 @@
                     <dl>
                       ${vase.height    && vase.height    !== "-" ? `<dt>${spec.height}</dt><dd>${vase.height}</dd>`       : ""}
                       ${vase.diameter  && vase.diameter  !== "-" ? `<dt>${spec.diameter}</dt><dd>${vase.diameter}</dd>`   : ""}
-                      ${(() => {
-                        const v = pickFieldByLang(vase, "material", lang);
-                        return v && v !== "-" ? `<dt>${spec.material}</dt><dd>${v}</dd>` : "";
-                      })()}
-                      ${(() => {
-                        const v = pickFieldByLang(vase, "technique", lang);
-                        return v && v !== "-" ? `<dt>${spec.technique}</dt><dd>${v}</dd>` : "";
-                      })()}
-                      ${(() => {
-                        const v = pickFieldByLang(vase, "finish", lang);
-                        return v && v !== "-" ? `<dt>${spec.finish}</dt><dd>${v}</dd>` : "";
-                      })()}
+                      ${vase.material  && vase.material  !== "-" ? `<dt>${spec.material}</dt><dd>${vase.material}</dd>`   : ""}
+                      ${vase.technique && vase.technique !== "-" ? `<dt>${spec.technique}</dt><dd>${vase.technique}</dd>` : ""}
+                      ${vase.finish    && vase.finish    !== "-" ? `<dt>${spec.finish}</dt><dd>${vase.finish}</dd>`       : ""}
                     </dl>
                   </div>
                 </div>
