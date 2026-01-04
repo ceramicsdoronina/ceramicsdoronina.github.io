@@ -23,8 +23,6 @@ html,body{
   padding:0;
   background:var(--bg);
   color:var(--text);
-  width: 100%;
-  overflow-x: hidden; /* Previene scroll orizzontale */
 }
 
 body{
@@ -33,16 +31,4 @@ body{
 
 img{max-width:100%;display:block;}
 a{text-decoration:none;color:inherit;}
-
-/* Gestione testi */
-p, li, a {
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
-/* I titoli NON devono spezzare le parole a metà */
-h1, h2, h3, h4, h5, h6 {
-  overflow-wrap: normal;
-  word-break: normal;
-}
 

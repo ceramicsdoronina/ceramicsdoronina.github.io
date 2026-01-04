@@ -1,14 +1,48 @@
 /* ═════════════════════════════════════════════
-   MOBILE.CSS (Versione Corretta)
-   Risolve:
-   - Titolo DORONINA che va a capo
-   - Sezioni Workshops/Giftcards su 2 colonne (ora 1)
-   - Testi spaziati male (U p c o m i n g)
-   - Modale con immagine portrait sopra
-   ═════════════════════════════════════════════ */
+   MOBILE.CSS (pulito)
+   - Mobile view forzata: body.mobile-view
+   - Responsive automatico: tablet/phone
+   Fix:
+   - niente scroll orizzontale
+   - hero title non spezzato
+   - sezioni e griglie sempre 1 colonna su iPhone
+   - modale: immagine sopra, portrait, menu non copre
+═════════════════════════════════════════════ */
+
 
 /* ─────────────────────────────────────────────
-   A) MOBILE VIEW MODE FORZATA (body.mobile-view)
+   A) FIX GLOBALI: niente overflow orizzontale
+──────────────────────────────────────────────*/
+html, body{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
+body{ position:relative; }
+
+main, header, footer, section, .container{
+  max-width:100%;
+  overflow-x:hidden;
+}
+
+img, video, iframe, svg{
+  max-width:100%;
+  height:auto;
+}
+
+/* Spezzatura SOLO per testi lunghi (non per i titoli) */
+p, li{
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+a{
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+
+
+/* ─────────────────────────────────────────────
+   B) MOBILE VIEW MODE FORZATA (body.mobile-view)
 ──────────────────────────────────────────────*/
 body.mobile-view{ font-size:14px; }
 
@@ -65,19 +99,26 @@ body.mobile-view .hero{
   min-height:60vh;
   align-items:flex-end;
   padding-bottom:40px;
-  overflow:hidden;
+  overflow:hidden; /* evita che immagini/video escano */
 }
 body.mobile-view .hero-overlay{ padding:0 16px 0; }
 
-/* FIX TITOLO DORONINA */
+/* Titolo: non spezzare, ridimensiona */
 body.mobile-view .hero-logo{
-  /* Usa vw per scalare fluidamente, clamp per limiti min/max */
-  font-size: clamp(32px, 13vw, 60px);
-  letter-spacing: 0.12em;
-  margin-bottom: 10px;
-  white-space: nowrap; /* Cerca di stare su una riga */
-  text-align: center;
-  width: 100%;
+  font-size:clamp(34px, 10vw, 58px); /* leggermente più flessibile */
+  letter-spacing:0.14em;
+  margin-bottom:10px;
+  white-space:nowrap;     /* <-- NON VA A CAPO */
+  word-break:normal;
+  overflow-wrap:normal;
+}
+
+/* Se davvero non ci sta su schermi mini, permetti un fallback controllato */
+@media (max-width: 360px){
+  body.mobile-view .hero-logo{
+    white-space:normal;   /* su schermi minuscoli può andare a capo */
+    letter-spacing:0.10em;
+  }
 }
 
 body.mobile-view .hero-tagline{ font-size:13px; max-width:90%; }
@@ -88,32 +129,19 @@ body.mobile-view .hero-scroll{
   margin:28px auto 0 auto;
 }
 
-/* SEZIONI: Forza 1 colonna (Flex Column è più sicuro di Grid qui) */
-body.mobile-view .about,
-body.mobile-view .workshops,
-body.mobile-view .giftcards {
-  display: flex !important;
-  flex-direction: column;
-  gap: 32px;
+/* About / Brand */
+body.mobile-view .about{
+  display:grid;
+  grid-template-columns:1fr !important;
+  gap:24px;
 }
-
-body.mobile-view .about-col,
-body.mobile-view .workshops-text,
-body.mobile-view .giftcards-text {
-  width: 100%;
-  padding: 0;
-}
-
+body.mobile-view .about-col{ gap:16px; width:100%; }
 body.mobile-view .about-col-right{ padding-top:0 !important; }
 body.mobile-view .about-cta{ margin:12px 0 0; }
 
-/* Immagini full width */
 body.mobile-view .about-img-main img,
-body.mobile-view .about-img-secondary img,
-body.mobile-view .workshops-img img,
-body.mobile-view .giftcards-img img{
+body.mobile-view .about-img-secondary img{
   border-radius:0;
-  width: 100%;
 }
 
 body.mobile-view .pill-btn{
@@ -122,7 +150,14 @@ body.mobile-view .pill-btn{
   padding:8px 14px;
 }
 
-/* Catalogo */
+/* Titoli sezioni: sempre full width */
+body.mobile-view .section h3,
+body.mobile-view .catalogue-header h3{
+  width:100%;
+  max-width:100%;
+}
+
+/* Catalogo: SEMPRE 1 colonna su mobile-view */
 body.mobile-view .catalogue-header{
   flex-direction:column;
   align-items:flex-start;
@@ -135,13 +170,24 @@ body.mobile-view .catalogue-header .lead{
   font-size:13px;
 }
 body.mobile-view .catalogue-grid{
-  display: grid;
-  grid-template-columns: 1fr !important;
+  grid-template-columns:1fr !important;
   gap:18px;
 }
 body.mobile-view .card{ border-radius:0; }
 body.mobile-view .card .body{ padding:16px 18px 18px; }
 body.mobile-view .card h4{ font-size:18px; }
+
+/* Workshops/Giftcards: anche loro 1 colonna */
+body.mobile-view .workshops,
+body.mobile-view .giftcards{
+  display:grid;
+  grid-template-columns:1fr !important;
+  gap:24px;
+}
+body.mobile-view .workshops-img img,
+body.mobile-view .giftcards-img img{
+  border-radius:0;
+}
 
 /* Contatti */
 body.mobile-view .contact-list{
@@ -162,7 +208,9 @@ body.mobile-view footer{ padding:18px 0; font-size:12px; }
 
 
 /* ─────────────────────────────────────────────
-   B) MODALE SU MOBILE (mobile-view)
+   C) MODALE SU MOBILE (mobile-view)
+   - immagine sopra, portrait grande
+   - menu non copre
 ──────────────────────────────────────────────*/
 body.mobile-view .modal{ z-index:9999; }
 
@@ -188,7 +236,7 @@ body.mobile-view .modal-body-inner{
 }
 
 body.mobile-view .modal-gallery{
-  order:-1; /* Immagine SOPRA */
+  order:-1;
   width:100%;
   flex:none;
   padding:12px 12px 6px;
@@ -216,9 +264,12 @@ body.mobile-view .vase-title{ font-size:22px; }
 
 
 /* ─────────────────────────────────────────────
-   C) RESPONSIVE AUTOMATICO (Tablet & Phone)
-   Include iPad: <= 1024px
+   D) RESPONSIVE AUTOMATICO (senza body.mobile-view)
+   - Phone: 1 colonna
+   - Tablet: 2 colonne (solo >=769px)
 ──────────────────────────────────────────────*/
+
+/* Phone + tablet: header fisso e hamburger */
 @media (max-width: 1024px){
   body{ font-size:14px; }
 
@@ -264,27 +315,13 @@ body.mobile-view .vase-title{ font-size:22px; }
   }
   body.nav-open nav ul{ display:flex; }
 
-  /* FIX TITOLO DORONINA (Responsive) */
-  .hero-logo {
-    font-size: clamp(32px, 13vw, 60px);
-    letter-spacing: 0.12em;
-    white-space: nowrap;
-    text-align: center;
-  }
-
-  /* FIX SEZIONI: Forza 1 colonna verticale */
+  /* About/workshops/giftcards sempre 1 colonna */
   .about,
   .workshops,
-  .giftcards {
-    display: flex !important;
-    flex-direction: column;
-    gap: 32px;
+  .giftcards{
+    grid-template-columns:1fr !important;
+    gap:24px;
   }
-  
-  .about-col, .workshops-text, .giftcards-text {
-    width: 100%;
-  }
-  
   .about-col-right{ padding-top:0 !important; }
 
   /* Modale: verticale anche qui */
@@ -322,7 +359,7 @@ body.mobile-view .vase-title{ font-size:22px; }
   .view-toggle{ display:none; }
 }
 
-/* PHONE: 1 colonna sempre per il catalogo */
+/* PHONE: 1 colonna sempre */
 @media (max-width: 768px){
   .catalogue-grid{
     grid-template-columns:1fr !important;
