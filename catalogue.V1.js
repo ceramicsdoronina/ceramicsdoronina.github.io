@@ -278,7 +278,7 @@
     });
 
     document.addEventListener("click", e => {
-      if (e.target.classList && e.target.classList.contains("modal") && e.target === e.currentTarget) {
+      if (e.target.classList && e.target.classList.contains("modal")) {
         e.target.classList.remove("open");
       }
     });
@@ -301,66 +301,45 @@
     document.querySelectorAll(".modal").forEach(modal => {
       const imgs = Array.from(modal.querySelectorAll(".modal-gallery-main img"));
       if (!imgs.length) return;
-  
+      let index = 0;
+
       const counterEl = modal.querySelector("[data-gallery-counter]");
       const controls = modal.querySelector("[data-gallery-controls]");
-      const galleryMain = modal.querySelector(".modal-gallery-main");
-      
       if (!controls) return;
-  
-      // Trova l'indice dell'immagine attualmente attiva
-      function getCurrentIndex() {
-        return imgs.findIndex(img => img.classList.contains("active"));
-      }
-  
+
       function updateGallery(newIndex) {
         if (newIndex < 0) newIndex = imgs.length - 1;
         if (newIndex >= imgs.length) newIndex = 0;
-        
-        // Rimuovi 'active' da tutte le immagini
-        imgs.forEach(img => img.classList.remove("active"));
-        
-        // Aggiungi 'active' solo all'immagine corrente
-        imgs[newIndex].classList.add("active");
-        
+        index = newIndex;
+        imgs.forEach((img, i) => {
+          img.classList.toggle("active", i === index);
+        });
         if (counterEl) {
-          counterEl.textContent = `${newIndex + 1} / ${imgs.length}`;
+          counterEl.textContent = `${index + 1} / ${imgs.length}`;
         }
       }
-  
-      const prevBtn = controls.querySelector("[data-gallery-prev]");
-      const nextBtn = controls.querySelector("[data-gallery-next]");
-  
-      if (prevBtn) {
-        prevBtn.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const currentIndex = getCurrentIndex();
-          updateGallery(currentIndex - 1);
-        });
-      }
-      
-      if (nextBtn) {
-        nextBtn.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const currentIndex = getCurrentIndex();
-          updateGallery(currentIndex + 1);
-        });
-      }
-  
-      // ← NUOVO: click sull'immagine per passare alla successiva
-      if (galleryMain) {
-        galleryMain.addEventListener("click", (e) => {
-          // Evita che il click chiuda il modale
-          e.stopPropagation();
-          const currentIndex = getCurrentIndex();
-          updateGallery(currentIndex + 1);
-        });
-        
-        // Cambia il cursore per indicare che è cliccabile
-        galleryMain.style.cursor = "pointer";
-      }
+
+      controls.querySelector("[data-gallery-prev]")?.addEventListener("click", () => {
+        updateGallery(index - 1);
+      });
+      controls.querySelector("[data-gallery-next]")?.addEventListener("click", () => {
+        updateGallery(index + 1);
+      });
     });
   }
-    
+
+  function initBehaviour() {
+    initModals();
+    initAccordions();
+    initGalleries();
+  }
+
+  // Espone le API nel namespace globale CD
+  window.CD = window.CD || {};
+  window.CD.catalogue = {
+    loadCsv,
+    render,
+    initBehaviour
+  };
+})();
+
