@@ -1,20 +1,50 @@
-
 /* ═════════════════════════════════════════════
-   MOBILE.CSS
-   - modalità mobile forzata (body.mobile-view)
-   - modalità responsive automatica (tablet/phone)
-   Include fix:
-   - Modale: immagine sopra + portrait grande
-   - Menu mobile non copre il modale
+   MOBILE.CSS (pulito)
+   - Mobile view forzata: body.mobile-view
+   - Responsive automatico: tablet/phone
+   Fix:
+   - niente scroll orizzontale
+   - hero title non spezzato
+   - sezioni e griglie sempre 1 colonna su iPhone
+   - modale: immagine sopra, portrait, menu non copre
 ═════════════════════════════════════════════ */
 
 
 /* ─────────────────────────────────────────────
-   1) MOBILE VIEW MODE FORZATA (body.mobile-view)
+   A) FIX GLOBALI: niente overflow orizzontale
 ──────────────────────────────────────────────*/
-body.mobile-view{
-  font-size:14px;
+html, body{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
 }
+body{ position:relative; }
+
+main, header, footer, section, .container{
+  max-width:100%;
+  overflow-x:hidden;
+}
+
+img, video, iframe, svg{
+  max-width:100%;
+  height:auto;
+}
+
+/* Spezzatura SOLO per testi lunghi (non per i titoli) */
+p, li{
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+a{
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+
+
+/* ─────────────────────────────────────────────
+   B) MOBILE VIEW MODE FORZATA (body.mobile-view)
+──────────────────────────────────────────────*/
+body.mobile-view{ font-size:14px; }
 
 /* Header fisso */
 body.mobile-view header{
@@ -24,13 +54,10 @@ body.mobile-view header{
   background:rgba(255,255,255,.9);
   backdrop-filter:saturate(180%) blur(14px);
 }
-body.mobile-view main{
-  padding-top:72px;
-}
+body.mobile-view main{ padding-top:72px; }
 
 /* Hamburger */
 .nav-toggle-btn{ display:none; }
-
 body.mobile-view .nav-toggle-btn,
 body.mobile-view #nav-toggle{
   display:inline-flex;
@@ -59,7 +86,10 @@ body.mobile-view nav ul{
   padding:10px 20px 14px;
   gap:10px;
   display:none;
-  z-index:2500; /* menu sopra header */
+  z-index:2500;
+  box-sizing:border-box;
+  width:100%;
+  max-width:100%;
 }
 body.mobile-view.nav-open nav ul{ display:flex; }
 body.mobile-view nav a{ font-size:14px; padding:4px 0; }
@@ -69,13 +99,28 @@ body.mobile-view .hero{
   min-height:60vh;
   align-items:flex-end;
   padding-bottom:40px;
+  overflow:hidden; /* evita che immagini/video escano */
 }
 body.mobile-view .hero-overlay{ padding:0 16px 0; }
+
+/* Titolo: non spezzare, ridimensiona */
 body.mobile-view .hero-logo{
-  font-size:clamp(38px,10vw,58px);
+  font-size:clamp(34px, 10vw, 58px); /* leggermente più flessibile */
   letter-spacing:0.14em;
   margin-bottom:10px;
+  white-space:nowrap;     /* <-- NON VA A CAPO */
+  word-break:normal;
+  overflow-wrap:normal;
 }
+
+/* Se davvero non ci sta su schermi mini, permetti un fallback controllato */
+@media (max-width: 360px){
+  body.mobile-view .hero-logo{
+    white-space:normal;   /* su schermi minuscoli può andare a capo */
+    letter-spacing:0.10em;
+  }
+}
+
 body.mobile-view .hero-tagline{ font-size:13px; max-width:90%; }
 body.mobile-view .hero-scroll{
   width:40px;
@@ -84,21 +129,18 @@ body.mobile-view .hero-scroll{
   margin:28px auto 0 auto;
 }
 
-/* Sezioni a colonna singola */
-body.mobile-view .about,
-body.mobile-view .workshops,
-body.mobile-view .giftcards{
-  grid-template-columns:1fr;
+/* About / Brand */
+body.mobile-view .about{
+  display:grid;
+  grid-template-columns:1fr !important;
   gap:24px;
 }
-body.mobile-view .about-col{ gap:16px; }
+body.mobile-view .about-col{ gap:16px; width:100%; }
 body.mobile-view .about-col-right{ padding-top:0 !important; }
 body.mobile-view .about-cta{ margin:12px 0 0; }
 
 body.mobile-view .about-img-main img,
-body.mobile-view .about-img-secondary img,
-body.mobile-view .workshops-img img,
-body.mobile-view .giftcards-img img{
+body.mobile-view .about-img-secondary img{
   border-radius:0;
 }
 
@@ -108,7 +150,14 @@ body.mobile-view .pill-btn{
   padding:8px 14px;
 }
 
-/* Catalogo */
+/* Titoli sezioni: sempre full width */
+body.mobile-view .section h3,
+body.mobile-view .catalogue-header h3{
+  width:100%;
+  max-width:100%;
+}
+
+/* Catalogo: SEMPRE 1 colonna su mobile-view */
 body.mobile-view .catalogue-header{
   flex-direction:column;
   align-items:flex-start;
@@ -120,14 +169,25 @@ body.mobile-view .catalogue-header .lead{
   max-width:100%;
   font-size:13px;
 }
-
 body.mobile-view .catalogue-grid{
-  grid-template-columns:1fr;
+  grid-template-columns:1fr !important;
   gap:18px;
 }
 body.mobile-view .card{ border-radius:0; }
 body.mobile-view .card .body{ padding:16px 18px 18px; }
 body.mobile-view .card h4{ font-size:18px; }
+
+/* Workshops/Giftcards: anche loro 1 colonna */
+body.mobile-view .workshops,
+body.mobile-view .giftcards{
+  display:grid;
+  grid-template-columns:1fr !important;
+  gap:24px;
+}
+body.mobile-view .workshops-img img,
+body.mobile-view .giftcards-img img{
+  border-radius:0;
+}
 
 /* Contatti */
 body.mobile-view .contact-list{
@@ -148,27 +208,18 @@ body.mobile-view footer{ padding:18px 0; font-size:12px; }
 
 
 /* ─────────────────────────────────────────────
-   2) FIX MODALE (mobile-view)
-   - immagine sopra
-   - portrait grande
+   C) MODALE SU MOBILE (mobile-view)
+   - immagine sopra, portrait grande
    - menu non copre
 ──────────────────────────────────────────────*/
+body.mobile-view .modal{ z-index:9999; }
 
-/* Il modale deve stare SOPRA a tutto */
-body.mobile-view .modal{
-  z-index:9999;
-}
-
-/* Quando modale aperto: nascondi menu e blocca scroll pagina */
+/* Se modale aperto, chiudi menu */
 body.mobile-view .modal.open ~ header nav ul,
 body.mobile-view .modal.open nav ul{
   display:none !important;
 }
-body.mobile-view .modal.open{
-  pointer-events:auto;
-}
 
-/* Dialog a schermo intero */
 body.mobile-view .modal-dialog{
   width:100%;
   max-width:100%;
@@ -177,62 +228,48 @@ body.mobile-view .modal-dialog{
   border-radius:0;
 }
 
-/* Impaginazione verticale: gallery sopra, dettagli sotto */
 body.mobile-view .modal-body-inner{
   display:flex;
-  flex-direction:column; /* <-- importante */
+  flex-direction:column;
   gap:0;
   padding:0;
 }
 
-/* Metti la gallery prima */
 body.mobile-view .modal-gallery{
-  order:-1;              /* <-- gallery in alto */
+  order:-1;
   width:100%;
   flex:none;
   padding:12px 12px 6px;
 }
 
-/* Metti i dettagli sotto */
-body.mobile-view .vase-detail-panel{
-  order:0;
-  flex:1;
-  min-width:0;
-  padding:14px 16px 18px;
-}
-
-/* Area immagine: portrait e grande */
 body.mobile-view .modal-gallery-main{
   width:100%;
-  aspect-ratio:3/4;      /* <-- PORTRAIT */
-  height:auto;
-  max-height:58vh;       /* <-- limita altezza per lasciare spazio ai testi */
+  aspect-ratio:3/4;     /* portrait */
+  max-height:58vh;
   margin:0 auto;
   background:#fff;
 }
+body.mobile-view .modal-gallery-main img{ object-fit:contain; }
 
-/* Non tagliare l'opera */
-body.mobile-view .modal-gallery-main img{
-  object-fit:contain;
+body.mobile-view .vase-detail-panel{
+  padding:14px 16px 18px;
 }
 
-/* Controlli più “touch friendly” */
 body.mobile-view .modal-gallery-controls button{
   min-width:44px;
   min-height:44px;
   font-size:22px;
 }
-
-/* Titolo un po’ più compatto */
-body.mobile-view .vase-title{
-  font-size:22px;
-}
+body.mobile-view .vase-title{ font-size:22px; }
 
 
 /* ─────────────────────────────────────────────
-   3) RESPONSIVE AUTOMATICO (tablet/phone)
-   Include iPad: <= 1024px
+   D) RESPONSIVE AUTOMATICO (senza body.mobile-view)
+   - Phone: 1 colonna
+   - Tablet: 2 colonne (solo >=769px)
 ──────────────────────────────────────────────*/
+
+/* Phone + tablet: header fisso e hamburger */
 @media (max-width: 1024px){
   body{ font-size:14px; }
 
@@ -272,23 +309,26 @@ body.mobile-view .vase-title{
     gap:10px;
     display:none;
     z-index:2500;
+    box-sizing:border-box;
+    width:100%;
+    max-width:100%;
   }
   body.nav-open nav ul{ display:flex; }
 
-  /* iPad: 2 colonne */
-  .catalogue-grid{
-    grid-template-columns:repeat(2, 1fr);
-    gap:18px;
+  /* About/workshops/giftcards sempre 1 colonna */
+  .about,
+  .workshops,
+  .giftcards{
+    grid-template-columns:1fr !important;
+    gap:24px;
   }
+  .about-col-right{ padding-top:0 !important; }
 
-  /* Se modale aperto: chiudi il menu */
-  .modal.open ~ header nav ul,
-  .modal.open nav ul{
-    display:none !important;
-  }
-
-  /* Modale: verticale, immagine sopra, portrait */
+  /* Modale: verticale anche qui */
   .modal{ z-index:9999; }
+  .modal.open ~ header nav ul,
+  .modal.open nav ul{ display:none !important; }
+
   .modal-dialog{
     width:100%;
     max-width:100%;
@@ -316,107 +356,22 @@ body.mobile-view .vase-title{
   }
   .modal-gallery-main img{ object-fit:contain; }
 
-  .vase-detail-panel{
-    padding:14px 16px 18px;
-  }
-
   .view-toggle{ display:none; }
 }
 
-/* Smartphone: 1 colonna */
+/* PHONE: 1 colonna sempre */
 @media (max-width: 768px){
   .catalogue-grid{
-    grid-template-columns:1fr;
+    grid-template-columns:1fr !important;
     gap:18px;
   }
 }
 
-/* Smartphone piccoli */
-@media (max-width: 480px){
-  .modal-gallery-main{
-    max-height:62vh; /* un filo più alta sui piccoli */
-  }
-}
-
-/* ─────────────────────────────────────────────
-   BRAND / ABOUT: immagine sopra, testo sotto (mobile + tablet)
-   Forza layout a 1 colonna anche quando il layout desktop è a 2 colonne.
-──────────────────────────────────────────────*/
-
-/* Modalità mobile forzata */
-body.mobile-view .about{
-  display:grid;
-  grid-template-columns:1fr !important;
-  gap:24px;
-}
-
-/* Se dentro .about hai colonne separate */
-body.mobile-view .about-col{
-  width:100%;
-}
-body.mobile-view .about-col-right{
-  padding-top:0 !important;
-}
-
-/* Responsive automatico (include iPad) */
-@media (max-width: 1024px){
-  .about{
-    display:grid;
-    grid-template-columns:1fr !important;
-    gap:24px;
-  }
-
-  /* Se usi classi colonna */
-  .about-col{
-    width:100%;
-  }
-  .about-col-right{
-    padding-top:0 !important;
-  }
-}
-
-/* ─────────────────────────────────────────────
-   FIX: niente scroll orizzontale (spazio bianco a destra)
-──────────────────────────────────────────────*/
-html, body{
-  width:100%;
-  max-width:100%;
-  overflow-x:hidden;
-}
-
-body{
-  position:relative;
-}
-
-/* spesso il colpevole è qualche wrapper o sezione */
-main, header, footer, section, .container{
-  max-width:100%;
-  overflow-x:hidden;
-}
-
-/* immagini/video/iframe non devono mai sforare */
-img, video, iframe, svg{
-  max-width:100%;
-  height:auto;
-}
-
-/* prevenzione: testi lunghi o link */
-p, h1, h2, h3, h4, a, li{
-  overflow-wrap:anywhere;
-  word-break:break-word;
-}
-@media (max-width: 1024px){
-  nav ul{
-    box-sizing:border-box;
-    width:100%;
-    max-width:100%;
-  }
-}
-@media (max-width: 1024px){
-  nav ul{
-    box-sizing:border-box;
-    width:100%;
-    max-width:100%;
+/* TABLET “vero”: 2 colonne solo da 769 a 1024 */
+@media (min-width: 769px) and (max-width: 1024px){
+  .catalogue-grid{
+    grid-template-columns:repeat(2, 1fr) !important;
+    gap:18px;
   }
 }
 
