@@ -1,38 +1,28 @@
 // catalogue.js
 (function () {
 
-  // Carica il file ODS
+  // Carica il CSV
   async function loadCsv() {
-    try {
-      const res = await fetch("catalogue/vasi.ods", { cache: "no-store" });
-      if (!res.ok) {
-        console.error("Impossibile caricare vasi.ods");
-        return [];
-      }
-
-      // Leggi il file come ArrayBuffer
-      const arrayBuffer = await res.arrayBuffer();
-      
-      // Usa SheetJS per parsare l'ODS
-      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-      
-      // Prendi il primo foglio
-      const firstSheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[firstSheetName];
-      
-      // Converti in array di oggetti
-      const data = XLSX.utils.sheet_to_json(worksheet, { 
-        raw: false,  // converte tutto in stringhe
-        defval: ""   // valore predefinito per celle vuote
-      });
-      
-      console.log("Dati caricati dal file ODS:", data.length, "righe");
-      return data;
-      
-    } catch (error) {
-      console.error("Errore nel caricamento del file ODS:", error);
+    const res = await fetch("catalogue/vasi.csv", { cache: "no-store" });
+    if (!res.ok) {
+      console.error("Impossibile caricare vasi.csv");
       return [];
     }
+
+    const text = await res.text();
+    const rows = text.trim().split(/\r?\n/).filter(r => r.trim().length > 0);
+    if (rows.length < 2) return [];
+
+    const firstLine = rows[0];
+    const delimiter = (firstLine.includes(";") && !firstLine.includes(",")) ? ";" : ",";
+    const header = firstLine.split(delimiter).map(h => h.trim());
+
+    return rows.slice(1).map(line => {
+      const cols = line.split(delimiter).map(c => c.trim());
+      const obj = {};
+      header.forEach((h, i) => { obj[h] = cols[i] ?? ""; });
+      return obj;
+    });
   }
 
   // Rende il catalogo nella griglia e crea i modali
@@ -380,5 +370,5 @@
     initBehaviour
   };
 
-})();
+})(); 
 
