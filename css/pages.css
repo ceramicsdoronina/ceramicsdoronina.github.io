@@ -116,7 +116,6 @@
   z-index:2;
   font-size:28px;
   letter-spacing:0.12em;
-  text-transform:uppercase;
   color:white;
   margin:0;
   text-shadow:0 2px 12px rgba(0,0,0,0.45);
@@ -125,26 +124,33 @@
 /* ─────────────────────────────────────────────
    WORKSHOPS / GIFTCARDS
 ──────────────────────────────────────────────*/
-.workshops,
-.giftcards{
+.giftcards, .workshops {
   display:grid;
-  grid-template-columns:minmax(0,1.1fr) minmax(0,0.9fr);
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "image text";
   gap:40px;
-  align-items:center;
+  align-items:start;
 }
 
-.workshops-text,
-.giftcards-text{
+.giftcards-img, .workshops-img{
+  grid-area: image;
+}
+
+.giftcards-text, .workshops-text {
+  grid-area: text;
   display:flex;
   flex-direction:column;
   gap:14px;
 }
+
 
 .workshops-list,
 .giftcards-list{
   margin:0;
   padding-left:18px;
   list-style:disc;
+  color: var(--muted);
 }
 .workshops-list li,
 .giftcards-list li{

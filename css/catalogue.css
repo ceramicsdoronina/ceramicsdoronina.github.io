@@ -3,23 +3,24 @@
 ──────────────────────────────────────────────*/
 .catalogue-header{
   display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:32px;
+  flex-direction:column;     /* ← UNA COLONNA */
+  align-items:flex-start;
+  gap:10px;
   margin-bottom:28px;
-}
-.catalogue-header h3{
-  margin:0;
-  font-size:40px;
-  letter-spacing:.12em;
 }
 .catalogue-header .lead{
   margin:0;
-  max-width:460px;
-  text-align:right;
+  max-width:100%;
+  text-align:left;           /* ← non più a destra */
   color:var(--muted);
   font-size:15px;
   line-height:1.5;
+}
+
+.catalogue-header h3{
+  margin:0;
+  font-size:40px;
+  letter-spacing:0;          /* ← evita “W o r k s h o p” */
 }
 
 .catalogue-grid{

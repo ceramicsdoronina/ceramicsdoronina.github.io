@@ -51,7 +51,7 @@ const messages = {
       deliveryText: "Отправляем по всему миру из Лигурии, надёжно упаковывая каждое изделие."
     },
     workshops: {
-      title: "МАСТЕР-КЛАССЫ",
+      title: "Мастер-Классы",
       scheduleTitle: "Ближайшие мастер-классы",
       scheduleLead: "Выберите дату и напишите мне, чтобы присоединиться к мастер-классу в небольших группах в моей студии в Генуе.",
       lead: "Керамические мастер-классы в маленьких группах в атмосфере внимания и спокойствия.",
@@ -136,7 +136,7 @@ const messages = {
       deliveryText: "Spediamo in tutto il mondo dalla Liguria, con imballaggio protettivo."
     },
     workshops: {
-      title: "WORKSHOP",
+      title: "Workshop",
       scheduleTitle: "Workshop in programma",
       scheduleLead: "Scegli una data e scrivimi per partecipare a una masterclass in piccoli gruppi nel mio studio a Genova.",
       lead: "Workshop di ceramica in piccoli gruppi, in un’atmosfera di cura e tranquillità.",
@@ -145,7 +145,7 @@ const messages = {
       list3: "Format per aziende ed eventi privati su richiesta.",
       note: "Per il calendario aggiornato o per organizzare una masterclass privata, scrivimi.",
       details: "Dettagli",
-      cta: "Scrivimi per iscriverti"
+      cta: "Scrivimi"
     },
     giftcards: {
       title: "CARTE REGALO",
@@ -159,7 +159,7 @@ const messages = {
       buy: "Compra",
       details: "Dettagli",
       modalTitle: "Carte regalo",
-      cta: "Scrivimi per una carta regaolo"
+      cta: "Scrivimi per una carta regalo"
     },
     status: {
       sold: "Venduto"
@@ -221,7 +221,7 @@ const messages = {
       deliveryText: "We ship worldwide from Liguria, Italy."
     },
     workshops: {
-      title: "WORKSHOPS",
+      title: "workshops",
       scheduleTitle: "Upcoming workshops",
       scheduleLead: "Choose a date and write to me to join a small group masterclass in my studio in Genoa.",
       lead: "Ceramic workshops in small groups, in a calm and attentive atmosphere.",

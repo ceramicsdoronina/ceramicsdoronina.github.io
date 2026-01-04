@@ -69,7 +69,7 @@ nav a:hover{
   border-radius:999px;
   padding:6px 10px;
   font-size:14px;
-  font-family:inherit;
+  font-family:"Noto Serif Display", serif;
 }
 
 /* CTA pill */
