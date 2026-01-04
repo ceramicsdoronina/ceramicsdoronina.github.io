@@ -12,8 +12,7 @@ async function appInit() {
     // carica in parallelo catalogo vasi e masterclass
     const [catalogueItems, masterclassItems, certificatiItems] = await Promise.all([
       CD.catalogue.loadCsv(),
-      console.log("[APP] Catalogo caricato:", catalogueData.length, "items"),
-
+      console.log("[APP] Catalogo caricato:", catalogue.length, "items"),
       CD.masterclass ? CD.masterclass.loadCsv() : Promise.resolve([]),
       CD.certificati ? CD.certificati.loadCsv() : Promise.resolve([])
     ]);
