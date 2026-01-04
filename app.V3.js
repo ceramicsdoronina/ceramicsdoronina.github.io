@@ -45,21 +45,10 @@ async function appInit() {
       console.log("✅ [APP] Certificati renderizzati");
     }
 
-    // ⚠️ IMPORTANTE: inizializza comportamenti DOPO tutti i render
-    // Aspetta che il DOM sia aggiornato
-    console.log("🔍 [APP] Attesa aggiornamento DOM...");
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    console.log("🔍 [APP] Inizializzazione comportamenti catalogo...");
+    // inizializza modali / accordion / gallery
+    console.log("🔍 [APP] Inizializzazione comportamenti...");
     CD.catalogue.initBehaviour();
-    console.log("✅ [APP] Comportamenti catalogo inizializzati");
-    
-    // Verifica che i modali siano stati creati
-    const modals = document.querySelectorAll('.modal');
-    console.log("✅ [APP] Modali trovati nel DOM:", modals.length);
-    
-    const modalButtons = document.querySelectorAll('[data-modal-target]');
-    console.log("✅ [APP] Bottoni modal trovati:", modalButtons.length);
+    console.log("✅ [APP] Comportamenti inizializzati");
 
   } catch (err) {
     console.error("❌ [APP] Errore nel caricamento dei dati:", err);
