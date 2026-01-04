@@ -1,0 +1,504 @@
+/* ═════════════════════════════════════════════
+   MOBILE.CSS
+   Stili per modalità mobile (forzata e automatica)
+   ═════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────
+   MOBILE VIEW MODE FORZATA (body.mobile-view)
+──────────────────────────────────────────────*/
+body.mobile-view{ 
+  font-size:14px; 
+}
+
+/* Header fisso */
+body.mobile-view header{
+  position:fixed;
+  top:0; left:0; right:0;
+  z-index:2000;
+  background:rgba(255,255,255,.9);
+  backdrop-filter:saturate(180%) blur(14px);
+}
+body.mobile-view main{ 
+  padding-top:72px; 
+}
+
+/* Hamburger menu */
+.nav-toggle-btn{ 
+  display:none; 
+}
+body.mobile-view .nav-toggle-btn,
+body.mobile-view #nav-toggle{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-left:8px;
+  width:32px;
+  height:32px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:#ffffff;
+  font-size:18px;
+  padding:0;
+  cursor:pointer;
+}
+
+body.mobile-view nav ul{
+  position:absolute;
+  top:100%;
+  right:0; left:0;
+  background:#ffffff;
+  border-bottom:1px solid var(--border);
+  flex-direction:column;
+  align-items:flex-start;
+  padding:10px 20px 14px;
+  gap:10px;
+  display:none;
+}
+body.mobile-view.nav-open nav ul{ 
+  display:flex; 
+}
+body.mobile-view nav a{ 
+  font-size:14px; 
+  padding:4px 0; 
+}
+
+/* Hero */
+body.mobile-view .hero{
+  min-height:60vh;
+  align-items:flex-end;
+  padding-bottom:40px;
+}
+body.mobile-view .hero-overlay{ 
+  padding:0 16px 0; 
+}
+body.mobile-view .hero-logo{
+  font-size:clamp(38px,10vw,58px);
+  letter-spacing:0.14em;
+  margin-bottom:10px;
+}
+body.mobile-view .hero-tagline{
+  font-size:13px;
+  max-width:90%;
+}
+body.mobile-view .hero-scroll{
+  width:40px;
+  height:40px;
+  font-size:18px;
+  margin:28px auto 0 auto;
+}
+
+/* Sezioni About, Workshops, Giftcards */
+body.mobile-view .about,
+body.mobile-view .workshops,
+body.mobile-view .giftcards{
+  grid-template-columns:1fr;
+  gap:24px;
+}
+body.mobile-view .about-col{ 
+  gap:16px; 
+}
+body.mobile-view .about-col-right{ 
+  padding-top:0 !important; 
+}
+body.mobile-view .about-cta{ 
+  margin:12px 0 0; 
+}
+
+body.mobile-view .about-img-main img,
+body.mobile-view .about-img-secondary img,
+body.mobile-view .workshops-img img,
+body.mobile-view .giftcards-img img{
+  border-radius:0;
+}
+
+body.mobile-view .pill-btn{
+  width:100%;
+  font-size:14px;
+  padding:8px 14px;
+}
+
+/* Catalogo */
+body.mobile-view .catalogue-header{
+  flex-direction:column;
+  align-items:flex-start;
+  gap:4px;
+  margin-bottom:18px;
+}
+body.mobile-view .catalogue-header .lead{
+  text-align:left;
+  max-width:100%;
+  font-size:13px;
+}
+
+body.mobile-view .catalogue-grid{
+  grid-template-columns:1fr;
+  gap:18px;
+}
+
+body.mobile-view .card{
+  border-radius:0;
+}
+body.mobile-view .card .body{ 
+  padding:16px 18px 18px; 
+}
+body.mobile-view .card h4{ 
+  font-size:18px; 
+}
+
+/* Modal su mobile forzato */
+body.mobile-view .modal-dialog{
+  max-width:100%;
+  width:100%;
+  max-height:100vh;
+  height:100vh;
+  border-radius:0;
+}
+
+body.mobile-view .modal-body-inner{
+  flex-direction:column-reverse; /* ← INVERTITO: gallery prima, dettagli dopo */
+  padding:0;
+  gap:0;
+}
+
+body.mobile-view .modal-gallery{
+  flex:none;
+  width:100%;
+  height:55vh; /* ← Più spazio per l'immagine */
+  padding:16px;
+  background:#f9f9f9;
+  order:-1; /* ← Forza gallery in alto */
+}
+
+body.mobile-view .modal-gallery-main{
+  height:100%;
+  width:100%;
+  aspect-ratio:3/4; /* ← PORTRAIT */
+  margin:0 auto;
+  max-width:400px; /* ← Limita larghezza su schermi grandi */
+}
+
+body.mobile-view .modal-gallery-main img{
+  object-fit:contain; /* ← Mostra tutta l'immagine senza tagliarla */
+}
+
+body.mobile-view .vase-detail-panel{
+  flex:1;
+  padding:20px;
+  overflow-y:auto;
+  order:1; /* ← Forza dettagli in basso */
+}
+
+body.mobile-view .modal-gallery-controls button{
+  width:44px;
+  height:44px;
+  font-size:24px;
+}
+
+body.mobile-view .modal-header{
+  padding:12px 16px;
+}
+
+body.mobile-view .vase-title{
+  font-size:22px;
+}
+
+/* Contatti */
+body.mobile-view .contact-list{
+  grid-template-columns:1fr;
+  gap:12px;
+}
+body.mobile-view .contact-item{
+  padding:10px 12px;
+  font-size:13px;
+}
+body.mobile-view .contact-map iframe{ 
+  height:320px; 
+}
+
+/* Logo */
+body.mobile-view .brand-img{
+  width:120px;
+  height:auto !important;
+}
+
+/* Footer */
+body.mobile-view footer{
+  padding:18px 0;
+  font-size:12px;
+}
+
+/* ─────────────────────────────────────────────
+   TABLET (≤1024px) - iPad, tablet Android
+──────────────────────────────────────────────*/
+@media (max-width: 1024px){
+  body{ 
+    font-size:14px; 
+  }
+
+  /* Header fisso */
+  header{
+    position:fixed;
+    top:0; left:0; right:0;
+    z-index:2000;
+    background:rgba(255,255,255,.9);
+    backdrop-filter:saturate(180%) blur(14px);
+  }
+  main{ 
+    padding-top:72px; 
+  }
+
+  /* Hamburger menu */
+  .nav-toggle-btn, #nav-toggle{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    margin-left:8px;
+    width:32px;
+    height:32px;
+    border-radius:999px;
+    border:1px solid var(--border);
+    background:#ffffff;
+    font-size:18px;
+    padding:0;
+    cursor:pointer;
+  }
+
+  nav ul{
+    position:absolute;
+    top:100%;
+    right:0; left:0;
+    background:#ffffff;
+    border-bottom:1px solid var(--border);
+    flex-direction:column;
+    align-items:flex-start;
+    padding:10px 20px 14px;
+    gap:10px;
+    display:none;
+  }
+  body.nav-open nav ul{ 
+    display:flex; 
+  }
+  nav a{ 
+    font-size:14px; 
+    padding:4px 0; 
+  }
+
+  /* Hero */
+  .hero{
+    min-height:60vh;
+    align-items:flex-end;
+    padding-bottom:40px;
+    overflow:hidden;
+  }
+  .hero-overlay{ 
+    padding:0 16px 0; 
+  }
+  .hero-logo{
+    font-size:clamp(38px,10vw,58px);
+    letter-spacing:0.14em;
+    margin-bottom:10px;
+  }
+  .hero-tagline{ 
+    font-size:13px; 
+    max-width:90%; 
+  }
+  .hero-scroll{
+    width:40px;
+    height:40px;
+    font-size:18px;
+    margin:28px auto 0 auto;
+  }
+
+  /* Sezioni */
+  .about, .workshops, .giftcards{
+    grid-template-columns:1fr;
+    gap:24px;
+  }
+  .about-col{ 
+    gap:16px; 
+  }
+  .about-col-right{ 
+    padding-top:0 !important; 
+  }
+
+  .about-img-main img,
+  .about-img-secondary img,
+  .workshops-img img,
+  .giftcards-img img{
+    border-radius:0;
+  }
+
+  .about-cta{ 
+    margin:12px 0 0; 
+  }
+
+  .pill-btn{ 
+    width:100%; 
+    font-size:14px; 
+    padding:8px 14px; 
+  }
+
+  /* Catalogo - 2 colonne su tablet */
+  .catalogue-header{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:4px;
+    margin-bottom:18px;
+  }
+  .catalogue-header .lead{
+    text-align:left;
+    max-width:100%;
+    font-size:13px;
+  }
+  
+  .catalogue-grid{ 
+    grid-template-columns:repeat(2, 1fr); 
+    gap:18px; 
+  }
+
+  .card{
+    border-radius:0;
+  }
+  .card .body{
+    padding:16px 18px 18px;
+  }
+  .card h4{
+    font-size:18px;
+  }
+
+  /* Modal su tablet */
+  .modal-dialog{
+    max-width:100%;
+    width:100%;
+    max-height:100vh;
+    height:100vh;
+    border-radius:0;
+  }
+
+  .modal-body-inner{
+    flex-direction:column-reverse; /* ← Gallery prima */
+    padding:0;
+    gap:0;
+  }
+
+  .modal-gallery{
+    flex:none;
+    width:100%;
+    height:55vh;
+    padding:16px;
+    background:#f9f9f9;
+    order:-1;
+  }
+
+  .modal-gallery-main{
+    height:100%;
+    width:100%;
+    aspect-ratio:3/4; /* ← PORTRAIT */
+    margin:0 auto;
+    max-width:450px;
+  }
+
+  .modal-gallery-main img{
+    object-fit:contain;
+  }
+
+  .vase-detail-panel{
+    flex:1;
+    padding:20px;
+    overflow-y:auto;
+    order:1;
+  }
+
+  .modal-gallery-controls button{
+    width:44px;
+    height:44px;
+    font-size:24px;
+  }
+
+  .modal-header{
+    padding:12px 16px;
+  }
+
+  .vase-title{
+    font-size:22px;
+  }
+
+  /* Contatti */
+  .contact-list{ 
+    grid-template-columns:1fr; 
+    gap:12px; 
+  }
+  .contact-item{ 
+    padding:10px 12px; 
+    font-size:13px; 
+  }
+  .contact-map iframe{ 
+    height:320px; 
+  }
+
+  footer{ 
+    padding:18px 0; 
+    font-size:12px; 
+  }
+
+  /* Nascondi toggle view */
+  .view-toggle{ 
+    display:none; 
+  }
+
+  /* Logo */
+  .brand-img{ 
+    width:120px; 
+    height:auto !important; 
+  }
+}
+
+/* ─────────────────────────────────────────────
+   SMARTPHONE (≤768px) - iPhone, Android phone
+──────────────────────────────────────────────*/
+@media (max-width: 768px){
+  /* Catalogo - 1 colonna su smartphone */
+  .catalogue-grid{ 
+    grid-template-columns:1fr;
+    gap:18px;
+  }
+
+  /* Modal - immagine più grande su smartphone */
+  .modal-gallery{
+    height:60vh; /* ← Più spazio per l'immagine */
+  }
+
+  .modal-gallery-main{
+    max-width:100%;
+  }
+  
+  .vase-detail-panel{
+    padding:16px;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   SMARTPHONE PICCOLI (≤480px) - iPhone SE, ecc.
+──────────────────────────────────────────────*/
+@media (max-width: 480px){
+  /* Modal - immagine occupa più spazio */
+  .modal-gallery{
+    height:58vh;
+    padding:12px;
+  }
+  
+  .vase-detail-panel{
+    padding:14px;
+  }
+
+  .vase-title{
+    font-size:20px;
+  }
+
+  .modal-gallery-controls button{
+    width:40px;
+    height:40px;
+    font-size:20px;
+  }
+}
+
