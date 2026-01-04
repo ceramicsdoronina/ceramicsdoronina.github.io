@@ -38,7 +38,6 @@ async function appInit() {
       console.log("✅ [APP] Masterclass renderizzate");
     }
 
-    // certificati
     if (CD.certificati && certificatiItems.length) {
       console.log("🔍 [APP] Rendering certificati...");
       CD.certificati.render(certificatiItems, currentLang);
