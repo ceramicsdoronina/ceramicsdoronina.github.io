@@ -260,6 +260,7 @@
   background:none;
   border:none;
   text-align:left;
+  font-size:18px;              /* ← QUESTO è il punto chiave */
 }
 .accordion-panel{
   display:none;
