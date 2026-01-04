@@ -140,7 +140,7 @@ body.mobile-view footer{
 }
 
 /* ─────────────────────────────────────────────
-   MOBILE AUTOMATICO (<= 1024px) - include iPad
+   MOBILE AUTOMATICO (<= 1024px)
 ──────────────────────────────────────────────*/
 @media (max-width: 1024px){
   body{ font-size:14px; }
@@ -233,12 +233,7 @@ body.mobile-view footer{
     max-width:100%;
     font-size:13px;
   }
-  
-  /* iPad: 2 colonne invece di 1 */
-  .catalogue-grid{ 
-    grid-template-columns:repeat(2, 1fr); 
-    gap:18px; 
-  }
+  .catalogue-grid{ grid-template-columns:1fr; gap:18px; }
 
   .card{
     border-radius:0;
@@ -256,17 +251,10 @@ body.mobile-view footer{
 
   footer{ padding:18px 0; font-size:12px; }
 
-  /* nascondo il toggle sui tablet */
+  /* nascondo il toggle sui telefoni */
   .view-toggle{ display:none; }
 
   /* logo mobile */
   .brand-img{ width:120px; height:auto !important; }
-}
-
-/* Solo per smartphone molto piccoli: 1 colonna */
-@media (max-width: 480px){
-  .catalogue-grid{ 
-    grid-template-columns:1fr; 
-  }
 }
 

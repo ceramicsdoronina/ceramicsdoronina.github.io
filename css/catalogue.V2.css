@@ -1,0 +1,65 @@
+/* ─────────────────────────────────────────────
+   CATALOGUE
+──────────────────────────────────────────────*/
+.catalogue-header{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:32px;
+  margin-bottom:28px;
+}
+.catalogue-header h3{
+  margin:0;
+  font-size:40px;
+  letter-spacing:.12em;
+}
+.catalogue-header .lead{
+  margin:0;
+  max-width:460px;
+  text-align:right;
+  color:var(--muted);
+  font-size:15px;
+  line-height:1.5;
+}
+
+.catalogue-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:24px;
+}
+
+.card{
+  border:1px solid var(--border);
+  border-radius:0;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  background:#ffffff;
+}
+
+/* PORTRAIT nelle card */
+.media-single{
+  width:100%;
+  aspect-ratio:3/4;
+  overflow:hidden;
+  cursor:pointer;
+}
+.media-single img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.card .body{
+  padding:22px;
+}
+
+.card h4{
+  margin:0 0 8px;
+  font-size:22px;
+}
+
+.card p{
+  margin:0 0 6px;
+}
+
