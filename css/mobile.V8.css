@@ -1,9 +1,14 @@
 /* ═════════════════════════════════════════════
-   MOBILE.CSS (Versione Finale - Layout Fix)
+   MOBILE.CSS (Versione Finale)
+   Risolve:
+   - Titolo DORONINA (no a capo)
+   - Tutte le sezioni (About, Workshops, Giftcards) a 1 colonna
+   - Immagini grandi e larghe 100%
+   - Modale portrait con immagine sopra
    ═════════════════════════════════════════════ */
 
 /* ─────────────────────────────────────────────
-   A) FIX GLOBALI
+   A) FIX GLOBALI: niente overflow orizzontale
 ──────────────────────────────────────────────*/
 html, body{
   width:100%;
@@ -22,15 +27,14 @@ img, video, iframe, svg{
   height:auto;
 }
 
-/* Gestione testi lunghi */
-p, li, a{
+/* Spezzatura SOLO per testi lunghi (non per i titoli) */
+p, li{
   overflow-wrap:anywhere;
   word-break:break-word;
 }
-/* I titoli non devono spezzarsi a metà */
-h1, h2, h3, h4{
-  overflow-wrap:normal;
-  word-break:normal;
+a{
+  overflow-wrap:anywhere;
+  word-break:break-word;
 }
 
 
@@ -96,7 +100,7 @@ body.mobile-view .hero{
 }
 body.mobile-view .hero-overlay{ padding:0 16px 0; }
 
-/* Titolo DORONINA */
+/* FIX TITOLO DORONINA */
 body.mobile-view .hero-logo{
   font-size: clamp(32px, 13vw, 60px);
   letter-spacing: 0.12em;
@@ -114,88 +118,55 @@ body.mobile-view .hero-scroll{
   margin:28px auto 0 auto;
 }
 
-/* ─────────────────────────────────────────────
-   SEZIONI SPECIALI (Workshops, Giftcards, About)
-   Tecnica "display: contents" per riordinare:
-   Titolo -> Immagine -> Testo
-──────────────────────────────────────────────*/
+/* SEZIONI: Forza 1 colonna verticale e larghezza piena */
+body.mobile-view .about,
 body.mobile-view .workshops,
-body.mobile-view .giftcards,
-body.mobile-view .about {
+body.mobile-view .giftcards {
   display: flex !important;
   flex-direction: column;
-  gap: 0; /* Gestito dai margini interni */
+  align-items: stretch !important; /* Fondamentale per occupare tutta la larghezza */
+  gap: 32px;
 }
 
-/* Rimuove il contenitore del testo dal layout per riordinare i figli */
+body.mobile-view .about-col,
 body.mobile-view .workshops-text,
 body.mobile-view .giftcards-text,
-body.mobile-view .about-col {
-  display: contents;
-}
-
-/* 1. IL TITOLO PRINCIPALE (Primo H3) */
-body.mobile-view .workshops-text > h3:first-child,
-body.mobile-view .giftcards-text > h3:first-child,
-body.mobile-view .about-col > h3:first-child {
-  order: 1;
-  width: 100%;
-  margin-bottom: 20px;
-  text-align: left;
-}
-
-/* 2. L'IMMAGINE */
 body.mobile-view .workshops-img,
-body.mobile-view .giftcards-img,
-body.mobile-view .about-img-main,
-body.mobile-view .about-img-secondary {
-  order: 2;
+body.mobile-view .giftcards-img {
   width: 100%;
-  margin-bottom: 24px;
-}
-body.mobile-view .workshops-img img,
-body.mobile-view .giftcards-img img,
-body.mobile-view .about-img-main img,
-body.mobile-view .about-img-secondary img {
-  width: 100%;
-  border-radius: 0;
+  padding: 0;
 }
 
-/* 3. TUTTO IL RESTO DEL TESTO (Paragrafi, liste, altri titoli) */
-body.mobile-view .workshops-text > *,
-body.mobile-view .giftcards-text > *,
-body.mobile-view .about-col > * {
-  order: 3;
-  width: 100%;
-}
-
-/* Fix specifici per About */
 body.mobile-view .about-col-right{ padding-top:0 !important; }
-body.mobile-view .about-cta{ margin:12px 0 0; order: 4; width: 100%; }
-body.mobile-view .pill-btn{ width:100%; font-size:14px; padding:8px 14px; }
+body.mobile-view .about-cta{ margin:12px 0 0; }
 
+/* Immagini full width */
+body.mobile-view .about-img-main img,
+body.mobile-view .about-img-secondary img,
+body.mobile-view .workshops-img img,
+body.mobile-view .giftcards-img img{
+  border-radius:0;
+  width: 100%;
+}
 
-/* ─────────────────────────────────────────────
-   CATALOGO
-──────────────────────────────────────────────*/
+body.mobile-view .pill-btn{
+  width:100%;
+  font-size:14px;
+  padding:8px 14px;
+}
+
+/* Catalogo */
 body.mobile-view .catalogue-header{
-  display: flex;
   flex-direction:column;
   align-items:flex-start;
-  gap:12px;
-  margin-bottom:24px;
-}
-body.mobile-view .catalogue-header h3{
-  width: 100%;
-  margin: 0;
+  gap:4px;
+  margin-bottom:18px;
 }
 body.mobile-view .catalogue-header .lead{
   text-align:left;
   max-width:100%;
   font-size:13px;
-  width: 100%;
 }
-
 body.mobile-view .catalogue-grid{
   display: grid;
   grid-template-columns: 1fr !important;
@@ -224,10 +195,11 @@ body.mobile-view footer{ padding:18px 0; font-size:12px; }
 
 
 /* ─────────────────────────────────────────────
-   C) MODALE SU MOBILE
+   C) MODALE SU MOBILE (mobile-view)
 ──────────────────────────────────────────────*/
 body.mobile-view .modal{ z-index:9999; }
 
+/* Se modale aperto, chiudi menu */
 body.mobile-view .modal.open ~ header nav ul,
 body.mobile-view .modal.open nav ul{
   display:none !important;
@@ -257,7 +229,7 @@ body.mobile-view .modal-gallery{
 
 body.mobile-view .modal-gallery-main{
   width:100%;
-  aspect-ratio:3/4;
+  aspect-ratio:3/4;     /* portrait */
   max-height:58vh;
   margin:0 auto;
   background:#fff;
@@ -325,7 +297,7 @@ body.mobile-view .vase-title{ font-size:22px; }
   }
   body.nav-open nav ul{ display:flex; }
 
-  /* FIX TITOLO DORONINA */
+  /* FIX TITOLO DORONINA (Responsive) */
   .hero-logo {
     font-size: clamp(32px, 13vw, 60px);
     letter-spacing: 0.12em;
@@ -333,48 +305,35 @@ body.mobile-view .vase-title{ font-size:22px; }
     text-align: center;
   }
 
-  /* FIX LAYOUT SEZIONI (Titolo -> Immagine -> Testo) */
-  .workshops, .giftcards, .about {
+  /* FIX SEZIONI: Forza 1 colonna verticale e larghezza piena */
+  .about,
+  .workshops,
+  .giftcards {
     display: flex !important;
     flex-direction: column;
-    gap: 0;
+    align-items: stretch !important; /* Sovrascrive align-items:center del desktop */
+    gap: 32px;
   }
   
-  /* Unwrap per riordinare */
-  .workshops-text, .giftcards-text, .about-col {
-    display: contents;
-  }
-
-  /* 1. Titolo */
-  .workshops-text > h3:first-child, 
-  .giftcards-text > h3:first-child,
-  .about-col > h3:first-child {
-    order: 1;
+  /* Forza larghezza 100% per testi e contenitori immagini */
+  .about-col, 
+  .workshops-text, 
+  .giftcards-text,
+  .workshops-img,
+  .giftcards-img {
     width: 100%;
-    margin-bottom: 20px;
   }
-
-  /* 2. Immagine */
-  .workshops-img, .giftcards-img, .about-img-main, .about-img-secondary {
-    order: 2;
-    width: 100%;
-    margin-bottom: 24px;
-  }
-  .workshops-img img, .giftcards-img img, .about-img-main img {
+  
+  /* Forza immagini al 100% */
+  .workshops-img img,
+  .giftcards-img img {
     width: 100%;
     border-radius: 0;
   }
-
-  /* 3. Testo */
-  .workshops-text > *, .giftcards-text > *, .about-col > * {
-    order: 3;
-    width: 100%;
-  }
   
   .about-col-right{ padding-top:0 !important; }
-  .about-cta { order: 4; width: 100%; margin-top: 12px; }
 
-  /* Modale */
+  /* Modale: verticale anche qui */
   .modal{ z-index:9999; }
   .modal.open ~ header nav ul,
   .modal.open nav ul{ display:none !important; }
