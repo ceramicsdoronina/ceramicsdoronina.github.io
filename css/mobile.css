@@ -338,3 +338,40 @@ body.mobile-view .vase-title{
   }
 }
 
+/* ─────────────────────────────────────────────
+   BRAND / ABOUT: immagine sopra, testo sotto (mobile + tablet)
+   Forza layout a 1 colonna anche quando il layout desktop è a 2 colonne.
+──────────────────────────────────────────────*/
+
+/* Modalità mobile forzata */
+body.mobile-view .about{
+  display:grid;
+  grid-template-columns:1fr !important;
+  gap:24px;
+}
+
+/* Se dentro .about hai colonne separate */
+body.mobile-view .about-col{
+  width:100%;
+}
+body.mobile-view .about-col-right{
+  padding-top:0 !important;
+}
+
+/* Responsive automatico (include iPad) */
+@media (max-width: 1024px){
+  .about{
+    display:grid;
+    grid-template-columns:1fr !important;
+    gap:24px;
+  }
+
+  /* Se usi classi colonna */
+  .about-col{
+    width:100%;
+  }
+  .about-col-right{
+    padding-top:0 !important;
+  }
+}
+
