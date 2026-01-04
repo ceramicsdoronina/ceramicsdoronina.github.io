@@ -140,9 +140,9 @@ body.mobile-view footer{
 }
 
 /* ─────────────────────────────────────────────
-   MOBILE AUTOMATICO (<= 768px)
+   MOBILE AUTOMATICO (<= 1024px)
 ──────────────────────────────────────────────*/
-@media (max-width: 768px){
+@media (max-width: 1024px){
   body{ font-size:14px; }
 
   header{
