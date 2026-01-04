@@ -1,5 +1,5 @@
 /* ═════════════════════════════════════════════
-   MOBILE.CSS (Versione Finale - Reordering)
+   MOBILE.CSS (Versione Finale - Layout Fix)
    ═════════════════════════════════════════════ */
 
 /* ─────────────────────────────────────────────
@@ -22,15 +22,15 @@ img, video, iframe, svg{
   height:auto;
 }
 
-/* Gestione testi */
+/* Gestione testi lunghi */
 p, li, a{
   overflow-wrap:anywhere;
   word-break:break-word;
 }
+/* I titoli non devono spezzarsi a metà */
 h1, h2, h3, h4{
   overflow-wrap:normal;
   word-break:normal;
-  hyphens: none;
 }
 
 
@@ -115,64 +115,26 @@ body.mobile-view .hero-scroll{
 }
 
 /* ─────────────────────────────────────────────
-   RICHIESTA 1: CATALOGO
-   Titolo da solo, testo sotto.
+   SEZIONI SPECIALI (Workshops, Giftcards, About)
+   Tecnica "display: contents" per riordinare:
+   Titolo -> Immagine -> Testo
 ──────────────────────────────────────────────*/
-body.mobile-view .catalogue-header{
-  display: flex;
-  flex-direction: column; /* Impila verticalmente */
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-body.mobile-view .catalogue-header h3{
-  width: 100%;
-  margin: 0;
-  line-height: 1.2;
-}
-
-body.mobile-view .catalogue-header .lead{
-  text-align: left;
-  max-width: 100%;
-  font-size: 13px;
-  width: 100%;
-  margin: 0;
-}
-
-body.mobile-view .catalogue-grid{
-  display: grid;
-  grid-template-columns: 1fr !important;
-  gap: 18px;
-}
-body.mobile-view .card{ border-radius:0; }
-body.mobile-view .card .body{ padding:16px 18px 18px; }
-body.mobile-view .card h4{ font-size:18px; }
-
-
-/* ─────────────────────────────────────────────
-   RICHIESTE 2, 3, 4, 5: WORKSHOPS & GIFTCARDS
-   Ordine: Titolo -> Immagine -> Testo
-   Layout: Colonna unica
-──────────────────────────────────────────────*/
-
-/* Imposta il contenitore principale come colonna flessibile */
 body.mobile-view .workshops,
 body.mobile-view .giftcards,
 body.mobile-view .about {
   display: flex !important;
   flex-direction: column;
-  gap: 0; /* Gestiamo lo spazio con i margini degli elementi */
+  gap: 0; /* Gestito dai margini interni */
 }
 
-/* "Scompatta" i contenitori di testo per poter riordinare i figli */
+/* Rimuove il contenitore del testo dal layout per riordinare i figli */
 body.mobile-view .workshops-text,
 body.mobile-view .giftcards-text,
 body.mobile-view .about-col {
   display: contents;
 }
 
-/* --- ORDINE 1: IL TITOLO PRINCIPALE (Primo H3) --- */
+/* 1. IL TITOLO PRINCIPALE (Primo H3) */
 body.mobile-view .workshops-text > h3:first-child,
 body.mobile-view .giftcards-text > h3:first-child,
 body.mobile-view .about-col > h3:first-child {
@@ -182,8 +144,7 @@ body.mobile-view .about-col > h3:first-child {
   text-align: left;
 }
 
-/* --- ORDINE 2: L'IMMAGINE --- */
-/* (Richiesta 2 e 4: Immagine subito sotto il titolo) */
+/* 2. L'IMMAGINE */
 body.mobile-view .workshops-img,
 body.mobile-view .giftcards-img,
 body.mobile-view .about-img-main,
@@ -192,41 +153,57 @@ body.mobile-view .about-img-secondary {
   width: 100%;
   margin-bottom: 24px;
 }
-
 body.mobile-view .workshops-img img,
 body.mobile-view .giftcards-img img,
 body.mobile-view .about-img-main img,
 body.mobile-view .about-img-secondary img {
   width: 100%;
   border-radius: 0;
-  display: block;
 }
 
-/* --- ORDINE 3: TUTTO IL RESTO DEL TESTO --- */
-/* (Richiesta 3 e 5: Sottotitoli e paragrafi su colonna unica) */
+/* 3. TUTTO IL RESTO DEL TESTO (Paragrafi, liste, altri titoli) */
 body.mobile-view .workshops-text > *,
 body.mobile-view .giftcards-text > *,
 body.mobile-view .about-col > * {
   order: 3;
-  width: 100%; /* Forza colonna unica */
-  max-width: 100%;
-}
-
-/* Fix specifici per i sottotitoli (Upcoming / Available) */
-/* Assicura che non siano schiacciati */
-body.mobile-view .workshops-text h3:not(:first-child),
-body.mobile-view .giftcards-text h3:not(:first-child) {
-  margin-top: 24px;
-  margin-bottom: 12px;
   width: 100%;
-  white-space: normal; /* Permette a capo normale */
-  line-height: 1.3;
 }
 
-/* Fix per About */
+/* Fix specifici per About */
 body.mobile-view .about-col-right{ padding-top:0 !important; }
 body.mobile-view .about-cta{ margin:12px 0 0; order: 4; width: 100%; }
 body.mobile-view .pill-btn{ width:100%; font-size:14px; padding:8px 14px; }
+
+
+/* ─────────────────────────────────────────────
+   CATALOGO
+──────────────────────────────────────────────*/
+body.mobile-view .catalogue-header{
+  display: flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:12px;
+  margin-bottom:24px;
+}
+body.mobile-view .catalogue-header h3{
+  width: 100%;
+  margin: 0;
+}
+body.mobile-view .catalogue-header .lead{
+  text-align:left;
+  max-width:100%;
+  font-size:13px;
+  width: 100%;
+}
+
+body.mobile-view .catalogue-grid{
+  display: grid;
+  grid-template-columns: 1fr !important;
+  gap:18px;
+}
+body.mobile-view .card{ border-radius:0; }
+body.mobile-view .card .body{ padding:16px 18px 18px; }
+body.mobile-view .card h4{ font-size:18px; }
 
 /* Contatti */
 body.mobile-view .contact-list{
@@ -356,15 +333,14 @@ body.mobile-view .vase-title{ font-size:22px; }
     text-align: center;
   }
 
-  /* ─────────────────────────────────────────────
-     APPLICAZIONE REORDERING ANCHE AL RESPONSIVE
-  ──────────────────────────────────────────────*/
+  /* FIX LAYOUT SEZIONI (Titolo -> Immagine -> Testo) */
   .workshops, .giftcards, .about {
     display: flex !important;
     flex-direction: column;
     gap: 0;
   }
   
+  /* Unwrap per riordinare */
   .workshops-text, .giftcards-text, .about-col {
     display: contents;
   }
@@ -397,16 +373,6 @@ body.mobile-view .vase-title{ font-size:22px; }
   
   .about-col-right{ padding-top:0 !important; }
   .about-cta { order: 4; width: 100%; margin-top: 12px; }
-
-  /* CATALOGO */
-  .catalogue-header{
-    flex-direction:column;
-    align-items:flex-start;
-    gap:12px;
-    margin-bottom:24px;
-  }
-  .catalogue-header h3{ width: 100%; margin: 0; }
-  .catalogue-header .lead{ width: 100%; text-align: left; margin: 0; }
 
   /* Modale */
   .modal{ z-index:9999; }
