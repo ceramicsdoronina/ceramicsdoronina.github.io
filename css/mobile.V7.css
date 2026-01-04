@@ -1,45 +1,14 @@
 /* ═════════════════════════════════════════════
-   MOBILE.CSS (Versione Finale)
+   MOBILE.CSS (Versione Corretta)
    Risolve:
-   - Titolo DORONINA (no a capo)
-   - Tutte le sezioni (About, Workshops, Giftcards) a 1 colonna
-   - Immagini grandi e larghe 100%
-   - Modale portrait con immagine sopra
+   - Titolo DORONINA che va a capo
+   - Sezioni Workshops/Giftcards su 2 colonne (ora 1)
+   - Testi spaziati male (U p c o m i n g)
+   - Modale con immagine portrait sopra
    ═════════════════════════════════════════════ */
 
 /* ─────────────────────────────────────────────
-   A) FIX GLOBALI: niente overflow orizzontale
-──────────────────────────────────────────────*/
-html, body{
-  width:100%;
-  max-width:100%;
-  overflow-x:hidden;
-}
-body{ position:relative; }
-
-main, header, footer, section, .container{
-  max-width:100%;
-  overflow-x:hidden;
-}
-
-img, video, iframe, svg{
-  max-width:100%;
-  height:auto;
-}
-
-/* Spezzatura SOLO per testi lunghi (non per i titoli) */
-p, li{
-  overflow-wrap:anywhere;
-  word-break:break-word;
-}
-a{
-  overflow-wrap:anywhere;
-  word-break:break-word;
-}
-
-
-/* ─────────────────────────────────────────────
-   B) MOBILE VIEW MODE FORZATA (body.mobile-view)
+   A) MOBILE VIEW MODE FORZATA (body.mobile-view)
 ──────────────────────────────────────────────*/
 body.mobile-view{ font-size:14px; }
 
@@ -102,10 +71,11 @@ body.mobile-view .hero-overlay{ padding:0 16px 0; }
 
 /* FIX TITOLO DORONINA */
 body.mobile-view .hero-logo{
+  /* Usa vw per scalare fluidamente, clamp per limiti min/max */
   font-size: clamp(32px, 13vw, 60px);
   letter-spacing: 0.12em;
   margin-bottom: 10px;
-  white-space: nowrap;
+  white-space: nowrap; /* Cerca di stare su una riga */
   text-align: center;
   width: 100%;
 }
@@ -118,21 +88,18 @@ body.mobile-view .hero-scroll{
   margin:28px auto 0 auto;
 }
 
-/* SEZIONI: Forza 1 colonna verticale e larghezza piena */
+/* SEZIONI: Forza 1 colonna (Flex Column è più sicuro di Grid qui) */
 body.mobile-view .about,
 body.mobile-view .workshops,
 body.mobile-view .giftcards {
   display: flex !important;
   flex-direction: column;
-  align-items: stretch !important; /* Fondamentale per occupare tutta la larghezza */
   gap: 32px;
 }
 
 body.mobile-view .about-col,
 body.mobile-view .workshops-text,
-body.mobile-view .giftcards-text,
-body.mobile-view .workshops-img,
-body.mobile-view .giftcards-img {
+body.mobile-view .giftcards-text {
   width: 100%;
   padding: 0;
 }
@@ -195,7 +162,7 @@ body.mobile-view footer{ padding:18px 0; font-size:12px; }
 
 
 /* ─────────────────────────────────────────────
-   C) MODALE SU MOBILE (mobile-view)
+   B) MODALE SU MOBILE (mobile-view)
 ──────────────────────────────────────────────*/
 body.mobile-view .modal{ z-index:9999; }
 
@@ -249,7 +216,7 @@ body.mobile-view .vase-title{ font-size:22px; }
 
 
 /* ─────────────────────────────────────────────
-   D) RESPONSIVE AUTOMATICO (Tablet & Phone)
+   C) RESPONSIVE AUTOMATICO (Tablet & Phone)
    Include iPad: <= 1024px
 ──────────────────────────────────────────────*/
 @media (max-width: 1024px){
@@ -305,30 +272,17 @@ body.mobile-view .vase-title{ font-size:22px; }
     text-align: center;
   }
 
-  /* FIX SEZIONI: Forza 1 colonna verticale e larghezza piena */
+  /* FIX SEZIONI: Forza 1 colonna verticale */
   .about,
   .workshops,
   .giftcards {
     display: flex !important;
     flex-direction: column;
-    align-items: stretch !important; /* Sovrascrive align-items:center del desktop */
     gap: 32px;
   }
   
-  /* Forza larghezza 100% per testi e contenitori immagini */
-  .about-col, 
-  .workshops-text, 
-  .giftcards-text,
-  .workshops-img,
-  .giftcards-img {
+  .about-col, .workshops-text, .giftcards-text {
     width: 100%;
-  }
-  
-  /* Forza immagini al 100% */
-  .workshops-img img,
-  .giftcards-img img {
-    width: 100%;
-    border-radius: 0;
   }
   
   .about-col-right{ padding-top:0 !important; }
