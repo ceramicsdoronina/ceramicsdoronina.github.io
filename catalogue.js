@@ -273,42 +273,61 @@
 
   // Inizializza modali, accordion e gallery (chiamata dopo render)
 function initModals() {
-  console.log("🔍 [CATALOGUE] Inizializzazione modali...");
+  console.log("🔍 [CATALOGUE] Inizializzazione modali con delegazione eventi...");
   
-  const modalTriggers = document.querySelectorAll("[data-modal-target]");
-  console.log("🔍 [CATALOGUE] Trigger trovati:", modalTriggers.length);
+  // Rimuovi eventuali listener precedenti
+  document.removeEventListener("click", handleModalClick);
   
-  modalTriggers.forEach(el => {
-    el.addEventListener("click", (e) => {
-      e.preventDefault();
-      const id = el.dataset.modalTarget;
-      console.log("🔍 [CATALOGUE] Click su trigger, apertura modal:", id);
-      const m = document.getElementById(id);
-      if (m) {
-        console.log("✅ [CATALOGUE] Modal trovato, apertura...");
-        m.classList.add("open");
-      } else {
-        console.error("❌ [CATALOGUE] Modal non trovato:", id);
-      }
-    });
-  });
-
-  document.querySelectorAll("[data-modal-close]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      console.log("🔍 [CATALOGUE] Chiusura modal");
-      btn.closest(".modal")?.classList.remove("open");
-    });
-  });
-
-  document.addEventListener("click", e => {
-    if (e.target.classList && e.target.classList.contains("modal")) {
-      console.log("🔍 [CATALOGUE] Click su sfondo modal, chiusura");
-      e.target.classList.remove("open");
-    }
-  });
+  // Aggiungi listener sul document (delegazione)
+  document.addEventListener("click", handleModalClick);
   
-  console.log("✅ [CATALOGUE] Modali inizializzati");
+  console.log("✅ [CATALOGUE] Modali inizializzati con delegazione");
 }
+
+// Handler separato per i click
+function handleModalClick(e) {
+  const target = e.target;
+  
+  // Apertura modal - click su bottone o immagine con data-modal-target
+  const modalTrigger = target.closest("[data-modal-target]");
+  if (modalTrigger) {
+    e.preventDefault();
+    e.stopPropagation();
+    const id = modalTrigger.dataset.modalTarget;
+    console.log("🔍 [CATALOGUE] Click su trigger, apertura modal:", id);
+    const modal = document.getElementById(id);
+    if (modal) {
+      console.log("✅ [CATALOGUE] Modal trovato, apertura...");
+      modal.classList.add("open");
+      console.log("✅ [CATALOGUE] Classe 'open' aggiunta");
+    } else {
+      console.error("❌ [CATALOGUE] Modal non trovato con ID:", id);
+    }
+    return;
+  }
+  
+  // Chiusura modal - click su X
+  const closeBtn = target.closest("[data-modal-close]");
+  if (closeBtn) {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("🔍 [CATALOGUE] Click su close, chiusura modal");
+    const modal = closeBtn.closest(".modal");
+    if (modal) {
+      modal.classList.remove("open");
+      console.log("✅ [CATALOGUE] Modal chiuso");
+    }
+    return;
+  }
+  
+  // Chiusura modal - click sullo sfondo
+  if (target.classList.contains("modal")) {
+    console.log("🔍 [CATALOGUE] Click su sfondo modal, chiusura");
+    target.classList.remove("open");
+  }
+}
+
+
 /*
   function initModals() {
     document.querySelectorAll("[data-modal-target]").forEach(el => {
@@ -405,11 +424,21 @@ function initModals() {
     });
   }
 
+function initBehaviour() {
+  console.log("🔍 [CATALOGUE] Inizializzazione comportamenti...");
+  initModals();
+  initAccordions();
+  initGalleries();
+  console.log("✅ [CATALOGUE] Comportamenti inizializzati");
+}
+
+/*
   function initBehaviour() {
     initModals();
     initAccordions();
     initGalleries();
   }
+*/
 
   // Espone le API nel namespace globale CD
   window.CD = window.CD || {};
