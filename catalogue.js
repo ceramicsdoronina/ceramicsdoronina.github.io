@@ -272,6 +272,44 @@
   }
 
   // Inizializza modali, accordion e gallery (chiamata dopo render)
+function initModals() {
+  console.log("🔍 [CATALOGUE] Inizializzazione modali...");
+  
+  const modalTriggers = document.querySelectorAll("[data-modal-target]");
+  console.log("🔍 [CATALOGUE] Trigger trovati:", modalTriggers.length);
+  
+  modalTriggers.forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+      const id = el.dataset.modalTarget;
+      console.log("🔍 [CATALOGUE] Click su trigger, apertura modal:", id);
+      const m = document.getElementById(id);
+      if (m) {
+        console.log("✅ [CATALOGUE] Modal trovato, apertura...");
+        m.classList.add("open");
+      } else {
+        console.error("❌ [CATALOGUE] Modal non trovato:", id);
+      }
+    });
+  });
+
+  document.querySelectorAll("[data-modal-close]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      console.log("🔍 [CATALOGUE] Chiusura modal");
+      btn.closest(".modal")?.classList.remove("open");
+    });
+  });
+
+  document.addEventListener("click", e => {
+    if (e.target.classList && e.target.classList.contains("modal")) {
+      console.log("🔍 [CATALOGUE] Click su sfondo modal, chiusura");
+      e.target.classList.remove("open");
+    }
+  });
+  
+  console.log("✅ [CATALOGUE] Modali inizializzati");
+}
+/*
   function initModals() {
     document.querySelectorAll("[data-modal-target]").forEach(el => {
       el.addEventListener("click", () => {
@@ -293,6 +331,7 @@
       }
     });
   }
+*/
 
   function initAccordions() {
     document.querySelectorAll(".accordion-header").forEach(btn => {
