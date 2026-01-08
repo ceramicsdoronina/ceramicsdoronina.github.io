@@ -240,7 +240,16 @@ body.mobile-view .contact-item{
 body.mobile-view .contact-map iframe{ height:320px; }
 
 /* Logo */
-body.mobile-view .brand-img{ width:120px; height:auto !important; }
+/* body.mobile-view .brand-img{ width:120px; height:auto !important; } */
+
+body.mobile-view .brand-img{
+  width:120px;
+  height:36px;              /* fixed height -> enables crop */
+  object-fit:cover;         /* crop, no distortion */
+  object-position:center;   /* adjust if needed */
+  display:block;
+}
+
 
 /* Footer */
 body.mobile-view footer{ padding:18px 0; font-size:12px; }
