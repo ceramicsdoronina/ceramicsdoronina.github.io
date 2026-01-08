@@ -1,6 +1,10 @@
 /* ═════════════════════════════════════════════
-   MOBILE.CSS (Versione Finale - Reordering)
-   ═════════════════════════════════════════════ */
+   MOBILE.CSS (pulito, no duplicati)
+   Supporta:
+   - body.mobile-view (view forzata)
+   - responsive automatico (<=1024px)
+   Menu: dropdown assoluto sotto la barra (stabile Safari)
+═════════════════════════════════════════════ */
 
 /* ─────────────────────────────────────────────
    A) FIX GLOBALI
@@ -10,452 +14,194 @@ html, body{
   max-width:100%;
   overflow-x:hidden;
 }
-body{ position:relative; }
-
-main, header, footer, section, .container{
-  max-width:100%;
-  overflow-x:hidden;
-}
-
 img, video, iframe, svg{
   max-width:100%;
   height:auto;
 }
-
-/* Gestione testi */
 p, li, a{
   overflow-wrap:anywhere;
   word-break:break-word;
 }
-h1, h2, h3, h4{
+h1,h2,h3,h4{
   overflow-wrap:normal;
   word-break:normal;
-  hyphens: none;
+  hyphens:none;
 }
 
+/* Hamburger nascosto di default */
+.nav-toggle-btn,
+#nav-toggle{
+  display:none;
+}
 
 /* ─────────────────────────────────────────────
-   B) MOBILE VIEW MODE FORZATA (body.mobile-view)
+   B) MOBILE VIEW FORZATA (body.mobile-view)
+   (questa è la modalità che usi nei log)
 ──────────────────────────────────────────────*/
-body.mobile-view{ font-size:14px; }
+body.mobile-view{
+  font-size:14px;
+}
 
-/* Header fisso */
 body.mobile-view header{
   position:fixed;
   top:0; left:0; right:0;
   z-index:2000;
-  background:rgba(255,255,255,.9);
+  background:rgba(255,255,255,.95);
   backdrop-filter:saturate(180%) blur(14px);
+  border-bottom:1px solid var(--border);
 }
-body.mobile-view main{ padding-top:56px; }
 
-/* Hamburger */
-.nav-toggle-btn{ display:none; }
+body.mobile-view main{
+  padding-top:72px; /* coerente con header */
+}
+
+/* mostra hamburger */
 body.mobile-view .nav-toggle-btn,
 body.mobile-view #nav-toggle{
   display:inline-flex;
   align-items:center;
   justify-content:center;
   margin-left:8px;
-  width:32px;
-  height:32px;
-  border-radius:999px;
+  width:36px;
+  height:36px;
+  border-radius:8px;
   border:1px solid var(--border);
-  background:#ffffff;
-  font-size:18px;
+  background:#fff;
+  font-size:20px;
   padding:0;
   cursor:pointer;
 }
 
-/* Menu a tendina */
+/* ✅ MENU MOBILE (come style.V1.css) */
 body.mobile-view nav ul{
-  position:fixed;
-  top:56px;
-  right:0; left:0;
-  background:#ffffff;
+  position:absolute;     /* <- stabile */
+  top:100%;              /* <- sotto la barra */
+  left:0;
+  right:0;
+
+  background:#fff;
   border-bottom:1px solid var(--border);
+  box-shadow:0 10px 30px rgba(0,0,0,.10);
+
+  display:none;          /* chiuso */
+  flex-direction:column;
+  align-items:stretch;
+
+  padding:8px 0;
+  margin:0;
+  list-style:none;
+
+  z-index:2500;          /* sopra header content */
+}
+
+body.mobile-view.nav-open nav ul{
+  display:flex;
+}
+
+body.mobile-view nav ul a{
+  display:block;
+  width:100%;
+  padding:14px 18px;
+  font-size:15px;
+  color:var(--text);
+  border-bottom:none !important;
+}
+body.mobile-view nav ul li{
+  border-bottom:1px solid rgba(0,0,0,.06);
+}
+body.mobile-view nav ul li:last-child{
+  border-bottom:none;
+}
+
+/* layout mobile: sezioni a 1 colonna */
+body.mobile-view .about,
+body.mobile-view .workshops,
+body.mobile-view .giftcards{
+  grid-template-columns:1fr !important;
+  gap:24px;
+}
+body.mobile-view .catalogue-header{
   flex-direction:column;
   align-items:flex-start;
-  padding:10px 20px 14px;
   gap:10px;
-  display:none;
-  z-index:9999;
-  box-sizing:border-box;
-  width:100%;
-  max-width:100%;
 }
-body.mobile-view.nav-open nav ul{ display:flex !important; }
-body.mobile-view nav a{ font-size:14px; padding:4px 0; }
-
-/* Hero */
-body.mobile-view .hero{
-  min-height:60vh;
-  align-items:flex-end;
-  padding-bottom:40px;
-  overflow:hidden;
-}
-body.mobile-view .hero-overlay{ padding:0 16px 0; }
-
-/* Titolo DORONINA */
-body.mobile-view .hero-logo{
-  font-size: clamp(32px, 13vw, 60px);
-  letter-spacing: 0.12em;
-  margin-bottom: 10px;
-  white-space: nowrap;
-  text-align: center;
-  width: 100%;
-}
-
-body.mobile-view .hero-tagline{ font-size:13px; max-width:90%; }
-body.mobile-view .hero-scroll{
-  width:40px;
-  height:40px;
-  font-size:18px;
-  margin:28px auto 0 auto;
-}
-
-/* ─────────────────────────────────────────────
-   RICHIESTA 1: CATALOGO
-   Titolo da solo, testo sotto.
-──────────────────────────────────────────────*/
-body.mobile-view .catalogue-header{
-  display: flex;
-  flex-direction: column; /* Impila verticalmente */
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-body.mobile-view .catalogue-header h3{
-  width: 100%;
-  margin: 0;
-  line-height: 1.2;
-}
-
 body.mobile-view .catalogue-header .lead{
-  text-align: left;
-  max-width: 100%;
-  font-size: 13px;
-  width: 100%;
-  margin: 0;
-}
-
-body.mobile-view .catalogue-grid{
-  display: grid;
-  grid-template-columns: 1fr !important;
-  gap: 18px;
-}
-body.mobile-view .card{ border-radius:0; }
-body.mobile-view .card .body{ padding:16px 18px 18px; }
-body.mobile-view .card h4{ font-size:18px; }
-
-
-/* ─────────────────────────────────────────────
-   RICHIESTE 2, 3, 4, 5: WORKSHOPS & GIFTCARDS
-   Ordine: Titolo -> Immagine -> Testo
-   Layout: Colonna unica
-──────────────────────────────────────────────*/
-
-/* Imposta il contenitore principale come colonna flessibile */
-body.mobile-view .workshops,
-body.mobile-view .giftcards,
-body.mobile-view .about {
-  display: flex !important;
-  flex-direction: column;
-  gap: 0; /* Gestiamo lo spazio con i margini degli elementi */
-}
-
-/* "Scompatta" i contenitori di testo per poter riordinare i figli */
-body.mobile-view .workshops-text,
-body.mobile-view .giftcards-text,
-body.mobile-view .about-col {
-  display: contents;
-}
-
-/* --- ORDINE 1: IL TITOLO PRINCIPALE (Primo H3) --- */
-body.mobile-view .workshops-text > h3:first-child,
-body.mobile-view .giftcards-text > h3:first-child,
-body.mobile-view .about-col > h3:first-child {
-  order: 1;
-  width: 100%;
-  margin-bottom: 20px;
-  text-align: left;
-}
-
-/* --- ORDINE 2: L'IMMAGINE --- */
-/* (Richiesta 2 e 4: Immagine subito sotto il titolo) */
-body.mobile-view .workshops-img,
-body.mobile-view .giftcards-img,
-body.mobile-view .about-img-main,
-body.mobile-view .about-img-secondary {
-  order: 2;
-  width: 100%;
-  margin-bottom: 24px;
-}
-
-body.mobile-view .workshops-img img,
-body.mobile-view .giftcards-img img,
-body.mobile-view .about-img-main img,
-body.mobile-view .about-img-secondary img {
-  width: 100%;
-  border-radius: 0;
-  display: block;
-}
-
-/* --- ORDINE 3: TUTTO IL RESTO DEL TESTO --- */
-/* (Richiesta 3 e 5: Sottotitoli e paragrafi su colonna unica) */
-body.mobile-view .workshops-text > *,
-body.mobile-view .giftcards-text > *,
-body.mobile-view .about-col > * {
-  order: 3;
-  width: 100%; /* Forza colonna unica */
-  max-width: 100%;
-}
-
-/* Fix specifici per i sottotitoli (Upcoming / Available) */
-/* Assicura che non siano schiacciati */
-body.mobile-view .workshops-text h3:not(:first-child),
-body.mobile-view .giftcards-text h3:not(:first-child) {
-  margin-top: 24px;
-  margin-bottom: 12px;
-  width: 100%;
-  white-space: normal; /* Permette a capo normale */
-  line-height: 1.3;
-}
-
-/* Fix per About */
-body.mobile-view .about-col-right{ padding-top:0 !important; }
-body.mobile-view .about-cta{ margin:12px 0 0; order: 4; width: 100%; }
-body.mobile-view .pill-btn{ width:100%; font-size:14px; padding:8px 14px; }
-
-/* Contatti */
-body.mobile-view .contact-list{
-  grid-template-columns:1fr;
-  gap:12px;
-}
-body.mobile-view .contact-item{
-  padding:10px 12px;
+  text-align:left;
+  max-width:100%;
   font-size:13px;
 }
-body.mobile-view .contact-map iframe{ height:320px; }
-
-/* Logo */
-body.mobile-view .brand-img{ width:120px; height:auto !important; } 
-
-/* Footer */
-body.mobile-view footer{ padding:18px 0; font-size:12px; }
-
+body.mobile-view .catalogue-grid{
+  grid-template-columns:1fr !important;
+  gap:18px;
+}
 
 /* ─────────────────────────────────────────────
-   C) MODALE SU MOBILE
-──────────────────────────────────────────────*/
-body.mobile-view .modal{ z-index:9999; }
-
-body.mobile-view .modal.open ~ header nav ul,
-body.mobile-view .modal.open nav ul{
-  display:none !important;
-}
-
-body.mobile-view .modal-dialog{
-  width:100%;
-  max-width:100%;
-  height:100vh;
-  max-height:100vh;
-  border-radius:0;
-}
-
-body.mobile-view .modal-body-inner{
-  display:flex;
-  flex-direction:column;
-  gap:0;
-  padding:0;
-}
-
-body.mobile-view .modal-gallery{
-  order:-1; /* Immagine SOPRA */
-  width:100%;
-  flex:none;
-  padding:12px 12px 6px;
-}
-
-body.mobile-view .modal-gallery-main{
-  width:100%;
-  aspect-ratio:3/4;
-  max-height:58vh;
-  margin:0 auto;
-  background:#fff;
-}
-body.mobile-view .modal-gallery-main img{ object-fit:contain; }
-
-body.mobile-view .vase-detail-panel{
-  padding:14px 16px 18px;
-}
-
-body.mobile-view .modal-gallery-controls button{
-  min-width:44px;
-  min-height:44px;
-  font-size:22px;
-}
-body.mobile-view .vase-title{ font-size:22px; }
-
-
-/* ─────────────────────────────────────────────
-   D) RESPONSIVE AUTOMATICO (Tablet & Phone)
-   Include iPad: <= 1024px
+   C) RESPONSIVE AUTOMATICO (senza mobile-view)
+   (utile su iPhone/Android senza forzare view)
 ──────────────────────────────────────────────*/
 @media (max-width: 1024px){
-  body{ font-size:14px; }
 
-  header{
-    position:fixed;
-    top:0; left:0; right:0;
-    z-index:2000;
-    background:rgba(255,255,255,.9);
-    backdrop-filter:saturate(180%) blur(14px);
-  }
-  main{ padding-top:56px; }
-
-  .nav-toggle-btn, #nav-toggle{
+  /* attiva hamburger anche senza mobile-view */
+  .nav-toggle-btn,
+  #nav-toggle{
     display:inline-flex;
     align-items:center;
     justify-content:center;
     margin-left:8px;
-    width:32px;
-    height:32px;
-    border-radius:999px;
+    width:36px;
+    height:36px;
+    border-radius:8px;
     border:1px solid var(--border);
-    background:#ffffff;
-    font-size:18px;
+    background:#fff;
+    font-size:20px;
     padding:0;
     cursor:pointer;
   }
 
-  nav ul{
+  /* header fixed anche qui */
+  header{
     position:fixed;
-    top:56px;
-    right:0; left:0;
-    background:#ffffff;
+    top:0; left:0; right:0;
+    z-index:2000;
+    background:rgba(255,255,255,.95);
+    backdrop-filter:saturate(180%) blur(14px);
     border-bottom:1px solid var(--border);
-    flex-direction:column;
-    align-items:flex-start;
-    padding:10px 20px 14px;
-    gap:10px;
-    display:none;
-    z-index:9999;
-    box-sizing:border-box;
-    width:100%;
-    max-width:100%;
-  }
-  body.nav-open nav ul{ display:flex !important; }
-
-  /* FIX TITOLO DORONINA */
-  .hero-logo {
-    font-size: clamp(32px, 13vw, 60px);
-    letter-spacing: 0.12em;
-    white-space: nowrap;
-    text-align: center;
   }
 
-  /* ─────────────────────────────────────────────
-     APPLICAZIONE REORDERING ANCHE AL RESPONSIVE
-  ──────────────────────────────────────────────*/
-  .workshops, .giftcards, .about {
-    display: flex !important;
-    flex-direction: column;
-    gap: 0;
-  }
-  
-  .workshops-text, .giftcards-text, .about-col {
-    display: contents;
-  }
+  main{ padding-top:72px; }
 
-  /* 1. Titolo */
-  .workshops-text > h3:first-child, 
-  .giftcards-text > h3:first-child,
-  .about-col > h3:first-child {
-    order: 1;
-    width: 100%;
-    margin-bottom: 20px;
-  }
+  /* menu dropdown */
+  nav ul{
+    position:absolute;
+    top:100%;
+    left:0;
+    right:0;
 
-  /* 2. Immagine */
-  .workshops-img, .giftcards-img, .about-img-main, .about-img-secondary {
-    order: 2;
-    width: 100%;
-    margin-bottom: 24px;
-  }
-  .workshops-img img, .giftcards-img img, .about-img-main img {
-    width: 100%;
-    border-radius: 0;
-  }
-
-  /* 3. Testo */
-  .workshops-text > *, .giftcards-text > *, .about-col > * {
-    order: 3;
-    width: 100%;
-  }
-  
-  .about-col-right{ padding-top:0 !important; }
-  .about-cta { order: 4; width: 100%; margin-top: 12px; }
-
-  /* CATALOGO */
-  .catalogue-header{
-    flex-direction:column;
-    align-items:flex-start;
-    gap:12px;
-    margin-bottom:24px;
-  }
-  .catalogue-header h3{ width: 100%; margin: 0; }
-  .catalogue-header .lead{ width: 100%; text-align: left; margin: 0; }
-
-  /* Modale */
-  .modal{ z-index:9999; }
-  .modal.open ~ header nav ul,
-  .modal.open nav ul{ display:none !important; }
-
-  .modal-dialog{
-    width:100%;
-    max-width:100%;
-    height:100vh;
-    max-height:100vh;
-    border-radius:0;
-  }
-  .modal-body-inner{
-    display:flex;
-    flex-direction:column;
-    gap:0;
-    padding:0;
-  }
-  .modal-gallery{
-    order:-1;
-    width:100%;
-    flex:none;
-    padding:12px 12px 6px;
-  }
-  .modal-gallery-main{
-    width:100%;
-    aspect-ratio:3/4;
-    max-height:58vh;
     background:#fff;
-  }
-  .modal-gallery-main img{ object-fit:contain; }
+    border-bottom:1px solid var(--border);
+    box-shadow:0 10px 30px rgba(0,0,0,.10);
 
-  .view-toggle{ display:none; }
+    display:none;
+    flex-direction:column;
+    align-items:stretch;
+
+    padding:8px 0;
+    margin:0;
+    list-style:none;
+
+    z-index:2500;
+  }
+
+  body.nav-open nav ul{ display:flex; }
 }
 
-/* PHONE: 1 colonna sempre per il catalogo */
+/* phone: 1 colonna */
 @media (max-width: 768px){
-  .catalogue-grid{
-    grid-template-columns:1fr !important;
-    gap:18px;
-  }
+  .catalogue-grid{ grid-template-columns:1fr !important; }
 }
 
-/* TABLET “vero”: 2 colonne solo da 769 a 1024 */
+/* tablet: 2 colonne */
 @media (min-width: 769px) and (max-width: 1024px){
-  .catalogue-grid{
-    grid-template-columns:repeat(2, 1fr) !important;
-    gap:18px;
-  }
+  .catalogue-grid{ grid-template-columns:repeat(2,1fr) !important; }
 }
 

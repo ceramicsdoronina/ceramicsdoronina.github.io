@@ -1,0 +1,327 @@
+/* ═════════════════════════════════════════════
+   MOBILE.CSS (Versione Finale Corretta)
+   ═════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────
+   A) FIX GLOBALI
+──────────────────────────────────────────────*/
+html, body{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
+body{ position:relative; }
+
+main, header, footer, section, .container{
+  max-width:100%;
+  overflow-x:hidden;
+}
+
+img, video, iframe, svg{
+  max-width:100%;
+  height:auto;
+}
+
+p, li, a{
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+h1, h2, h3, h4{
+  overflow-wrap:normal;
+  word-break:normal;
+  hyphens: none;
+}
+
+/* ─────────────────────────────────────────────
+   B) HAMBURGER NASCOSTO SU DESKTOP
+──────────────────────────────────────────────*/
+.nav-toggle-btn,
+#nav-toggle {
+  display: none; /* Nascosto di default su desktop */
+}
+
+/* ─────────────────────────────────────────────
+   C) RESPONSIVE AUTOMATICO (max-width: 1024px)
+──────────────────────────────────────────────*/
+@media (max-width: 1024px){
+  body{ font-size:14px; }
+
+  /* Header fisso */
+  header{
+    position:fixed;
+    top:0; 
+    left:0; 
+    right:0;
+    z-index:1000;
+    background:rgba(255,255,255,.95);
+    backdrop-filter:saturate(180%) blur(14px);
+    border-bottom:1px solid var(--border);
+  }
+  
+  main{ 
+    padding-top:60px;
+  }
+
+  /* MOSTRA hamburger solo su mobile/tablet */
+  .nav-toggle-btn, 
+  #nav-toggle{
+    display:inline-flex !important;
+    align-items:center;
+    justify-content:center;
+    margin-left:8px;
+    width:36px;
+    height:36px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:#ffffff;
+    font-size:20px;
+    padding:0;
+    cursor:pointer;
+    z-index:1002;
+  }
+
+  /* Menu nascosto di default */
+  nav ul{
+    position: fixed !important;
+    top: 60px !important;
+    left: 0 !important;
+    right: 0 !important;
+    
+    background: #ffffff !important;
+    border-bottom: 1px solid var(--border) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+    
+    /* NASCOSTO */
+    display: none !important;
+    
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none !important;
+    
+    z-index: 1001 !important;
+    max-height: calc(100vh - 60px) !important;
+    overflow-y: auto !important;
+    
+    width: 100% !important;
+  }
+
+body.nav-open nav ul a{
+  color: var(--text) !important;
+  font-size: 16px;
+}
+
+  /* Menu APERTO - con massima priorità 
+  body.nav-open nav ul{
+    display: flex !important;
+  } */
+
+  /* Stile voci menu */
+  nav ul li{
+    width: 100% !important;
+    margin: 0 !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+  }
+  
+  nav ul li:last-child{
+    border-bottom: none !important;
+  }
+
+  nav a{ 
+    display: block !important;
+    width: 100% !important;
+    font-size: 15px !important; 
+    padding: 16px 20px !important;
+    border-bottom: none !important;
+    transition: background 0.2s !important;
+  }
+  
+  nav a:hover{
+    background: #f8f8f8 !important;
+  }
+
+  /* Stile voci menu */
+  nav ul li{
+    width:100%;
+    margin:0;
+    border-bottom:1px solid #f0f0f0;
+  }
+  
+  nav ul li:last-child{
+    border-bottom:none;
+  }
+
+  nav a{ 
+    display:block;
+    width:100%;
+    font-size:15px; 
+    padding:16px 20px;
+    border-bottom:none !important;
+    transition:background 0.2s;
+  }
+  
+  nav a:hover{
+    background:#f8f8f8;
+  }
+
+  /* Hero */
+  .hero{
+    min-height:60vh;
+    align-items:flex-end;
+    padding-bottom:40px;
+  }
+  
+  .hero-overlay{ 
+    padding:0 16px; 
+  }
+
+  .hero-logo{
+    font-size: clamp(32px, 13vw, 60px);
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+  }
+
+  .hero-tagline{ 
+    font-size:13px; 
+    max-width:90%; 
+  }
+
+  /* Reordering sections */
+  .workshops, .giftcards, .about {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .workshops-text, .giftcards-text, .about-col {
+    display: contents;
+  }
+
+  .workshops-text > h3:first-child, 
+  .giftcards-text > h3:first-child,
+  .about-col > h3:first-child {
+    order: 1;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .workshops-img, .giftcards-img, .about-img-main, .about-img-secondary {
+    order: 2;
+    width: 100%;
+    margin-bottom: 24px;
+  }
+
+  .workshops-img img, .giftcards-img img, .about-img-main img {
+    width: 100%;
+    border-radius: 0;
+  }
+
+  .workshops-text > *, .giftcards-text > *, .about-col > * {
+    order: 3;
+    width: 100%;
+  }
+
+  .about-col-right{ padding-top:0 !important; }
+  .about-cta { order: 4; width: 100%; margin-top: 12px; }
+
+  /* Catalogo */
+  .catalogue-header{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:12px;
+  }
+  
+  .catalogue-header h3{ 
+    width: 100%; 
+    margin: 0; 
+  }
+  
+  .catalogue-header .lead{ 
+    width: 100%; 
+    text-align: left; 
+    margin: 0; 
+  }
+
+  /* Modale */
+  .modal{ z-index:2000; }
+  
+/*  .modal.open ~ header nav ul,
+  .modal.open nav ul{ 
+    display:none !important; 
+  }
+*/
+
+/* Chiudi il menu SOLO quando una modale è aperta */
+body.modal-open nav ul{
+  display:none !important;
+}
+
+  .modal-dialog{
+    width:100%;
+    max-width:100%;
+    height:100vh;
+    max-height:100vh;
+    border-radius:0;
+  }
+  
+  .modal-body-inner{
+    display:flex;
+    flex-direction:column;
+    gap:0;
+    padding:0;
+  }
+  
+  .modal-gallery{
+    order:-1;
+    width:100%;
+    flex:none;
+    padding:12px 12px 6px;
+  }
+  
+  .modal-gallery-main{
+    width:100%;
+    aspect-ratio:3/4;
+    max-height:58vh;
+    background:#fff;
+  }
+  
+  .modal-gallery-main img{ 
+    object-fit:contain; 
+  }
+
+  .view-toggle{ display:none; }
+}
+
+/* ─────────────────────────────────────────────
+   D) PHONE: 1 colonna
+──────────────────────────────────────────────*/
+@media (max-width: 768px){
+  .catalogue-grid{
+    grid-template-columns:1fr !important;
+    gap:18px;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   E) TABLET: 2 colonne
+──────────────────────────────────────────────*/
+@media (min-width: 769px) and (max-width: 1024px){
+  .catalogue-grid{
+    grid-template-columns:repeat(2, 1fr) !important;
+    gap:18px;
+  }
+}
+
+/* ═════════════════════════════════════════════
+   DEBUG TEMPORANEO - rimuovi dopo il test
+   ═════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  body.nav-open nav ul {
+    display: flex !important;
+    background: red !important; /* per vedere se appare */
+    min-height: 200px !important;
+  }
+}
+

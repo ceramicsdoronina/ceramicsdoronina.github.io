@@ -3,49 +3,32 @@
 
   function initNavbarToggle() {
     const body = document.body;
-    const toggle = document.querySelector("header #nav-toggle") ||
-               document.querySelector("header .nav-toggle-btn");
-    const navUl = document.querySelector("header nav ul");
-  
-    console.log("🔍 [UI] Inizializzazione navbar toggle");
-    console.log("🔍 [UI] Toggle button trovato:", !!toggle);
-    console.log("🔍 [UI] Nav ul trovato:", !!navUl);
+    const toggle =
+      document.getElementById("nav-toggle") ||
+      document.querySelector(".nav-toggle-btn");
   
     if (!toggle) {
-      console.warn("❌ [UI] Toggle button non trovato");
-      return;
-    }
-    
-    if (!navUl) {
-      console.warn("❌ [UI] Nav ul non trovato");
+      console.warn("[UI] nav toggle button not found");
       return;
     }
   
-    // Evita listener duplicati
+    //  evita listener duplicati
     if (toggle.dataset.bound === "1") {
-      console.log("✅ [UI] Toggle già inizializzato");
+      console.log("[UI] nav toggle already bound");
       return;
     }
     toggle.dataset.bound = "1";
   
     toggle.addEventListener("click", (e) => {
+      console.log("[UI] nav toggle button click");
       e.preventDefault();
       e.stopPropagation();
-      
-      const wasOpen = body.classList.contains("nav-open");
-      body.classList.toggle("nav-open");
-      const isOpen = body.classList.contains("nav-open");
-      
-      console.log("🔍 [UI] Toggle cliccato");
-      console.log("🔍 [UI] Era aperto:", wasOpen);
-      console.log("🔍 [UI] Ora aperto:", isOpen);
-      console.log("🔍 [UI] Body classes:", body.className);
-      console.log("🔍 [UI] Nav ul display:", window.getComputedStyle(navUl).display);
-      
+  
+      const isOpen = body.classList.toggle("nav-open");
+      console.log("[UI] nav-open now:", isOpen, "body class:", body.className);
+  
       toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
     });
-    
-    console.log("✅ [UI] Navbar toggle inizializzato");
   }
 
   function setViewMode(mode) {
