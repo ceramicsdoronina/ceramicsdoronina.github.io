@@ -1,6 +1,35 @@
 // ui.js
 (function () {
 
+  function initNavbarAutoClose() {
+    document.addEventListener("click", (e) => {
+      if (!document.body.classList.contains("nav-open")) return;
+  
+      const clickedToggle = e.target.closest("#nav-toggle, .nav-toggle-btn");
+      const clickedInsideMenu = e.target.closest("header nav ul");
+  
+      // Non chiudere se sto cliccando sul bottone hamburger o dentro al menu
+      if (clickedToggle || clickedInsideMenu) return;
+  
+      // Chiudi in tutti gli altri casi (fuori header + dentro header ma fuori menu)
+      document.body.classList.remove("nav-open");
+    });
+  
+    // Chiudi anche quando clicchi su una voce del menu
+    document.addEventListener("click", (e) => {
+      const link = e.target.closest("header nav a");
+      if (!link) return;
+      document.body.classList.remove("nav-open");
+    });
+  
+    // ESC
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        document.body.classList.remove("nav-open");
+      }
+    });
+  }
+
   function initNavbarToggle() {
     const body = document.body;
     const toggle = document.querySelector("header #nav-toggle") ||
@@ -73,6 +102,7 @@
   window.CD = window.CD || {};
   window.CD.ui = {
     initNavbarToggle,
+    initNavbarAutoClose,
     initViewToggle
   };
 })();

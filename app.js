@@ -69,6 +69,7 @@ async function appInit() {
   // UI
   console.log("🔍 [APP] Inizializzazione UI...");
   CD.ui.initNavbarToggle();
+  CD.ui.initNavbarAutoClose();
   CD.ui.initViewToggle();
   console.log("✅ [APP] UI inizializzata");
   
