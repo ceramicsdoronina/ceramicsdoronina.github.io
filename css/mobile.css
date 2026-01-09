@@ -327,3 +327,48 @@ body.mobile-view .lead{
   line-height:1.5 !important;
 }
 
+/* =========================
+   CONTACT: mobile = 1 colonna + tutto centrato
+========================= */
+
+/* Mobile view forzata */
+body.mobile-view .contact-list{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:6px !important;
+  justify-items:center !important;   /* centra ogni "card" nella colonna */
+  text-align:center !important;
+}
+
+body.mobile-view .contact-item{
+  width:100% !important;
+  justify-content:center !important; /* centra contenuto (flex) */
+  text-align:center !important;
+}
+
+/* centra anche il blocco studio + mappa */
+body.mobile-view .contact-studio{
+  text-align:center !important;
+}
+
+/* Responsive automatico (telefono senza toggle) */
+@media (max-width: 768px){
+  .contact-list{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:6px !important;
+    justify-items:center !important;
+    text-align:center !important;
+  }
+
+  .contact-item{
+    width:100% !important;
+    justify-content:center !important;
+    text-align:center !important;
+  }
+
+  .contact-studio{
+    text-align:center !important;
+  }
+}
+
