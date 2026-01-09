@@ -221,7 +221,7 @@ const messages = {
       deliveryText: "We ship worldwide from Liguria, Italy."
     },
     workshops: {
-      title: "workshops",
+      title: "Workshops",
       scheduleTitle: "Upcoming workshops",
       scheduleLead: "Choose a date and write to me to join a small group masterclass in my studio in Genoa.",
       lead: "Ceramic workshops in small groups, in a calm and attentive atmosphere.",

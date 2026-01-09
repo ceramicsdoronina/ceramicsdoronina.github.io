@@ -113,13 +113,32 @@ body.mobile-view nav ul li:last-child{
   border-bottom:none;
 }
 
-/* layout mobile: sezioni a 1 colonna */
-body.mobile-view .about,
-body.mobile-view .workshops,
-body.mobile-view .giftcards{
+/* layout mobile: sezioni a 1 colonna (target corretto: container + class) */
+body.mobile-view .container.about{
   grid-template-columns:1fr !important;
-  gap:24px;
+  gap:24px !important;
 }
+
+/* workshops/giftcards: in mobile passa a FLEX per evitare collassi/sparizioni */
+body.mobile-view .container.workshops,
+body.mobile-view .container.giftcards{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:24px !important;
+}
+
+/* ordine: immagine sopra testo */
+body.mobile-view .workshops-img,
+body.mobile-view .giftcards-img{ order:1 !important; }
+
+body.mobile-view .workshops-text,
+body.mobile-view .giftcards-text{ order:2 !important; }
+
+/* reset padding-top della colonna destra dell'about */
+body.mobile-view .about-col-right{
+  padding-top:0 !important;
+}
+
 body.mobile-view .catalogue-header{
   flex-direction:column;
   align-items:flex-start;
@@ -193,6 +212,35 @@ body.mobile-view .catalogue-grid{
   }
 
   body.nav-open nav ul{ display:flex; }
+  /* ABOUT: 1 colonna anche senza mobile-view */
+  .container.about{
+    grid-template-columns:1fr !important;
+    gap:24px !important;
+  }
+  .about-col-right{
+    padding-top:0 !important;
+  }
+
+  /* WORKSHOPS/GIFTCARDS: flex colonna anche senza mobile-view */
+  .container.workshops,
+  .container.giftcards{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:24px !important;
+  }
+
+  .section h3{
+    font-size:28px !important;
+    line-height:1.15 !important;
+    }
+    .lead{
+      font-size:15px !important;
+      line-height:1.5 !important;
+    }
+
+  .workshops-img, .giftcards-img{ order:1 !important; }
+  .workshops-text, .giftcards-text{ order:2 !important; }
+
 }
 
 /* phone: 1 colonna */
@@ -203,5 +251,79 @@ body.mobile-view .catalogue-grid{
 /* tablet: 2 colonne */
 @media (min-width: 769px) and (max-width: 1024px){
   .catalogue-grid{ grid-template-columns:repeat(2,1fr) !important; }
+}
+
+/* Mod */
+
+/* ==========================================
+   WORKSHOPS + GIFTCARDS: mobile safe layout
+   (niente grid-template-areas, no collapse)
+========================================== */
+
+/* mobile-view forzata */
+body.mobile-view .container.workshops,
+body.mobile-view .container.giftcards{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:24px !important;
+}
+
+/* responsive automatico */
+@media (max-width: 1024px){
+  .container.workshops,
+  .container.giftcards{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:24px !important;
+  }
+}
+
+/* ordine: immagine sopra testo */
+body.mobile-view .workshops-img,
+body.mobile-view .giftcards-img{
+  order:1 !important;
+}
+
+body.mobile-view .workshops-text,
+body.mobile-view .giftcards-text{
+  order:2 !important;
+}
+
+/* anche per responsive */
+@media (max-width: 1024px){
+  .workshops-img, .giftcards-img{ order:1 !important; }
+  .workshops-text, .giftcards-text{ order:2 !important; }
+}
+
+/* assicurati che l'immagine non collassi */
+.workshops-img img,
+.giftcards-img img{
+  display:block;
+  width:100%;
+  height:auto;
+}
+
+/* Modal: mobile = gallery sopra testo */
+body.mobile-view .modal-body-inner{
+  flex-direction:column !important;
+}
+body.mobile-view .modal-gallery{ order:1 !important; }
+body.mobile-view .vase-detail-panel{ order:2 !important; min-width:0 !important; }
+
+@media (max-width: 768px){
+  .modal-body-inner{ flex-direction:column !important; }
+  .modal-gallery{ order:1 !important; }
+  .vase-detail-panel{ order:2 !important; min-width:0 !important; }
+}
+
+/* Tipografia: evita effetto "tutto minuscolo" nelle sezioni */
+body.mobile-view .section h3{
+  font-size:28px !important;
+  line-height:1.15 !important;
+}
+
+body.mobile-view .lead{
+  font-size:15px !important;
+  line-height:1.5 !important;
 }
 
