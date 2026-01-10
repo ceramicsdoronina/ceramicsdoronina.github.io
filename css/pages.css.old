@@ -170,123 +170,67 @@
   border-radius:0;
   object-fit:cover;
 }
+
 /* ─────────────────────────────────────────────
-   CONTACT (layout come screenshot)
+   CONTACT
 ──────────────────────────────────────────────*/
-.contact-block h3{
-  margin:0 0 22px 0;
-}
-
-.contact-grid-2{
+.contact-list{
   display:grid;
-  grid-template-columns: 1fr 1.1fr;
-  gap:40px;
-  align-items:start;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
 }
 
-.contact-row{
-  margin-bottom:18px;
-}
-
-.contact-label{
+/* qui l’aspetto “come testo” (non bottone) */
+.contact-item{
+  border:none;
+  border-radius:0;
+  padding:0;
   font-size:16px;
-  color:var(--text);
-  margin-bottom:2px;
+  line-height:1.6;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  background:transparent;
 }
 
-.contact-value{
-  font-size:16px;
-  color:var(--muted);
+/* centra SOLO WhatsApp se usi la classe */
+.contact-item--center{
+  justify-content:center;
+  text-align:center;
+}
+
+.contact-studio{
+  margin-top:28px;
+  text-align:center;
+}
+.contact-studio-line{
+  font-size:22px;
   line-height:1.35;
+  margin:0 0 10px 0;
 }
 
-.contact-maplink{
-  text-decoration:none;
+.contact-maplink{ text-decoration:none; color:inherit; }
+
+.contact-open{
+  margin:0 0 16px 0;
+}
+.contact-openlink{
+  text-decoration:underline;
+  text-underline-offset:4px;
   color:inherit;
 }
 
-.contact-maplink,
-.contact-maplink:visited,
-.contact-maplink:hover,
-.contact-maplink:active{
-  color: var(--muted);
-}
-
-
-.contact-hours{
-  margin-top:6px;
-  font-size:14px;
-  color:var(--muted);
-}
-
-.contact-hours-days{
-  font-size:16px;
-  color:var(--muted);
-  margin-bottom:6px;
-}
-
-.contact-hours-line{
-  display:flex;
-  align-items:center;
-  gap:16px;
-}
-
-.contact-hours-time{
-  font-size:16px;
-  color:var(--muted);
-}
-
-.contact-hours-dash{
-  height:1px;
-  width:60px;
-  background:#d1d5db;
-}
-
 .contact-map{
+  margin:0 auto;
+  max-width:980px;
+  border:0;
   border-radius:0;
   overflow:hidden;
 }
 .contact-map iframe{
   width:100%;
-  height:320px;
+  height:420px;
   border:0;
-}
-
-/* icons row */
-.contact-icons-row{
-  margin-top:26px;
-  display:grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap:16px;
-}
-
-.contact-icon-btn{
-  background:var(--btn-primary);
-  color:#fff;
-  border-radius:12px;
-  height:54px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.contact-icon{
-  font-size:26px;
-  line-height:1;
-}
-
-/* mobile: 1 colonna */
-@media (max-width: 1024px){
-  .contact-grid-2{
-    grid-template-columns: 1fr;
-    gap:22px;
-  }
-  .contact-map iframe{
-    height:260px;
-  }
-  .contact-icons-row{
-    grid-template-columns: 1fr;
-  }
 }
 
 /* ─────────────────────────────────────────────

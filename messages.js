@@ -81,13 +81,15 @@ const messages = {
     },
     contact: {
       title: "Контакты",
-      emailLabel: "Email:",
-      instagramLabel: "Instagram:",
-      whatsappLabel: "WhatsApp:",
-      whatsappCta: "Написать",
-      studioTitle: "Мастерская:",
-      studioAddress: "Via San Lorenzo 7/5 Sc. Dx, 16123 Genova, Италия",
-      openInMaps: "Открыть в Google Maps"
+      addressLabel: "Адрес",
+      addressValue: "Via San Lorenzo 7/5 Sc. Dx, 16123 Генуя",
+      countrySuffix: ", Италия",
+      phoneLabel: "Телефонный номер",
+      emailLabel: "Почта",
+      hoursLabel: "График работы",
+      hoursDays: "Пн–Пт",
+      hoursFrom: "10:00",
+      hoursTo: "19:00"
     },
     footer: {
       made: "Сайт на GitHub Pages"
@@ -166,13 +168,15 @@ const messages = {
     },
     contact: {
       title: "Contatti",
-      emailLabel: "Email:",
-      instagramLabel: "Instagram:",
-      whatsappLabel: "WhatsApp:",
-      whatsappCta: "Scrivimi",
-      studioTitle: "Studio:",
-      studioAddress: "Via San Lorenzo 7/5 Sc. Dx, 16123 Genova",
-      openInMaps: "Apri in Google Maps"
+      addressLabel: "Indirizzo",
+      addressValue: "Via San Lorenzo 7/5 Sc. Dx, 16123 Genova",
+      countrySuffix: " (Italia)",
+      phoneLabel: "Numero di telefono",
+      emailLabel: "Email",
+      hoursLabel: "Orari",
+      hoursDays: "Lun–Ven",
+      hoursFrom: "10:00",
+      hoursTo: "19:00"
     },
     footer: {
       made: "Realizzato con GitHub Pages"
@@ -250,14 +254,16 @@ const messages = {
       sold: "Sold out"
     },
     contact: {
-      title: "Contact",
-      emailLabel: "Email:",
-      instagramLabel: "Instagram:",
-      whatsappLabel: "WhatsApp:",
-      whatsappCta: "Write me",
-      studioTitle: "Studio:",
-      studioAddress: "Via San Lorenzo 7/5 Sc. Dx, 16123 Genoa, Italy",
-      openInMaps: "Open in Google Maps"
+      title: "Contacts",
+      addressLabel: "Address",
+      addressValue: "Via San Lorenzo 7/5 Sc. Dx, 16123 Genoa",
+      countrySuffix: ", Italy",
+      phoneLabel: "Phone number",
+      emailLabel: "Email",
+      hoursLabel: "Opening hours",
+      hoursDays: "Mon–Fri",
+      hoursFrom: "10:00",
+      hoursTo: "19:00"
     },
     footer: {
       made: "Made with GitHub Pages"

@@ -1,0 +1,88 @@
+<section id="contact" class="section">
+  <!-- TITOLO (1 colonna) -->
+  <div class="container">
+    <h3 data-i18n="contact.title">Contatti</h3>
+    <div aria-hidden="true" style="height:24px"></div>
+  </div>
+
+  <!-- BLOCCO 2 COLONNE (desktop) / 1 COLONNA (mobile) -->
+  <div class="container contact contact-grid">
+
+    <!-- SINISTRA: elenco contatti + orari -->
+    <div class="contact-info">
+      <div class="contact-lines">
+        <p class="contact-line">
+          <strong data-i18n="contact.studioLabel">Studio:</strong>
+          <a class="contact-maplink"
+             href="https://maps.app.goo.gl/DEw15dcPELNibQ2n9"
+             target="_blank" rel="noopener">
+            <span data-i18n="contact.address">Via San Lorenzo 7/5 Sc. Dx, 16123 Genova</span>
+            <span data-i18n="contact.countrySuffix"></span>
+          </a>
+        </p>
+
+        <p class="contact-line">
+          <strong data-i18n="contact.whatsappLabel">WhatsApp:</strong>
+          <span>+39 380 683 6745</span>
+        </p>
+
+        <p class="contact-line">
+          <strong data-i18n="contact.emailLabel">Email:</strong>
+          <span>ceramist.doronina@gmail.com</span>
+        </p>
+
+        <p class="contact-line">
+          <strong data-i18n="contact.hoursLabel">Orari:</strong>
+          <span data-i18n="contact.hoursValue">Lun–Ven 10:00–19:00</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- DESTRA: mappa -->
+    <div class="contact-mapwrap">
+      <div class="contact-map">
+        <iframe
+          src="https://www.google.com/maps?q=Via%20San%20Lorenzo%207%2F5%20Sc.%20Dx%2C%2016123%20Genova&output=embed"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen
+          title="Studio map">
+        </iframe>
+      </div>
+
+      <p class="contact-open">
+        <a class="contact-openlink"
+           href="https://maps.app.goo.gl/DEw15dcPELNibQ2n9"
+           target="_blank" rel="noopener"
+           data-i18n="contact.openMaps">
+          Apri in Google Maps
+        </a>
+      </p>
+    </div>
+
+  </div>
+
+  <!-- ICONE SOTTO (1 riga desktop, stack mobile) -->
+  <div class="container contact-icons">
+    <a class="contact-icon"
+       href="https://instagram.com/ceramicsdoronina"
+       target="_blank" rel="noopener"
+       aria-label="Instagram">
+      <span data-i18n="contact.instagramLabel">Instagram</span>
+    </a>
+
+    <a class="contact-icon"
+       href="mailto:ceramist.doronina@gmail.com"
+       aria-label="Email">
+      <span data-i18n="contact.emailLabel">Email</span>
+    </a>
+
+    <a class="contact-icon"
+       href="https://wa.me/393806836745"
+       target="_blank" rel="noopener"
+       aria-label="WhatsApp">
+      <span data-i18n="contact.whatsappLabel">WhatsApp</span>
+    </a>
+  </div>
+</section>
+

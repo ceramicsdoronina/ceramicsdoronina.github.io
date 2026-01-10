@@ -372,3 +372,59 @@ body.mobile-view .contact-studio{
   }
 }
 
+/* CONTACT: desktop 2 colonne / mobile 1 colonna */
+.contact-grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:40px;
+  align-items:start;
+}
+
+.contact-lines{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.contact-line{
+  margin:0;
+  color:var(--text);
+}
+
+.contact-line strong{
+  color:var(--text);
+}
+
+.contact-mapwrap .contact-open{
+  margin:12px 0 0;
+  text-align:center;
+}
+
+/* icone sotto */
+.contact-icons{
+  margin-top:24px;
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:14px;
+}
+.contact-icon{
+  background: var(--btn-primary);
+  color: #fff;
+  text-align:center;
+  padding:14px 12px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:600;
+}
+
+/* MOBILE: 1 colonna */
+body.mobile-view .contact-grid{
+  grid-template-columns: 1fr !important;
+  gap:24px !important;
+}
+body.mobile-view .contact-icons{
+  grid-template-columns: 1fr !important;
+}
+
