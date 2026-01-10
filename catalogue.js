@@ -359,6 +359,33 @@ function initCardGalleries() {
       else show(index + 1); // centro + destra
     });
 
+    // ---- SWIPE MOBILE ----
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    block.addEventListener("touchstart", (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    
+    block.addEventListener("touchend", (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+    
+    function handleSwipe() {
+      const delta = touchEndX - touchStartX;
+      const threshold = 30; // px minimi per considerare swipe
+    
+      if (Math.abs(delta) < threshold) return;
+    
+      if (delta > 0) {
+        // swipe destra → sinistra logica inversa
+        show(index - 1);
+      } else {
+        show(index + 1);
+      }
+    }
+
   });
 }
 
