@@ -368,7 +368,7 @@
   color:#fff;
   font-size:22px;
   line-height:1;
-  display:flex;
+  display:none !important;
   align-items:center;
   justify-content:center;
   cursor:pointer;

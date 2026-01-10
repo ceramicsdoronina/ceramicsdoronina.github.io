@@ -344,14 +344,21 @@ function initCardGalleries() {
       if (counter) counter.textContent = `${index + 1}/${imgs.length}`;
     };
 
-    block.querySelector(`[data-card-prev="${id}"]`)?.addEventListener("click", (e) => {
-      e.preventDefault(); e.stopPropagation();
-      show(index - 1);
+    block.addEventListener("click", (e) => {
+      // evita che click su bottoni di card (se presenti) faccia casino
+      if (e.target.closest("button") || e.target.closest("a")) return;
+    
+      const rect = block.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const isLeft = x < rect.width * 0.33; // terzo sinistro
+    
+      e.preventDefault();
+      e.stopPropagation();
+    
+      if (isLeft) show(index - 1);
+      else show(index + 1); // centro + destra
     });
-    block.querySelector(`[data-card-next="${id}"]`)?.addEventListener("click", (e) => {
-      e.preventDefault(); e.stopPropagation();
-      show(index + 1);
-    });
+
   });
 }
 
