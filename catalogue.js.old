@@ -78,16 +78,7 @@
 
       const sold = (vase.venduto || "").trim().toLowerCase() === "si";
 
-      // const img1 = vase.img1 && vase.img1 !== "-" ? `images/catalogue/${vase.img1}` : "images/placeholder.jpg";
-      // Modifica
-
-      const cardImgs = [
-        vase.img1, vase.img2, vase.img3,
-        vase.img4, vase.img5, vase.img6
-      ].filter(x => x && x !== "-")
-       .map(fn => `images/catalogue/${fn}`);
-
-      // Fine Modifica
+      const img1 = vase.img1 && vase.img1 !== "-" ? `images/catalogue/${vase.img1}` : "images/placeholder.jpg";
 
       const priceOldStr = vase.price_old && vase.price_old !== "-" ? vase.price_old : null;
       const priceNewStr = vase.price_new && vase.price_new !== "-" ? vase.price_new : null;
@@ -156,48 +147,17 @@
       const card = document.createElement("article");
       card.className = "card";
 
-//      card.innerHTML = `
-//        <div class="media media-single" data-modal-target="modal-${vase.id}">
-//          <img src="${img1}" alt="${name}">
-//        </div>
-//        <div class="body">
-//          <h4>${name}</h4>
-//          <p>${short}</p>
-//          ${cardStatusBlock}
-//          ${actionsHtml}
-//        </div>
-//      `;
-
-         const cardGalleryHtml = cardImgs.length
-           ? cardImgs.map((src, idx) => `
-               <img src="${src}" alt="${name} ${idx+1}" class="card-img ${idx===0 ? "active" : ""}">
-             `).join("")
-           : `<img src="images/placeholder.jpg" alt="${name}" class="card-img active">`;
-         
-         const hasMultiple = cardImgs.length > 1;
-         
-         card.innerHTML = `
-           <div class="media media-carousel" data-card-gallery="${vase.id}">
-             <div class="card-gallery">
-               ${cardGalleryHtml}
-             </div>
-         
-             ${hasMultiple ? `
-               <button type="button" class="card-gallery-btn prev" data-card-prev="${vase.id}" aria-label="Previous image">‹</button>
-               <button type="button" class="card-gallery-btn next" data-card-next="${vase.id}" aria-label="Next image">›</button>
-               <div class="card-gallery-counter" data-card-counter="${vase.id}">1/${cardImgs.length}</div>
-             ` : ``}
-           </div>
-         
-           <div class="body">
-             <h4>${name}</h4>
-             <p>${short}</p>
-             ${cardStatusBlock}
-             ${actionsHtml}
-           </div>
-         `;
-// Fine Modifica
-
+      card.innerHTML = `
+        <div class="media media-single" data-modal-target="modal-${vase.id}">
+          <img src="${img1}" alt="${name}">
+        </div>
+        <div class="body">
+          <h4>${name}</h4>
+          <p>${short}</p>
+          ${cardStatusBlock}
+          ${actionsHtml}
+        </div>
+      `;
 
       grid.appendChild(card);
 
@@ -327,33 +287,6 @@
       modalRoot.appendChild(modal);
     });
   }
-
-function initCardGalleries() {
-  document.querySelectorAll(".media-carousel").forEach(block => {
-    const id = block.getAttribute("data-card-gallery");
-    const imgs = Array.from(block.querySelectorAll(".card-img"));
-    const counter = block.querySelector(`[data-card-counter="${id}"]`);
-    if (imgs.length <= 1) return;
-
-    let index = 0;
-    const show = (i) => {
-      if (i < 0) i = imgs.length - 1;
-      if (i >= imgs.length) i = 0;
-      index = i;
-      imgs.forEach((img, k) => img.classList.toggle("active", k === index));
-      if (counter) counter.textContent = `${index + 1}/${imgs.length}`;
-    };
-
-    block.querySelector(`[data-card-prev="${id}"]`)?.addEventListener("click", (e) => {
-      e.preventDefault(); e.stopPropagation();
-      show(index - 1);
-    });
-    block.querySelector(`[data-card-next="${id}"]`)?.addEventListener("click", (e) => {
-      e.preventDefault(); e.stopPropagation();
-      show(index + 1);
-    });
-  });
-}
 
   // Inizializza modali, accordion e gallery (chiamata dopo render)
 function initModals() {
@@ -513,7 +446,6 @@ function initBehaviour() {
   initModals();
   initAccordions();
   initGalleries();
-  initCardGalleries();  // card
   console.log("✅ [CATALOGUE] Comportamenti inizializzati");
 }
 
