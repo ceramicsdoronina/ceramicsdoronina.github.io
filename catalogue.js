@@ -364,11 +364,11 @@ function initCardGalleries() {
     let touchEndX = 0;
     
     block.addEventListener("touchstart", (e) => {
-      touchStartX = e.changedTouches[0].screenX;
+      touchStartX = e.changedTouches[0].clientX;
     }, { passive: true });
     
     block.addEventListener("touchend", (e) => {
-      touchEndX = e.changedTouches[0].screenX;
+      touchEndX = e.changedTouches[0].clientX;
       handleSwipe();
     }, { passive: true });
     

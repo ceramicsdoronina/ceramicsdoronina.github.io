@@ -335,6 +335,7 @@
   width:100%;
   aspect-ratio:3/4;
   overflow:hidden;
+  touch-action: pan-y;
 }
 
 .card-gallery{
