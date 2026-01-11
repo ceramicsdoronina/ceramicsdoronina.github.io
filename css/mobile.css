@@ -2,7 +2,7 @@
    MOBILE.CSS (pulito, no duplicati)
    Supporta:
    - body.mobile-view (view forzata)
-   - responsive automatico (<=1024px)
+   - responsive automatico (<=768px)
    Menu: dropdown assoluto sotto la barra (stabile Safari)
 ═════════════════════════════════════════════ */
 
@@ -169,7 +169,7 @@ body.mobile-view .catalogue-grid{
    C) RESPONSIVE AUTOMATICO (senza mobile-view)
    (utile su iPhone/Android senza forzare view)
 ──────────────────────────────────────────────*/
-@media (max-width: 1024px){
+@media (max-width: 768px){
 
   /* attiva hamburger anche senza mobile-view */
   .nav-toggle-btn,
@@ -269,7 +269,7 @@ body.mobile-view .catalogue-grid{
 }
 
 /* tablet: 2 colonne */
-@media (min-width: 769px) and (max-width: 1024px){
+@media (min-width: 769px) and (max-width: 768px){
   .catalogue-grid{ grid-template-columns:repeat(2,1fr) !important; }
 }
 
@@ -289,7 +289,7 @@ body.mobile-view .container.giftcards{
 }
 
 /* responsive automatico */
-@media (max-width: 1024px){
+@media (max-width: 768px){
   .container.workshops,
   .container.giftcards{
     display:flex !important;
@@ -310,7 +310,7 @@ body.mobile-view .giftcards-text{
 }
 
 /* anche per responsive */
-@media (max-width: 1024px){
+@media (max-width: 768px){
   .workshops-img, .giftcards-img{ order:1 !important; }
   .workshops-text, .giftcards-text{ order:2 !important; }
 }

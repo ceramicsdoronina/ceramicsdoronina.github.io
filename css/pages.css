@@ -81,7 +81,7 @@
   .mobile-only{ display:block; }
 }
 
-@media (max-width: 728px){
+@media (max-width: 768px){
   .hero-logo{
     font-size: clamp(42px, 10vw, 64px);
     letter-spacing: 0.10em; /* riduce la larghezza totale */
@@ -287,7 +287,7 @@
 }
 
 /* mobile: 1 colonna */
-@media (max-width: 728px){
+@media (max-width: 768px){
   .contact-grid-2{
     grid-template-columns: 1fr;
     gap:22px;
