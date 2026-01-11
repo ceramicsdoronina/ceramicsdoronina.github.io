@@ -81,7 +81,7 @@
   .mobile-only{ display:block; }
 }
 
-@media (max-width: 768px){
+@media (max-width: 1024px){
   .hero-logo{
     font-size: clamp(42px, 10vw, 64px);
     letter-spacing: 0.10em; /* riduce la larghezza totale */
