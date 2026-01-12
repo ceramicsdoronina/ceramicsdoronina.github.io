@@ -308,6 +308,13 @@
   margin-top:32px;
 }
 
+#giftcards h3[data-i18n="giftcards.cardsTitle"]{
+  text-transform:none !important;
+  margin-top:32px;
+}
+
+
+
 .spacer{ display:block; }
 .spacer-24{ height:24px; }
 

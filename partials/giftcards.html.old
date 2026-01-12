@@ -1,11 +1,11 @@
 <section id="giftcards" class="section">
   <!-- TITOLO -->
   <div class="container">
-    <h3 data-i18n="giftcards.title">Carte Regalo</h3>
-    <div aria-hidden="true" style="height:24px"></div>
+      <h3 data-i18n="giftcards.title">Carte Regalo</h3>
+      <div aria-hidden="true" style="height:24px"></div>
   </div>
 
-  <!-- BLOCCO TESTO + FOTO INTRO GIFTCARDS (stessa struttura di workshops) -->
+
   <div class="container giftcards">
 
     <div class="giftcards-text">
@@ -29,22 +29,21 @@
         Scrivimi per scegliere insieme l’importo, la formula e il testo personale del tuo regalo.
       </p>
 
-      <div aria-hidden="true" style="height:24px"></div>
+      <div aria-hidden="true" class="spacer spacer-24 giftcards-title-spacer"></div>
 
       <a href="mailto:ceramist.doronina@gmail.com" class="pill-btn giftcards-cta">
         <span class="pill-text" data-i18n="giftcards.cta">Scrivi per una Gift Card</span>
-        <span class="pill-arrow" aria-hidden="true"></span>
       </a>
     </div>
 
     <div class="giftcards-img">
+      <!-- Usa una foto dedicata alle gift card, se ce l’hai -->
       <div aria-hidden="true" style="height:24px"></div>
-      <img src="images/giftcard.jpg" alt="Carta regalo Ceramics Doronina pronta per essere regalata">
-      <div aria-hidden="true" style="height:24px"></div>
+      <img src="images/giftcard.jpg" alt="Carta regalo di  Ceramics Doronina pronta per essere regalata">
     </div>
+    <div aria-hidden="true" style="height:24px"></div>
 
-  </div><!-- /container.giftcards -->
-
+  </div>
   <!-- BLOCCO CERTIFICATI DINAMICI DA certificati.csv -->
   <div class="container">
     <div class="catalogue-header">

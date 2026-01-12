@@ -74,7 +74,7 @@ const messages = {
       buy: "Купить",
       details: "Подробнее",
       modalTitle: "Подарочный сертификат",
-      cta: "Написать насчёт сертификата"
+      cta: "Написать "
     },
     status: {
       sold: "Продано"
@@ -161,7 +161,7 @@ const messages = {
       buy: "Compra",
       details: "Dettagli",
       modalTitle: "Carte regalo",
-      cta: "Scrivimi per una carta regalo"
+      cta: "Scrivimi"
     },
     status: {
       sold: "Venduto"
@@ -248,7 +248,7 @@ const messages = {
       buy: "Buy",
       details: "Details",
       modalTitle: "Gift Card",
-      cta: "Write for a Gift Card"
+      cta: "Write me"
     },
     status: {
       sold: "Sold out"
