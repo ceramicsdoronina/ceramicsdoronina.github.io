@@ -448,3 +448,11 @@ body.mobile-view .contact-icons{
   grid-template-columns: 1fr !important;
 }
 
+body.mobile-view #giftcards h3{
+  margin-bottom:2px;
+}
+
+body.mobile-view #giftcards.section{
+  padding-top:18px;   /* prima 35px */
+}
+
