@@ -448,11 +448,24 @@ body.mobile-view .contact-icons{
   grid-template-columns: 1fr !important;
 }
 
-body.mobile-view #giftcards h3{
-  margin-bottom:2px;
+/* Mobile: riduci TUTTI gli spacer da 24px dentro Giftcards */
+body.mobile-view #giftcards div[aria-hidden="true"][style*="height:24px"],
+body.mobile-view #giftcards .giftcards-title-spacer{
+  height: 8px !important;
 }
 
-body.mobile-view #giftcards.section{
-  padding-top:18px;   /* prima 35px */
+/* anche per responsive automatico senza mobile-view */
+@media (max-width: 768px){
+  #giftcards div[aria-hidden="true"][style*="height:24px"],
+  #giftcards .giftcards-title-spacer{
+    height: 8px !important;
+  }
+}
+
+/* Mobile: spazio tra CTA e titolo Giftcards */
+@media (max-width: 768px){
+  #giftcards h3{
+    margin-top: 36px;
+  }
 }
 
