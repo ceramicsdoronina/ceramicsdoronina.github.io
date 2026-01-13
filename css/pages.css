@@ -264,27 +264,33 @@
 }
 
 /* icons row */
+/* icons row: piccoli e centrati */
 .contact-icons-row{
   margin-top:26px;
-  display:grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap:16px;
+  display:flex;
+  justify-content:center;
+  gap:18px;
 }
 
+/* bottone piccolo (non barra larga) */
 .contact-icon-btn{
+  width:64px;
+  height:64px;
   background:var(--btn-primary);
-  color:#fff;
-  border-radius:12px;
-  height:54px;
+  border-radius:50%;
   display:flex;
   align-items:center;
   justify-content:center;
 }
 
-.contact-icon{
-  font-size:26px;
-  line-height:1;
+/* icone PNG */
+.contact-icon-btn img{
+  width:44px;
+  height:44px;
+  display:block;
+  object-fit:contain;
 }
+
 
 /* mobile: 1 colonna */
 @media (max-width: 768px){
@@ -317,4 +323,28 @@
 
 .spacer{ display:block; }
 .spacer-24{ height:24px; }
+
+.contact-social{
+  display:flex;
+  justify-content:center;
+  gap:18px;
+  margin-top:24px;
+}
+
+.social-btn{
+  width:78px;          /* “corto” */
+  height:56px;
+  background:var(--btn-primary);
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.social-btn img{
+  width:30px;
+  height:30px;
+  object-fit:contain;
+  background:transparent;
+}
 

@@ -448,3 +448,8 @@ body.mobile-view .contact-icons{
   grid-template-columns: 1fr !important;
 }
 
+@media (max-width: 768px){
+  .contact-icon-btn{ width:56px; height:56px; }
+  .contact-icon-btn img{ width:48px; height:48px; }
+}
+

@@ -107,3 +107,47 @@
   };
 })();
 
+// --- Likes (globali) ---
+(function () {
+  const LIKE_KEY = "cd_likes_v1";
+
+  function getLikes() {
+    try { return new Set(JSON.parse(localStorage.getItem(LIKE_KEY) || "[]")); }
+    catch { return new Set(); }
+  }
+
+  function setLikes(set) {
+    localStorage.setItem(LIKE_KEY, JSON.stringify([...set]));
+  }
+
+  function toggleLike(key) {
+    const likes = getLikes();
+    if (likes.has(key)) likes.delete(key);
+    else likes.add(key);
+    setLikes(likes);
+    return likes;
+  }
+
+  function isLiked(key) {
+    return getLikes().has(key);
+  }
+
+  window.CD = window.CD || {};
+  window.CD.likes = { getLikes, toggleLike, isLiked };
+})();
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-like-key]");
+  if (!btn) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  const key = btn.getAttribute("data-like-key");
+  const likes = window.CD.likes.toggleLike(key);
+  btn.textContent = likes.has(key) ? "♥" : "♡";
+
+  // se hai una sezione preferiti, aggiornala
+  window.CD?.likedSection?.render?.();
+});
+
