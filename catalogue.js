@@ -77,6 +77,7 @@
       const long  = vase[`long_${lang}`]  && vase[`long_${lang}`]  !== "-" ? vase[`long_${lang}`]  : vase.long_ru;
 
       const sold = (vase.venduto || "").trim().toLowerCase() === "si";
+      const variantId = (vase.shopify_variant_id || "").trim();
 
       // const img1 = vase.img1 && vase.img1 !== "-" ? `images/catalogue/${vase.img1}` : "images/placeholder.jpg";
       // Modifica
@@ -142,15 +143,44 @@
             </button>
           </div>`;
       } else {
-        actionsHtml = `
-          <div class="card-actions">
-            <button class="card-btn primary" data-modal-target="modal-${vase.id}">
-              ${primaryLabel}
-            </button>
-            <button class="card-btn secondary" data-modal-target="modal-${vase.id}">
-              ${secondaryLabel}
-            </button>
-          </div>`;
+        const variantId = (vase.shopify_variant_id || "").trim();
+        // Registra nomi trilingui per il carrello
+        if (variantId && variantId !== "-") {
+          window.CD = window.CD || {};
+          window.CD.shop = window.CD.shop || {};
+          window.CD.shop.nameByVariant = window.CD.shop.nameByVariant || {};
+        
+          window.CD.shop.nameByVariant[String(variantId)] = {
+            it: (vase.name_it && vase.name_it !== "-") ? vase.name_it : (vase.name_ru || ""),
+            en: (vase.name_en && vase.name_en !== "-") ? vase.name_en : (vase.name_ru || ""),
+            ru: (vase.name_ru && vase.name_ru !== "-") ? vase.name_ru : ""
+          };
+        }
+
+        if (!variantId || variantId === "-") {
+          // ❌ NON vendibile → niente "Compra"
+          actionsHtml = `
+            <div class="card-actions">
+              <button class="card-btn secondary" data-modal-target="modal-${vase.id}">
+                ${secondaryLabel}
+              </button>
+            </div>`;
+        } else {
+          // ✅ Vendibile → mostra "Compra"
+          actionsHtml = `
+            <div class="card-actions">
+              <button class="card-btn primary"
+                      type="button"
+                      data-add-to-cart="${variantId}"
+                      data-vase-name="${name}">
+                ${primaryLabel}
+              </button>
+              <button class="card-btn secondary" data-modal-target="modal-${vase.id}">
+                ${secondaryLabel}
+              </button>
+            </div>`;
+        }
+
       }
 
       const card = document.createElement("article");
@@ -261,7 +291,13 @@
                 <h3 class="vase-subtitle">${short}</h3>
                 ${priceBlock}
                 <div class="vase-actions">
-                  <button class="vase-btn-primary">${primaryLabel}</button>
+                  <button
+                    type="button"
+                    class="vase-btn-primary"
+                    data-add-to-cart="${variantId}"
+                    data-vase-name="${name}">
+                    ${primaryLabel}
+                  </button>
                   <button class="vase-btn-outline">${secondaryLabel}</button>
                 </div>
 
@@ -542,14 +578,45 @@ function handleModalClick(e) {
     });
   }
 
-function initBehaviour() {
-  console.log("🔍 [CATALOGUE] Inizializzazione comportamenti...");
-  initModals();
-  initAccordions();
-  initGalleries();
-  initCardGalleries();  // card
-  console.log("✅ [CATALOGUE] Comportamenti inizializzati");
-}
+  function initShopifyCartButtons() {
+    console.log("🛒 [SHOP] initShopifyCartButtons attach");
+  
+    document.addEventListener("click", async (e) => {
+      const btn = e.target.closest("[data-add-to-cart]");
+      if (!btn) return;
+  
+      e.preventDefault();
+      e.stopPropagation();
+  
+      const variantId = (btn.dataset.addToCart || "").trim();
+      const vaseName  = (btn.dataset.vaseName || "").trim();
+  
+      console.log("[SHOP] click Compra:", { vaseName, variantId });
+  
+      if (!variantId || variantId === "-") {
+        console.warn("[SHOP] Variant ID mancante per:", vaseName);
+        return;
+      }
+  
+      try {
+        const res = await window.CD.shop.addVariant(variantId, 1);
+        if (res) console.log("[SHOP] Aggiunto al carrello:", variantId);
+        else console.warn("[SHOP] Non aggiunto (cart non pronta):", variantId);
+      } catch (err) {
+        console.error("[SHOP] Errore add-to-cart", err);
+      }
+    }, true); // capture=true: più robusto
+  }
+  
+  function initBehaviour() {
+    console.log("🔍 [CATALOGUE] Inizializzazione comportamenti...");
+    initModals();
+    initAccordions();
+    initGalleries();
+    initCardGalleries();  // card
+    initShopifyCartButtons();
+    console.log("✅ [CATALOGUE] Comportamenti inizializzati");
+  }
 
 /*
   function initBehaviour() {

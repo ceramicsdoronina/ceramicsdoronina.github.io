@@ -91,6 +91,13 @@ const messages = {
       hoursFrom: "10:00",
       hoursTo: "19:00"
     },
+    cart: {
+      title: "Корзина",
+      total: "Итого",
+      empty: "Корзина пуста",
+      checkout: "Оформить",
+      qty: "Кол-во"
+    },
     footer: {
       made: "Сайт на GitHub Pages"
     }
@@ -178,6 +185,13 @@ const messages = {
       hoursFrom: "10:00",
       hoursTo: "19:00"
     },
+    cart: {
+      title: "Carrello",
+      total: "Totale",
+      empty: "Il carrello è vuoto",
+      checkout: "Checkout",
+      qty: "Quantità"
+    },
     footer: {
       made: "Realizzato con GitHub Pages"
     }
@@ -264,6 +278,13 @@ const messages = {
       hoursDays: "Mon–Fri",
       hoursFrom: "10:00",
       hoursTo: "19:00"
+    },
+    cart: {
+      title: "Cart",
+      total: "Total",
+      empty: "Your cart is empty",
+      checkout: "Checkout",
+      qty: "Quantity"
     },
     footer: {
       made: "Made with GitHub Pages"

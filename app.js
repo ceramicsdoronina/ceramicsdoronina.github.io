@@ -71,8 +71,13 @@ async function appInit() {
   CD.ui.initNavbarToggle();
   CD.ui.initNavbarAutoClose();
   CD.ui.initViewToggle();
+  CD.ui.initCartOpenButton();
   console.log("✅ [APP] UI inizializzata");
   
+  if (window.CD?.shop?.init) {
+    window.CD.shop.init();
+  }
+
   console.log("🎉 [APP] Inizializzazione completata!");
 }
 
