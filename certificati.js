@@ -5,6 +5,33 @@
   const FALLBACK_IMG = "images/giftcard.jpg"; // fallback già presente nel tuo sito
 
   async function loadCsv() {
+    try {
+      const res = await fetch("catalogue/certificati.ods", { cache: "no-store" });
+      if (!res.ok) {
+        console.error("Impossibile caricare catalogue/certificati.ods");
+        return [];
+      }
+  
+      const arrayBuffer = await res.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: "array" });
+  
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+  
+      const data = XLSX.utils.sheet_to_json(worksheet, {
+        raw: false,
+        defval: ""
+      });
+  
+      console.log("Dati caricati da certificati.ods:", data.length, "righe");
+      return data;
+    } catch (error) {
+      console.error("Errore nel caricamento di certificati.ods:", error);
+      return [];
+    }
+  }
+
+  async function load1Csv() {
     const res = await fetch("catalogue/certificati.csv", { cache: "no-store" });
     if (!res.ok) {
       console.error("Impossibile caricare catalogue/certificati.csv");
