@@ -348,3 +348,14 @@
   background:transparent;
 }
 
+.cart-item__remove{
+  margin-top:8px;
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:10px;
+  padding:6px 10px;
+  cursor:pointer;
+  color:var(--muted);
+}
+
+Удалить

@@ -96,6 +96,7 @@ const messages = {
       total: "Итого",
       empty: "Корзина пуста",
       checkout: "Оформить",
+      remove: "Удалить",
       qty: "Кол-во"
     },
     footer: {
@@ -190,6 +191,7 @@ const messages = {
       total: "Totale",
       empty: "Il carrello è vuoto",
       checkout: "Checkout",
+      remove: "Elimina",
       qty: "Quantità"
     },
     footer: {
@@ -284,6 +286,7 @@ const messages = {
       total: "Total",
       empty: "Your cart is empty",
       checkout: "Checkout",
+      remove: "Remove",
       qty: "Quantity"
     },
     footer: {

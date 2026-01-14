@@ -201,6 +201,18 @@
       }
     },
 
+    async removeLineItem(lineItemId) {
+      if (!this.client || !this.checkoutId) return;
+    
+      try {
+        await this.client.checkout.removeLineItems(this.checkoutId, [lineItemId]);
+        await this.renderDrawer();
+        console.log("🗑️ [SHOP] Line item rimosso:", lineItemId);
+      } catch (err) {
+        console.error("❌ [SHOP] removeLineItems FAILED:", err);
+      }
+    },
+
     async renderDrawer() {
       if (!this.client || !this.checkoutId) return;
 
@@ -256,6 +268,11 @@
               <div class="cart-item__meta">
                 <div class="cart-item__title">${title}</div>
                 <div class="cart-item__sub">${t("cart.qty") || "Qty"}: ${q} · ${price} ${cur}</div>
+                <button type="button"
+                        class="cart-item__remove"
+                        data-line-id="${li.id}">
+                  ${t("cart.remove") || "Remove"}
+                </button>
               </div>
             </div>
           `;
@@ -312,6 +329,19 @@
       });
     }
   }
+
+  document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".cart-item__remove");
+    if (!btn) return;
+  
+    e.preventDefault();
+    e.stopPropagation();
+  
+    const lineId = btn.dataset.lineId;
+    if (!lineId) return;
+  
+    await window.CD.shop.removeLineItem(lineId);
+  });
 
   // ─────────────────────────────────────────────
   // EXPORT
