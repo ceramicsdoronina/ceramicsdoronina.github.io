@@ -449,7 +449,28 @@ body.mobile-view .contact-icons{
 }
 
 @media (max-width: 768px){
-  .contact-icon-btn{ width:56px; height:56px; }
-  .contact-icon-btn img{ width:48px; height:48px; }
+  .contact-icon-btn{ width:64px; height:64px; }
+  .contact-icon-btn img{ width:52px; height:52px; }
 }
+
+/* FORCE icon size inside contact circles */
+.contact-icon-btn img{
+  width:64px !important;
+  height:64px !important;
+  max-width:none !important;
+  max-height:none !important;
+}
+
+@media (max-width:768px){
+  .contact-icon-btn{
+    width:56px;
+    height:56px;
+  }
+
+  .contact-icon-btn img{
+    width:54px !important;
+    height:54px !important;
+  }
+}
+
 
