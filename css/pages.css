@@ -36,8 +36,8 @@
 
 .hero-logo{
   font-size:clamp(64px,9vw,140px);
-  letter-spacing:0.22em;
-  font-weight:400;
+  letter-spacing:0.28em;
+  font-weight:450;
   margin:0 0 20px;
   color:var(--white);
 }
@@ -83,9 +83,9 @@
 
 @media (max-width: 768px){
   .hero-logo{
-    font-size: clamp(42px, 10vw, 64px);
-    letter-spacing: 0.10em; /* riduce la larghezza totale */
-    padding: 0 12px;        /* evita “taglio” ai bordi */
+    font-size: clamp(48px, 10vw, 64px);
+    letter-spacing: 0.20em; /* riduce la larghezza totale */
+    padding: 0 14px;        /* evita “taglio” ai bordi */
     max-width: 100%;
     box-sizing: border-box;
   }
