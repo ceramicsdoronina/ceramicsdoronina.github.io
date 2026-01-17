@@ -247,3 +247,43 @@ footer{
   text-decoration:none;
 }
 
+.nav-icon-btn{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:transparent;
+  border:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.nav-icon-btn img{
+  width:18px;
+  height:18px;
+  color:#444;
+}
+
+/* Language selector – same style as nav text */
+.lang select{
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: var(--text);          /* stesso grigio del testo */
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+
+  /* rimuove stile browser */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.lang{
+  margin-right:6px;
+}
+
+

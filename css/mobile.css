@@ -472,4 +472,14 @@ body.mobile-view .contact-icons{
   }
 }
 
+@media (max-width:768px){
+  #cart-open-btn{
+    width:44px;
+    height:44px;
+  }
+  #cart-open-btn img{
+    width:22px;
+    height:22px;
+  }
+}
 
