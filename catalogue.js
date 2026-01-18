@@ -291,16 +291,17 @@
                 <h3 class="vase-subtitle">${short}</h3>
                 ${priceBlock}
                 <div class="vase-actions">
-                  <button
-                    type="button"
-                    class="vase-btn-primary"
-                    data-add-to-cart="${variantId}"
-                    data-vase-name="${name}">
-                    ${primaryLabel}
-                  </button>
+                  ${
+                    (!sold && variantId && variantId !== "-")
+                      ? `<button type="button" class="vase-btn-primary"
+                                 data-add-to-cart="${variantId}"
+                                 data-vase-name="${name}">
+                           ${primaryLabel}
+                         </button>`
+                      : ""
+                  }
                   <button class="vase-btn-outline">${secondaryLabel}</button>
                 </div>
-
                 <button class="accordion-header" data-acc-target="desc-${vase.id}">
                   <span>${msgs.detail.description}</span>
                   <span>›</span>
@@ -383,6 +384,7 @@ function initCardGalleries() {
     block.addEventListener("click", (e) => {
       // evita che click su bottoni di card (se presenti) faccia casino
       if (e.target.closest("button") || e.target.closest("a")) return;
+      if (e.target.closest(".card-actions")) return;
     
       const rect = block.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -579,6 +581,9 @@ function handleModalClick(e) {
   }
 
   function initShopifyCartButtons() {
+    if (window.__cd_shop_btns_inited) return;
+    window.__cd_shop_btns_inited = true;
+  
     console.log("🛒 [SHOP] initShopifyCartButtons attach");
   
     document.addEventListener("click", async (e) => {
@@ -591,10 +596,15 @@ function handleModalClick(e) {
       const variantId = (btn.dataset.addToCart || "").trim();
       const vaseName  = (btn.dataset.vaseName || "").trim();
   
-      console.log("[SHOP] click Compra:", { vaseName, variantId });
+      console.log("🛒 [SHOP] click Compra:", { vaseName, variantId });
   
       if (!variantId || variantId === "-") {
-        console.warn("[SHOP] Variant ID mancante per:", vaseName);
+        console.warn("⚠️ [SHOP] Variant ID mancante per:", vaseName);
+        return;
+      }
+  
+      if (!window.CD?.shop?.addVariant) {
+        console.error("❌ [SHOP] CD.shop.addVariant non disponibile (ui.js non caricato?)");
         return;
       }
   
@@ -605,9 +615,10 @@ function handleModalClick(e) {
       } catch (err) {
         console.error("[SHOP] Errore add-to-cart", err);
       }
-    }, true); // capture=true: più robusto
+    }, false); // IMPORTANTISSIMO: bubble (non capture)
   }
-  
+
+
   function initBehaviour() {
     console.log("🔍 [CATALOGUE] Inizializzazione comportamenti...");
     initModals();
@@ -635,4 +646,3 @@ function handleModalClick(e) {
   };
 
 })();
-

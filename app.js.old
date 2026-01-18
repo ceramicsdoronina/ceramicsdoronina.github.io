@@ -1,0 +1,122 @@
+// app.js
+async function appInit() {
+  console.log("🚀 [APP] Inizializzazione app...");
+
+  // lingua
+  CD.i18n.initLanguage();
+  const currentLang = CD.i18n.getCurrentLang();
+
+  console.log("🔍 [APP] Lingua corrente:", currentLang);
+
+  try {
+    // carica in parallelo catalogo vasi e masterclass
+    console.log("🔍 [APP] Caricamento dati in parallelo...");
+    
+    const [catalogueItems, masterclassItems, certificatiItems] = await Promise.all([
+      CD.catalogue.loadCsv(),
+      CD.masterclass ? CD.masterclass.loadCsv() : Promise.resolve([]),
+      CD.certificati ? CD.certificati.loadCsv() : Promise.resolve([])
+    ]);
+
+    console.log("✅ [APP] Catalogo caricato:", catalogueItems.length, "items");
+    console.log("✅ [APP] Masterclass caricate:", masterclassItems.length, "items");
+    console.log("✅ [APP] Certificati caricati:", certificatiItems.length, "items");
+
+    window.__catalogueData   = catalogueItems;
+    window.__masterclassData = masterclassItems;
+    window.__certificatiData = certificatiItems;
+
+    // vasi
+    console.log("🔍 [APP] Rendering catalogo...");
+    CD.catalogue.render(catalogueItems, currentLang);
+    console.log("✅ [APP] Catalogo renderizzato");
+
+    // masterclass
+    if (CD.masterclass && masterclassItems.length) {
+      console.log("🔍 [APP] Rendering masterclass...");
+      CD.masterclass.render(masterclassItems, currentLang);
+      console.log("✅ [APP] Masterclass renderizzate");
+    }
+
+    // certificati
+    if (CD.certificati && certificatiItems.length) {
+      console.log("🔍 [APP] Rendering certificati...");
+      CD.certificati.render(certificatiItems, currentLang);
+      console.log("✅ [APP] Certificati renderizzati");
+    }
+
+    // ⚠️ IMPORTANTE: inizializza comportamenti DOPO tutti i render
+    // Aspetta che il DOM sia aggiornato
+    console.log("🔍 [APP] Attesa aggiornamento DOM...");
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    console.log("🔍 [APP] Inizializzazione comportamenti catalogo...");
+    CD.catalogue.initBehaviour();
+    console.log("✅ [APP] Comportamenti catalogo inizializzati");
+    
+    // Verifica che i modali siano stati creati
+    const modals = document.querySelectorAll('.modal');
+    console.log("✅ [APP] Modali trovati nel DOM:", modals.length);
+    
+    const modalButtons = document.querySelectorAll('[data-modal-target]');
+    console.log("✅ [APP] Bottoni modal trovati:", modalButtons.length);
+
+  } catch (err) {
+    console.error("❌ [APP] Errore nel caricamento dei dati:", err);
+    console.error("❌ [APP] Stack trace:", err.stack);
+  }
+
+  // UI
+  console.log("🔍 [APP] Inizializzazione UI...");
+  CD.ui.initNavbarToggle();
+  CD.ui.initNavbarAutoClose();
+  CD.ui.initViewToggle();
+  CD.ui.initCartOpenButton();
+  console.log("✅ [APP] UI inizializzata");
+  
+  if (window.CD?.shop?.init) {
+    window.CD.shop.init();
+  }
+
+  console.log("🎉 [APP] Inizializzazione completata!");
+
+  // ─────────────────────────────────────────────
+  // RITORNO DA SHOPIFY CHECKOUT (stima success/fail)
+  // ─────────────────────────────────────────────
+  (function handleCheckoutReturn() {
+    const started = localStorage.getItem("cd_checkout_started");
+    const tsStr = localStorage.getItem("cd_checkout_ts");
+    if (!started || !tsStr) return;
+  
+    // pulizia flag in ogni caso (così non si ripete)
+    localStorage.removeItem("cd_checkout_started");
+    localStorage.removeItem("cd_checkout_ts");
+  
+    const elapsedMs = Date.now() - Number(tsStr);
+  
+    const lang = CD.i18n.getCurrentLang();
+    const dict = CD.i18n.messages[lang] || CD.i18n.messages.it;
+    const msgSuccess = dict.checkoutStatus?.success ||
+      "Il tuo ordine è in fase di processamento, a breve riceverai un messaggio";
+    const msgFail = dict.checkoutStatus?.fail ||
+      "C'è stato un problema nella finalizzazione del tuo ordine";
+  
+    // soglia pratica: se torna dopo >= 30s, consideriamo "probabile successo"
+    const PROBABLE_SUCCESS_MS = 30000;
+  
+    if (elapsedMs >= PROBABLE_SUCCESS_MS) {
+      // 1.1: probabile successo → svuota carrello + messaggio + home
+      if (CD.shop?.resetCart) CD.shop.resetCart();
+      alert(msgSuccess);
+      window.location.hash = "#home";
+    } else {
+      // 1.2: probabile fallimento/abbandono → carrello invariato + messaggio + apri carrello
+      alert(msgFail);
+      if (CD.shop?.openDrawer) CD.shop.openDrawer();
+    }
+  })();
+}
+
+// deve essere visibile a importer.js
+window.appInit = appInit;
+

@@ -13,27 +13,29 @@ const messages = {
       contact: "Контакты"
     },
     hero: {
-      h1: "Современная художественная керамика ручной работы – Ceramics Doronina",
-      tagline:
-        "Тактильная интерьерная керамика с бисерной вышивкой, которая превратит ваш дом в место силы и вдохновения."
+  	h1: {
+    		it: "Ceramica artistica contemporanea fatta a mano – Ceramics Doronina",
+    		en: "Handmade contemporary artistic ceramics – Ceramics Doronina",
+    		ru: "Современная художественная керамика ручной работы – Ceramics Doronina"
+  	},
+      tagline: "Тактильная интерьерная керамика с бисерной вышивкой, которая превратит ваш дом в место силы и вдохновения."
     },
     about: {
       title: "О бренде",
-      intro1:
-        "Меня зовут Анна, и я создаю интерьерную керамику как объект искусства, который поддерживает, вдохновляет и становится частью вашего личного пространства силы.",
+      intro1: "Меня зовут Анна, и я создаю интерьерную керамику как объект искусства, который поддерживает, вдохновляет и становится частью вашего личного пространства силы.",
       intro2: "Я верю, что предметы, с которыми мы живём, влияют на наше состояние.",
       btnCatalogue: "Каталог",
       btnWorkshops: "Мастер-классы",
       btnGiftCards: "Подарочные сертификаты",
       text1: "Мои вазы — это не просто формы, а предметы, которые меняют атмосферу дома.",
-      text2:
-        "В каждой работе — высокотемпературная глина, тактильные текстуры, бисерная вышивка и сочетание несовершенных форм с ощущением роскоши."
+      text2: "В каждой работе — высокотемпературная глина, тактильные текстуры, бисерная вышивка и сочетание несовершенных форм с ощущением роскоши."
     },
     catalogue: {
       title: "Каталог",
       lead: "Каждое изделие — это уникальная эмоция для вашего пространства",
-      addToCart: "Купить",
-      viewPhotos: "Подробнее",
+      // BOTTONI CARD
+      addToCart: "Купить",        // bottone pieno rosso
+      viewPhotos: "Подробнее",    // bottone bianco bordo rosso
       spec: {
         height: "Высота",
         diameter: "Диаметр",
@@ -51,8 +53,7 @@ const messages = {
     workshops: {
       title: "Мастер-Классы",
       scheduleTitle: "Ближайшие мастер-классы",
-      scheduleLead:
-        "Выберите дату и напишите мне, чтобы присоединиться к мастер-классу в небольших группах в моей студии в Генуе.",
+      scheduleLead: "Выберите дату и напишите мне, чтобы присоединиться к мастер-классу в небольших группах в моей студии в Генуе.",
       lead: "Керамические мастер-классы в маленьких группах в атмосфере внимания и спокойствия.",
       list1: "Индивидуальные и групповые занятия в студии в Генуе.",
       list2: "Формы, тактильные поверхности, работа с глазурями и декором.",
@@ -73,7 +74,7 @@ const messages = {
       buy: "Купить",
       details: "Подробнее",
       modalTitle: "Подарочный сертификат",
-      cta: "Написать"
+      cta: "Написать "
     },
     status: {
       sold: "Продано"
@@ -117,27 +118,23 @@ const messages = {
       contact: "Contatti"
     },
     hero: {
-      h1: "Ceramica artistica contemporanea fatta a mano – Ceramics Doronina",
-      tagline:
-        "Ceramica tattile da interno con ricami di perle che trasforma la tua casa in un luogo di forza e ispirazione."
+      tagline: "Ceramica tattile da interno con ricami di perle che trasforma la tua casa in un luogo di forza e ispirazione."
     },
     about: {
       title: "Il brand",
-      intro1:
-        "Mi chiamo Anna e creo ceramiche d’interni come oggetti d’arte che sostengono, ispirano e diventano parte del tuo spazio personale di forza.",
+      intro1: "Mi chiamo Anna e creo ceramiche d’interni come oggetti d’arte che sostengono, ispirano e diventano parte del tuo spazio personale di forza.",
       intro2: "Credo che gli oggetti con cui viviamo influenzino il nostro stato interiore.",
       btnCatalogue: "Catalogo",
       btnWorkshops: "Masterclass",
       btnGiftCards: "Carte Regalo",
       text1: "I miei vasi non sono solo forme, ma oggetti che trasformano l’atmosfera della casa.",
-      text2:
-        "In ogni pezzo ci sono argille ad alta temperatura, superfici tattili, ricami di perle e l’unione di forme imperfette con una sensazione di lusso."
+      text2: "In ogni pezzo ci sono argille ad alta temperatura, superfici tattili, ricami di perle e l’unione di forme imperfette con una sensazione di lusso."
     },
     catalogue: {
       title: "Catalogo",
       lead: "Ogni pezzo è un’emozione unica per il tuo spazio.",
-      addToCart: "Compra",
-      viewPhotos: "Dettagli",
+      addToCart: "Compra",      // rosso pieno
+      viewPhotos: "Dettagli",   // bianco bordo rosso
       spec: {
         height: "Altezza",
         diameter: "Diametro",
@@ -155,8 +152,7 @@ const messages = {
     workshops: {
       title: "Workshop",
       scheduleTitle: "Workshop in programma",
-      scheduleLead:
-        "Scegli una data e scrivimi per partecipare a una masterclass in piccoli gruppi nel mio studio a Genova.",
+      scheduleLead: "Scegli una data e scrivimi per partecipare a una masterclass in piccoli gruppi nel mio studio a Genova.",
       lead: "Workshop di ceramica in piccoli gruppi, in un’atmosfera di cura e tranquillità.",
       list1: "Percorsi individuali e di gruppo nel mio studio a Genova.",
       list2: "Forme, superfici tattili, lavoro con smalti e decorazioni.",
@@ -167,8 +163,7 @@ const messages = {
     },
     giftcards: {
       title: "CARTE REGALO",
-      lead:
-        "Regala l’emozione di lavorare con l’argilla o di scegliere un oggetto in ceramica per la casa.",
+      lead: "Regala l’emozione di lavorare con l’argilla o di scegliere un oggetto in ceramica per la casa.",
       list1: "Buono per partecipare a un workshop.",
       list2: "Buono per un pezzo finito o per una commissione su misura.",
       list3: "Formato digitale o stampata pronta da regalare.",
@@ -222,21 +217,17 @@ const messages = {
       contact: "Contact"
     },
     hero: {
-      h1: "Handmade contemporary artistic ceramics – Ceramics Doronina",
-      tagline:
-        "Tactile interior ceramics with pearl embroidery that turns your home into a place of strength and inspiration."
+      tagline: "Tactile interior ceramics with pearl embroidery that turns your home into a place of strength and inspiration."
     },
     about: {
       title: "About the brand",
-      intro1:
-        "My name is Anna, and I create interior ceramics as art objects that support, inspire, and become part of your personal space of strength.",
+      intro1: "My name is Anna, and I create interior ceramics as art objects that support, inspire, and become part of your personal space of strength.",
       intro2: "I believe that the objects we live with influence our inner state.",
       btnCatalogue: "Catalogue",
       btnWorkshops: "Masterclass",
       btnGiftCards: "Gift Cards",
       text1: "My vases are not just shapes, but objects that transform the atmosphere of a home.",
-      text2:
-        "Each piece combines high-temperature clays, tactile textures, bead embroidery, and the meeting of imperfect forms with a sense of luxury."
+      text2: "Each piece combines high-temperature clays, tactile textures, bead embroidery, and the meeting of imperfect forms with a sense of luxury."
     },
     catalogue: {
       title: "Catalogue",
@@ -260,8 +251,7 @@ const messages = {
     workshops: {
       title: "Workshops",
       scheduleTitle: "Upcoming workshops",
-      scheduleLead:
-        "Choose a date and write to me to join a small group masterclass in my studio in Genoa.",
+      scheduleLead: "Choose a date and write to me to join a small group masterclass in my studio in Genoa.",
       lead: "Ceramic workshops in small groups, in a calm and attentive atmosphere.",
       list1: "Individual and group sessions in my studio in Genoa.",
       list2: "Forms, tactile surfaces, working with glazes and decoration.",
@@ -288,7 +278,7 @@ const messages = {
       sold: "Sold out"
     },
     contact: {
-      title: "Contact",
+      title: "Contacts",
       addressLabel: "Address",
       addressValue: "Via San Lorenzo 7/5 Sc. Dx, 16123 Genoa",
       countrySuffix: ", Italy",

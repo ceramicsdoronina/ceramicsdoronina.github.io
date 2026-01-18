@@ -5,55 +5,47 @@
   // ─────────────────────────────────────────────
   function initNavbarToggle() {
     const body = document.body;
-    const toggle =
-      document.getElementById("nav-toggle") || document.querySelector(".nav-toggle-btn");
+    const toggle = document.getElementById("nav-toggle") || document.querySelector(".nav-toggle-btn");
+    const navUl = document.querySelector("header nav ul");
 
-    if (!toggle) {
-      console.warn("[UI] nav toggle button not found");
+    if (!toggle || !navUl) {
+      console.warn("[UI] nav toggle elements not found");
       return;
     }
+
+    // evita doppio binding
+    if (toggle.dataset.bound === "1") return;
+    toggle.dataset.bound = "1";
 
     toggle.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
       const isOpen = body.classList.toggle("nav-open");
       toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-      console.log("[UI] nav-open now:", isOpen, "body class:", body.className);
     });
   }
 
-  // Chiudi menu quando clicchi fuori dal menu (mobile)
+  // chiudi menu cliccando fuori / su link
   function initNavbarAutoClose() {
     document.addEventListener("click", (e) => {
       const body = document.body;
       if (!body.classList.contains("nav-open")) return;
 
-      const nav = document.querySelector("header");
-      const toggle =
-        document.getElementById("nav-toggle") || document.querySelector(".nav-toggle-btn");
+      const clickedToggle = e.target.closest("#nav-toggle, .nav-toggle-btn");
+      const clickedInsideMenu = e.target.closest("header nav ul");
+      if (clickedToggle || clickedInsideMenu) return;
 
-      const clickedInsideHeader = nav && nav.contains(e.target);
-      const clickedToggle = toggle && toggle.contains(e.target);
+      body.classList.remove("nav-open");
+    });
 
-      // Se clicco sul toggle, ci pensa initNavbarToggle
-      if (clickedToggle) return;
+    document.addEventListener("click", (e) => {
+      const link = e.target.closest("header nav a");
+      if (!link) return;
+      document.body.classList.remove("nav-open");
+    });
 
-      // Se clicco dentro l'header ma NON sul menu UL, chiudi
-      // (così clic su logo/lingua chiude)
-      if (clickedInsideHeader) {
-        const menu = document.querySelector("header nav ul");
-        if (menu && !menu.contains(e.target)) {
-          body.classList.remove("nav-open");
-          if (toggle) toggle.setAttribute("aria-expanded", "false");
-          return;
-        }
-      }
-
-      // Se clicco fuori header, chiudi
-      if (!clickedInsideHeader) {
-        body.classList.remove("nav-open");
-        if (toggle) toggle.setAttribute("aria-expanded", "false");
-      }
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") document.body.classList.remove("nav-open");
     });
   }
 
@@ -81,32 +73,32 @@
   }
 
   // ─────────────────────────────────────────────
-  // SHOPIFY: Checkout-based cart + custom drawer
-  // (stabile: non usa ShopifyBuy.UI.createComponent('cart'))
+  // SHOPIFY (Cart/Checkout adaptive)
   // ─────────────────────────────────────────────
   const SHOP_DOMAIN = "ceramicsdoronina.myshopify.com";
-  const STOREFRONT_TOKEN = "de1ab17005ca54e662d4c86543f523cd"; // <-- il tuo token Storefront
+  const STOREFRONT_TOKEN = "de1ab17005ca54e662d4c86543f523cd";
   const CHECKOUT_KEY = "cd_checkout_id_v1";
-
+  const CART_KEY     = "cd_cart_id_v1";
+  
   function toStorefrontVariantId(id) {
     const s = String(id || "").trim();
     if (!s) return "";
-
-    // già gid
     if (s.startsWith("gid://shopify/ProductVariant/")) return s;
-
-    // già base64 (tipicamente Z2lkOi8v...)
     if (s.startsWith("Z2lkOi8v")) return s;
-
-    // numero -> gid base64
     return btoa(`gid://shopify/ProductVariant/${s}`);
   }
-
+  
+  function getCheckoutUrl(obj) {
+    return (obj && (obj.checkoutUrl || obj.webUrl)) || "";
+  }
+  
   function getLang() {
-    // prova CD.i18n, poi html lang, poi fallback
-    return (window.CD?.i18n?.currentLang)
-        || document.documentElement.lang
-        || "it";
+    return (
+      window.CD?.i18n?.lang ||
+      window.CD?.i18n?.currentLang ||
+      document.documentElement.lang ||
+      "it"
+    );
   }
   
   function t(keyPath) {
@@ -115,231 +107,349 @@
     const dict = all[lang] || all.it || {};
     return keyPath.split(".").reduce((o, k) => (o && o[k] != null ? o[k] : null), dict);
   }
-
-
-  function $(id) {
-    return document.getElementById(id);
-  }
-
+  
   window.CD = window.CD || {};
+  const existingShop = window.CD.shop || {};
+  
+  window.CD.shop = Object.assign(existingShop, {
+    client: existingShop.client || null,
+    storeId: existingShop.storeId || null, // cartId o checkoutId
+    mode: existingShop.mode || null,
+    isReady: existingShop.isReady || false,
+    _initPromise: null,
+    _addBusy: false,
+  
+    _api() {
+      if (this.client && this.client.cart) return { api: this.client.cart, mode: "cart", key: CART_KEY };
+      return { api: this.client.checkout, mode: "checkout", key: CHECKOUT_KEY };
+    },
+  
+    async init(force = false) {
+      if (this._initPromise && !force) return this._initPromise;
 
-  window.CD.shop = {
-    client: null,
-    checkoutId: null,
-    isReady: false,
+      this._initPromise = (async () => {
+      
+            if (typeof ShopifyBuy === "undefined" || !ShopifyBuy.buildClient) {
+              console.error("❌ [SHOP] ShopifyBuy non disponibile (manca buy-button-storefront.min.js)");
+              return;
+            }
+        
+            if (!this.client || force) {
+              this.client = ShopifyBuy.buildClient({
+                domain: SHOP_DOMAIN,
+                storefrontAccessToken: STOREFRONT_TOKEN
+              });
+            }
+        
+            const { api, mode, key } = this._api();
+      
+            this.mode = mode;
+        
+            const saved = localStorage.getItem(key);
+      
+            if (saved) this.storeId = saved;
+        
+            if (this.storeId) {
+              try {
+                const existing = await api.fetch(this.storeId);
+                if (!existing) {
+                  console.warn("⚠️ [SHOP] api.fetch null → reset id:", this.storeId);
+                  localStorage.removeItem(key);
+                  this.storeId = null;
+                } else if (existing.completedAt) {
+                  console.warn("⚠️ [SHOP] store completato → reset id:", this.storeId);
+                  localStorage.removeItem(key);
+                  this.storeId = null;
+                }
+              } catch (e) {
+                // "Load failed" è spesso rete / troppi fetch in parallelo / Safari glitch
+                const msg = String(e && (e.message || e)).toLowerCase();
+                console.warn("⚠️ [SHOP] api.fetch errore:", e);
+              
+                if (msg.includes("load failed")) {
+                  // NON resettare: lascia l'id e riprova più tardi
+                  console.warn("⚠️ [SHOP] errore transitorio (Load failed) → NON resetto storeId");
+                  return; // esci da init senza distruggere lo stato
+                }
+              
+                // altri errori: qui sì resetti
+                localStorage.removeItem(key);
+                this.storeId = null;
+              }
+            }
+        
+            if (!this.storeId) {
+              const created = await api.create();
+              this.storeId = created.id;
+              localStorage.setItem(key, this.storeId);
+            }
+        
+            this.isReady = true;
+            console.log("✅ [SHOP] Store pronto:", this.mode, this.storeId);
+            console.log("🧪 [SHOP] mode:", this.mode, "has cart:", !!this.client.cart);
+        
+            await this.renderDrawer();
+      })();
+      const res = this._initPromise;
+      try { await res; } finally { this._initPromise = null; }
+      return res;
+    },
+  
+    async resetCart() {
+      this.closeDrawer();
 
-    async init() {
-      if (this.isReady) return;
+      const { api, mode, key } = this._api();
+      this.mode = mode;
 
-      if (typeof ShopifyBuy === "undefined" || !ShopifyBuy.buildClient) {
-        console.error("❌ [SHOP] ShopifyBuy non disponibile. Hai caricato buy-button-storefront.min.js?");
-        return;
-      }
+      localStorage.removeItem(key);
+      this.storeId = null;
+      this.isReady = false;
 
-      this.client = ShopifyBuy.buildClient({
-        domain: SHOP_DOMAIN,
-        storefrontAccessToken: STOREFRONT_TOKEN
-      });
-
-      // 🧪 DEBUG: verifica quali variant sono visibili allo Storefront
-      try {
-        const products = await this.client.product.fetchAll(10);
-        console.log("🧪 [SHOP] prodotti visibili:", products.length);
-        products.forEach(p => {
-          console.log(" -", p.title);
-          p.variants.forEach(v => console.log("    variant.id =", v.id));
-        });
-      } catch (e) {
-        console.error("❌ [SHOP] fetchAll products FAILED:", e);
-      }
-
-      // riprendi checkout precedente
-      const saved = localStorage.getItem(CHECKOUT_KEY);
-      if (saved) this.checkoutId = saved;
-
-      // crea checkout se manca
-      if (!this.checkoutId) {
-        const co = await this.client.checkout.create();
-        this.checkoutId = co.id;
-        localStorage.setItem(CHECKOUT_KEY, this.checkoutId);
-      }
+      const created = await api.create();
+      this.storeId = created.id;
+      localStorage.setItem(key, this.storeId);
 
       this.isReady = true;
-      console.log("✅ [SHOP] Checkout/cart pronto:", this.checkoutId);
-
-      // Render iniziale (così se hai già prodotti salvati li vedi)
-      await this.renderDrawer();
+      console.log("✅ [SHOP] Store ricreato:", this.mode, this.storeId);
     },
-
+  
     async addVariant(variantId, qty = 1) {
+      if (this._addBusy) {
+        console.warn("⚠️ [SHOP] addVariant ignorato (busy)");
+        return false;
+      }
+      this._addBusy = true;
+      try {
+            await this.init();
+            const { api } = this._api();
+            if (!api || !this.storeId) return false;
+        
+            const storefrontId = toStorefrontVariantId(variantId);
+            if (!storefrontId) return false;
+        
+            try {
+              if (typeof api.addLineItems === "function") {
+                await api.addLineItems(this.storeId, [{ variantId: storefrontId, quantity: qty }]);
+              } else if (typeof api.addLines === "function") {
+                await api.addLines(this.storeId, [{ merchandiseId: storefrontId, quantity: qty }]);
+              } else {
+                console.error("❌ [SHOP] Nessun metodo addLineItems/addLines");
+                return false;
+              }
+        
+              await this.renderDrawer();
+              this.openDrawer();
+              return true;
+            } catch (err) {
+              console.error("❌ [SHOP] add FAILED:", err);
+        
+              // retry una volta
+              try {
+                await this.resetCart();
+                const { api: api2 } = this._api();
+        
+                if (typeof api2.addLineItems === "function") {
+                  await api2.addLineItems(this.storeId, [{ variantId: storefrontId, quantity: qty }]);
+                } else if (typeof api2.addLines === "function") {
+                  await api2.addLines(this.storeId, [{ merchandiseId: storefrontId, quantity: qty }]);
+                } else {
+                  return false;
+                }
+        
+                await this.renderDrawer();
+                this.openDrawer();
+                return true;
+              } catch (err2) {
+                console.error("❌ [SHOP] add retry FAILED:", err2);
+                return false;
+              }
+            }
+      } finally {
+        this._addBusy = false;
+      }
+    },
+  
+    async removeLineItem(lineId) {
       await this.init();
-      if (!this.client || !this.checkoutId) return null;
-
-      const storefrontId = toStorefrontVariantId(variantId);
-      if (!storefrontId) {
-        console.warn("⚠️ [SHOP] variantId vuoto:", variantId);
-        return null;
-      }
-
-      console.log("🧾 [SHOP] add-to-cart", JSON.stringify({ variantId, storefrontId, qty }));
-
+      const { api } = this._api();
+      if (!api || !this.storeId) return;
+  
       try {
-        await this.client.checkout.addLineItems(this.checkoutId, [
-          { variantId: storefrontId, quantity: qty }
-        ]);
+        if (typeof api.removeLineItems === "function") {
+          await api.removeLineItems(this.storeId, [lineId]);
+        } else if (typeof api.removeLines === "function") {
+          await api.removeLines(this.storeId, [lineId]);
+        } else {
+          console.error("❌ [SHOP] Nessun metodo removeLineItems/removeLines");
+          return;
+        }
         await this.renderDrawer();
-        this.openDrawer();
-        return true;
       } catch (err) {
-        console.error("❌ [SHOP] addLineItems FAILED (raw):", err);
-        try {
-          console.error("❌ [SHOP] addLineItems FAILED (json):", JSON.stringify(err, Object.getOwnPropertyNames(err)));
-        } catch (_) {}
-        if (err && err.errors) console.error("❌ [SHOP] err.errors:", err.errors);
-        if (err && err.message) console.error("❌ [SHOP] err.message:", err.message);
-        return null;
+        console.error("❌ [SHOP] remove FAILED:", err);
       }
     },
-
-    async removeLineItem(lineItemId) {
-      if (!this.client || !this.checkoutId) return;
-    
-      try {
-        await this.client.checkout.removeLineItems(this.checkoutId, [lineItemId]);
-        await this.renderDrawer();
-        console.log("🗑️ [SHOP] Line item rimosso:", lineItemId);
-      } catch (err) {
-        console.error("❌ [SHOP] removeLineItems FAILED:", err);
-      }
-    },
-
+  
     async renderDrawer() {
-      if (!this.client || !this.checkoutId) return;
-
-      const itemsEl = $("cart-items");
-      const totalEl = $("cart-total");
-      const checkoutBtn = $("cart-checkout-btn");
-
-      // Se il drawer markup non esiste, non fare nulla
+      const itemsEl = document.getElementById("cart-items");
+      const totalEl = document.getElementById("cart-total");
+      const checkoutBtn = document.getElementById("cart-checkout-btn");
       if (!itemsEl || !totalEl || !checkoutBtn) return;
-
-      const co = await this.client.checkout.fetch(this.checkoutId);
-
-      // link checkout
-      checkoutBtn.href = co.webUrl;
-
-      // total (subtotal)
-      const amount = co?.subtotalPriceV2?.amount ?? co?.subtotalPrice ?? "0";
-      const currency = co?.subtotalPriceV2?.currencyCode ?? "";
+  
+      if (!this.client || !this.storeId) return;
+  
+      const { api } = this._api();
+  
+      const obj = await api.fetch(this.storeId);
+      if (!obj) {
+        console.warn("⚠️ [SHOP] fetch null in renderDrawer → creo store nuovo e mostro carrello vuoto");
+        await this.resetCart();
+      
+        // mostra vuoto e non loopare
+        itemsEl.innerHTML = `<div style="color:var(--muted)">${t("cart.empty") || "Il carrello è vuoto"}</div>`;
+        totalEl.textContent = "0";
+        checkoutBtn.removeAttribute("href");
+        return;
+      }
+  
+      const url = getCheckoutUrl(obj);
+      if (!url) {
+        console.warn("⚠️ [SHOP] checkoutUrl/webUrl mancante → reset");
+        await this.resetCart();
+        return;
+      }
+      checkoutBtn.href = url;
+  
+      if (!checkoutBtn.dataset.boundCheckoutTrack) {
+        checkoutBtn.dataset.boundCheckoutTrack = "1";
+        checkoutBtn.addEventListener("click", () => {
+          localStorage.setItem("cd_checkout_started", "1");
+          localStorage.setItem("cd_checkout_ts", String(Date.now()));
+        });
+      }
+  
+      checkoutBtn.textContent = (window.CD?.i18n?.messages?.[getLang()]?.cart?.checkout) || "Checkout";
+  
+      // totale (minimo)
+      const amount =
+        obj?.subtotalPriceV2?.amount ||
+        obj?.cost?.subtotalAmount?.amount ||
+        "0";
+      const currency =
+        obj?.subtotalPriceV2?.currencyCode ||
+        obj?.cost?.subtotalAmount?.currencyCode ||
+        "";
       totalEl.textContent = `${amount} ${currency}`.trim();
-
-      const lineItems = co.lineItems || [];
-      if (!lineItems.length) {
+  
+      const lineItems = obj.lineItems || obj.lines || [];
+      const arr = Array.isArray(lineItems)
+        ? lineItems
+        : (lineItems?.edges ? lineItems.edges.map(e => e.node) : []);
+  
+      if (!arr.length) {
         itemsEl.innerHTML = `<div style="color:var(--muted)">${t("cart.empty") || "Il carrello è vuoto"}</div>`;
         return;
       }
-
-      const titleEl = document.querySelector(".cart-drawer__title");
-      if (titleEl) titleEl.textContent = t("cart.title") || "Carrello";
-      
-      const totalLabel = document.querySelector(".cart-drawer__total span:first-child");
-      if (totalLabel) totalLabel.textContent = t("cart.total") || "Totale";
-      
-      if (checkoutBtn) checkoutBtn.textContent = t("cart.checkout") || "Checkout";
-
-      itemsEl.innerHTML = lineItems
-        .map((li) => {
-          const img = li?.variant?.image?.src || "";
-          const lang = getLang();
-          const variantNumeric = li?.variant?.id
-            ? String(li.variant.id).split("/").pop()
-            : "";
-          
-          const localName =
-            window.CD?.shop?.nameByVariant?.[variantNumeric]?.[lang];
-          
-          const title = localName || li?.title || "Item";
-          const q = li?.quantity || 1;
-          const price = li?.variant?.priceV2?.amount || li?.variant?.price || "";
-          const cur = li?.variant?.priceV2?.currencyCode || "";
-          return `
-            <div class="cart-item">
-              ${img ? `<img class="cart-item__img" src="${img}" alt="">` : ""}
-              <div class="cart-item__meta">
-                <div class="cart-item__title">${title}</div>
-                <div class="cart-item__sub">${t("cart.qty") || "Qty"}: ${q} · ${price} ${cur}</div>
-                <button type="button"
-                        class="cart-item__remove"
-                        data-line-id="${li.id}">
-                  ${t("cart.remove") || "Remove"}
-                </button>
-              </div>
+  
+      const lang = getLang();
+  
+      itemsEl.innerHTML = arr.map((li) => {
+        const id = li.id;
+        const q = li.quantity || 1;
+        const title = li.title || li.merchandise?.product?.title || "Item";
+  
+        const img =
+          li?.variant?.image?.src ||
+          li?.merchandise?.image?.src ||
+          "";
+  
+        const variantNumeric =
+          li?.variant?.id ? String(li.variant.id).split("/").pop()
+          : (li?.merchandise?.id ? String(li.merchandise.id).split("/").pop() : "");
+  
+        const localName = window.CD?.shop?.nameByVariant?.[variantNumeric]?.[lang];
+        const finalTitle = localName || title;
+  
+        return `
+          <div class="cart-item">
+            ${img ? `<img class="cart-item__img" src="${img}" alt="">` : ""}
+            <div class="cart-item__meta">
+              <div class="cart-item__title">${finalTitle}</div>
+              <div class="cart-item__sub">${t("cart.qty") || "Qty"}: ${q}</div>
+              <button type="button" class="cart-item__remove" data-line-id="${id}">
+                ${t("cart.remove") || "Remove"}
+              </button>
             </div>
-          `;
-        })
-        .join("");
+          </div>
+        `;
+      }).join("");
     },
-
+  
     openDrawer() {
-      const drawer = $("cart-drawer");
+      const drawer = document.getElementById("cart-drawer");
       if (!drawer) return;
       drawer.classList.add("is-open");
       drawer.setAttribute("aria-hidden", "false");
     },
-
+    
     closeDrawer() {
-      const drawer = $("cart-drawer");
+      const drawer = document.getElementById("cart-drawer");
       if (!drawer) return;
       drawer.classList.remove("is-open");
       drawer.setAttribute("aria-hidden", "true");
     }
-  };
+  
+  });
 
   // ─────────────────────────────────────────────
-  // CART BUTTON: open/close drawer (navbar + drawer)
+  // CART OPEN/CLOSE BUTTONS
   // ─────────────────────────────────────────────
   function initCartOpenButton() {
-    const openBtn = $("cart-open-btn");
-    const closeBtn = $("cart-close-btn");
-    const drawer = $("cart-drawer");
-
-    if (!openBtn) {
-      console.warn("⚠️ [SHOP] #cart-open-btn non trovato (navbar)");
+    const drawer = document.getElementById("cart-drawer");
+    if (!drawer) {
+      console.warn("[UI] #cart-drawer non trovato");
       return;
     }
-
-    openBtn.addEventListener("click", async (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+  
+    // evita doppio binding
+    if (drawer.dataset.bound === "1") return;
+    drawer.dataset.bound = "1";
+  
+    async function openCart(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
       await window.CD.shop.init();
-      window.CD.shop.openDrawer();
+      await window.CD.shop.renderDrawer();
+      window.CD.shop.openDrawer();      // <-- usa is-open
+    }
+  
+    function closeCart(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      window.CD.shop.closeDrawer();     // <-- usa is-open
+    }
+  
+    document.addEventListener("click", (e) => {
+      const openBtn = e.target.closest("#cart-open-btn");
+      if (openBtn) return openCart(e);
+  
+      const closeBtn = e.target.closest("#cart-close-btn");
+      if (closeBtn) return closeCart(e);
+  
+      // click sullo sfondo (il contenitore #cart-drawer)
+      if (e.target.closest("[data-cart-backdrop]")) return closeCart(e);
+    }, false);
+  
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeCart(e);
     });
-
-    if (closeBtn) {
-      closeBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        window.CD.shop.closeDrawer();
-      });
-    }
-
-    if (drawer) {
-      drawer.addEventListener("click", (e) => {
-        if (e.target === drawer) window.CD.shop.closeDrawer();
-      });
-    }
   }
 
+  // delegazione remove item
   document.addEventListener("click", async (e) => {
     const btn = e.target.closest(".cart-item__remove");
     if (!btn) return;
-  
     e.preventDefault();
     e.stopPropagation();
-  
     const lineId = btn.dataset.lineId;
     if (!lineId) return;
-  
     await window.CD.shop.removeLineItem(lineId);
   });
 
