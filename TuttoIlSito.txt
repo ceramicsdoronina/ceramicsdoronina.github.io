@@ -7,61 +7,27 @@ async function appInit() {
   // lingua
   CD.i18n.initLanguage();
   const currentLang = CD.i18n.getCurrentLang();
-
   console.log("🔍 [APP] Lingua corrente:", currentLang);
 
   try {
-    // carica in parallelo catalogo vasi e masterclass
     console.log("🔍 [APP] Caricamento dati in parallelo...");
-    
+
     const [catalogueItems, masterclassItems, certificatiItems] = await Promise.all([
       CD.catalogue.loadCsv(),
       CD.masterclass ? CD.masterclass.loadCsv() : Promise.resolve([]),
       CD.certificati ? CD.certificati.loadCsv() : Promise.resolve([])
     ]);
 
-    console.log("✅ [APP] Catalogo caricato:", catalogueItems.length, "items");
-    console.log("✅ [APP] Masterclass caricate:", masterclassItems.length, "items");
-    console.log("✅ [APP] Certificati caricati:", certificatiItems.length, "items");
-
-    window.__catalogueData   = catalogueItems;
+    window.__catalogueData = catalogueItems;
     window.__masterclassData = masterclassItems;
     window.__certificatiData = certificatiItems;
 
-    // vasi
-    console.log("🔍 [APP] Rendering catalogo...");
     CD.catalogue.render(catalogueItems, currentLang);
-    console.log("✅ [APP] Catalogo renderizzato");
+    if (CD.masterclass) CD.masterclass.render(masterclassItems, currentLang);
+    if (CD.certificati) CD.certificati.render(certificatiItems, currentLang);
 
-    // masterclass
-    if (CD.masterclass && masterclassItems.length) {
-      console.log("🔍 [APP] Rendering masterclass...");
-      CD.masterclass.render(masterclassItems, currentLang);
-      console.log("✅ [APP] Masterclass renderizzate");
-    }
-
-    // certificati
-    if (CD.certificati && certificatiItems.length) {
-      console.log("🔍 [APP] Rendering certificati...");
-      CD.certificati.render(certificatiItems, currentLang);
-      console.log("✅ [APP] Certificati renderizzati");
-    }
-
-    // ⚠️ IMPORTANTE: inizializza comportamenti DOPO tutti i render
-    // Aspetta che il DOM sia aggiornato
-    console.log("🔍 [APP] Attesa aggiornamento DOM...");
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    console.log("🔍 [APP] Inizializzazione comportamenti catalogo...");
+    await new Promise((r) => setTimeout(r, 50));
     CD.catalogue.initBehaviour();
-    console.log("✅ [APP] Comportamenti catalogo inizializzati");
-    
-    // Verifica che i modali siano stati creati
-    const modals = document.querySelectorAll('.modal');
-    console.log("✅ [APP] Modali trovati nel DOM:", modals.length);
-    
-    const modalButtons = document.querySelectorAll('[data-modal-target]');
-    console.log("✅ [APP] Bottoni modal trovati:", modalButtons.length);
 
   } catch (err) {
     console.error("❌ [APP] Errore nel caricamento dei dati:", err);
@@ -69,16 +35,60 @@ async function appInit() {
   }
 
   // UI
-  console.log("🔍 [APP] Inizializzazione UI...");
   CD.ui.initNavbarToggle();
   CD.ui.initNavbarAutoClose();
   CD.ui.initViewToggle();
-  console.log("✅ [APP] UI inizializzata");
-  
+  CD.ui.initCartOpenButton();
+
+  // Precarica shop (non blocca)
+  if (CD.shop?.init) CD.shop.init();
+
   console.log("🎉 [APP] Inizializzazione completata!");
+
+  // ─────────────────────────────────────────────
+  // RITORNO DA CHECKOUT (best-effort)
+  // ─────────────────────────────────────────────
+  async function handleCheckoutReturn() {
+    const started = localStorage.getItem("cd_checkout_started");
+    const tsStr = localStorage.getItem("cd_checkout_ts");
+    if (!started || !tsStr) return;
+
+    localStorage.removeItem("cd_checkout_started");
+    localStorage.removeItem("cd_checkout_ts");
+
+    const elapsedMs = Date.now() - Number(tsStr);
+
+    const lang = CD.i18n.getCurrentLang();
+    const dict = CD.i18n.messages[lang] || CD.i18n.messages.it;
+
+    const msgSuccess = dict.checkoutStatus?.success ||
+      "Il tuo ordine è in fase di processamento, a breve riceverai un messaggio";
+    const msgFail = dict.checkoutStatus?.fail ||
+      "C'è stato un problema nella finalizzazione del tuo ordine";
+
+    const PROBABLE_SUCCESS_MS = 30000;
+
+    if (elapsedMs >= PROBABLE_SUCCESS_MS) {
+      if (CD.shop?.resetCart) await CD.shop.resetCart();
+      alert(msgSuccess);
+      window.history.replaceState({}, "", window.location.origin + window.location.pathname + "#home");
+    } else {
+      alert(msgFail);
+      if (CD.shop?.openDrawer) CD.shop.openDrawer();
+      window.history.replaceState({}, "", window.location.origin + window.location.pathname + "#home");
+    }
+  }
+
+  await handleCheckoutReturn();
+
+  // Safari/Chrome bfcache: la pagina torna “congelata”
+  window.addEventListener("pageshow", async () => {
+    await handleCheckoutReturn();
+    if (CD.shop?.init) await CD.shop.init();
+    if (CD.shop?.renderDrawer) await CD.shop.renderDrawer();
+  });
 }
 
-// deve essere visibile a importer.js
 window.appInit = appInit;
 
 
@@ -163,8 +173,18 @@ window.appInit = appInit;
       const long  = vase[`long_${lang}`]  && vase[`long_${lang}`]  !== "-" ? vase[`long_${lang}`]  : vase.long_ru;
 
       const sold = (vase.venduto || "").trim().toLowerCase() === "si";
+      const variantId = (vase.shopify_variant_id || "").trim();
 
-      const img1 = vase.img1 && vase.img1 !== "-" ? `images/catalogue/${vase.img1}` : "images/placeholder.jpg";
+      // const img1 = vase.img1 && vase.img1 !== "-" ? `images/catalogue/${vase.img1}` : "images/placeholder.jpg";
+      // Modifica
+
+      const cardImgs = [
+        vase.img1, vase.img2, vase.img3,
+        vase.img4, vase.img5, vase.img6
+      ].filter(x => x && x !== "-")
+       .map(fn => `images/catalogue/${fn}`);
+
+      // Fine Modifica
 
       const priceOldStr = vase.price_old && vase.price_old !== "-" ? vase.price_old : null;
       const priceNewStr = vase.price_new && vase.price_new !== "-" ? vase.price_new : null;
@@ -219,31 +239,91 @@ window.appInit = appInit;
             </button>
           </div>`;
       } else {
-        actionsHtml = `
-          <div class="card-actions">
-            <button class="card-btn primary" data-modal-target="modal-${vase.id}">
-              ${primaryLabel}
-            </button>
-            <button class="card-btn secondary" data-modal-target="modal-${vase.id}">
-              ${secondaryLabel}
-            </button>
-          </div>`;
+        const variantId = (vase.shopify_variant_id || "").trim();
+        // Registra nomi trilingui per il carrello
+        if (variantId && variantId !== "-") {
+          window.CD = window.CD || {};
+          window.CD.shop = window.CD.shop || {};
+          window.CD.shop.nameByVariant = window.CD.shop.nameByVariant || {};
+        
+          window.CD.shop.nameByVariant[String(variantId)] = {
+            it: (vase.name_it && vase.name_it !== "-") ? vase.name_it : (vase.name_ru || ""),
+            en: (vase.name_en && vase.name_en !== "-") ? vase.name_en : (vase.name_ru || ""),
+            ru: (vase.name_ru && vase.name_ru !== "-") ? vase.name_ru : ""
+          };
+        }
+
+        if (!variantId || variantId === "-") {
+          // ❌ NON vendibile → niente "Compra"
+          actionsHtml = `
+            <div class="card-actions">
+              <button class="card-btn secondary" data-modal-target="modal-${vase.id}">
+                ${secondaryLabel}
+              </button>
+            </div>`;
+        } else {
+          // ✅ Vendibile → mostra "Compra"
+          actionsHtml = `
+            <div class="card-actions">
+              <button class="card-btn primary"
+                      type="button"
+                      data-add-to-cart="${variantId}"
+                      data-vase-name="${name}">
+                ${primaryLabel}
+              </button>
+              <button class="card-btn secondary" data-modal-target="modal-${vase.id}">
+                ${secondaryLabel}
+              </button>
+            </div>`;
+        }
+
       }
 
       const card = document.createElement("article");
       card.className = "card";
 
-      card.innerHTML = `
-        <div class="media media-single" data-modal-target="modal-${vase.id}">
-          <img src="${img1}" alt="${name}">
-        </div>
-        <div class="body">
-          <h4>${name}</h4>
-          <p>${short}</p>
-          ${cardStatusBlock}
-          ${actionsHtml}
-        </div>
-      `;
+//      card.innerHTML = `
+//        <div class="media media-single" data-modal-target="modal-${vase.id}">
+//          <img src="${img1}" alt="${name}">
+//        </div>
+//        <div class="body">
+//          <h4>${name}</h4>
+//          <p>${short}</p>
+//          ${cardStatusBlock}
+//          ${actionsHtml}
+//        </div>
+//      `;
+
+         const cardGalleryHtml = cardImgs.length
+           ? cardImgs.map((src, idx) => `
+               <img src="${src}" alt="${name} ${idx+1}" class="card-img ${idx===0 ? "active" : ""}">
+             `).join("")
+           : `<img src="images/placeholder.jpg" alt="${name}" class="card-img active">`;
+         
+         const hasMultiple = cardImgs.length > 1;
+         
+         card.innerHTML = `
+           <div class="media media-carousel" data-card-gallery="${vase.id}">
+             <div class="card-gallery">
+               ${cardGalleryHtml}
+             </div>
+         
+             ${hasMultiple ? `
+               <button type="button" class="card-gallery-btn prev" data-card-prev="${vase.id}" aria-label="Previous image">‹</button>
+               <button type="button" class="card-gallery-btn next" data-card-next="${vase.id}" aria-label="Next image">›</button>
+               <div class="card-gallery-counter" data-card-counter="${vase.id}">1/${cardImgs.length}</div>
+             ` : ``}
+           </div>
+         
+           <div class="body">
+             <h4>${name}</h4>
+             <p>${short}</p>
+             ${cardStatusBlock}
+             ${actionsHtml}
+           </div>
+         `;
+// Fine Modifica
+
 
       grid.appendChild(card);
 
@@ -307,10 +387,17 @@ window.appInit = appInit;
                 <h3 class="vase-subtitle">${short}</h3>
                 ${priceBlock}
                 <div class="vase-actions">
-                  <button class="vase-btn-primary">${primaryLabel}</button>
+                  ${
+                    (!sold && variantId && variantId !== "-")
+                      ? `<button type="button" class="vase-btn-primary"
+                                 data-add-to-cart="${variantId}"
+                                 data-vase-name="${name}">
+                           ${primaryLabel}
+                         </button>`
+                      : ""
+                  }
                   <button class="vase-btn-outline">${secondaryLabel}</button>
                 </div>
-
                 <button class="accordion-header" data-acc-target="desc-${vase.id}">
                   <span>${msgs.detail.description}</span>
                   <span>›</span>
@@ -373,6 +460,68 @@ window.appInit = appInit;
       modalRoot.appendChild(modal);
     });
   }
+
+function initCardGalleries() {
+  document.querySelectorAll(".media-carousel").forEach(block => {
+    const id = block.getAttribute("data-card-gallery");
+    const imgs = Array.from(block.querySelectorAll(".card-img"));
+    const counter = block.querySelector(`[data-card-counter="${id}"]`);
+    if (imgs.length <= 1) return;
+
+    let index = 0;
+    const show = (i) => {
+      if (i < 0) i = imgs.length - 1;
+      if (i >= imgs.length) i = 0;
+      index = i;
+      imgs.forEach((img, k) => img.classList.toggle("active", k === index));
+      if (counter) counter.textContent = `${index + 1}/${imgs.length}`;
+    };
+
+    block.addEventListener("click", (e) => {
+      // evita che click su bottoni di card (se presenti) faccia casino
+      if (e.target.closest("button") || e.target.closest("a")) return;
+      if (e.target.closest(".card-actions")) return;
+    
+      const rect = block.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const isLeft = x < rect.width * 0.33; // terzo sinistro
+    
+      e.preventDefault();
+      e.stopPropagation();
+    
+      if (isLeft) show(index - 1);
+      else show(index + 1); // centro + destra
+    });
+
+    // ---- SWIPE MOBILE ----
+    let touchStartX = 0;
+    let touchEndX = 0;
+    
+    block.addEventListener("touchstart", (e) => {
+      touchStartX = e.changedTouches[0].clientX;
+    }, { passive: true });
+    
+    block.addEventListener("touchend", (e) => {
+      touchEndX = e.changedTouches[0].clientX;
+      handleSwipe();
+    }, { passive: true });
+    
+    function handleSwipe() {
+      const delta = touchEndX - touchStartX;
+      const threshold = 30; // px minimi per considerare swipe
+    
+      if (Math.abs(delta) < threshold) return;
+    
+      if (delta > 0) {
+        // swipe destra → sinistra logica inversa
+        show(index - 1);
+      } else {
+        show(index + 1);
+      }
+    }
+
+  });
+}
 
   // Inizializza modali, accordion e gallery (chiamata dopo render)
 function initModals() {
@@ -527,13 +676,54 @@ function handleModalClick(e) {
     });
   }
 
-function initBehaviour() {
-  console.log("🔍 [CATALOGUE] Inizializzazione comportamenti...");
-  initModals();
-  initAccordions();
-  initGalleries();
-  console.log("✅ [CATALOGUE] Comportamenti inizializzati");
-}
+  function initShopifyCartButtons() {
+    if (window.__cd_shop_btns_inited) return;
+    window.__cd_shop_btns_inited = true;
+  
+    console.log("🛒 [SHOP] initShopifyCartButtons attach");
+  
+    document.addEventListener("click", async (e) => {
+      const btn = e.target.closest("[data-add-to-cart]");
+      if (!btn) return;
+  
+      e.preventDefault();
+      e.stopPropagation();
+  
+      const variantId = (btn.dataset.addToCart || "").trim();
+      const vaseName  = (btn.dataset.vaseName || "").trim();
+  
+      console.log("🛒 [SHOP] click Compra:", { vaseName, variantId });
+  
+      if (!variantId || variantId === "-") {
+        console.warn("⚠️ [SHOP] Variant ID mancante per:", vaseName);
+        return;
+      }
+  
+      if (!window.CD?.shop?.addVariant) {
+        console.error("❌ [SHOP] CD.shop.addVariant non disponibile (ui.js non caricato?)");
+        return;
+      }
+  
+      try {
+        const res = await window.CD.shop.addVariant(variantId, 1);
+        if (res) console.log("[SHOP] Aggiunto al carrello:", variantId);
+        else console.warn("[SHOP] Non aggiunto (cart non pronta):", variantId);
+      } catch (err) {
+        console.error("[SHOP] Errore add-to-cart", err);
+      }
+    }, false); // IMPORTANTISSIMO: bubble (non capture)
+  }
+
+
+  function initBehaviour() {
+    console.log("🔍 [CATALOGUE] Inizializzazione comportamenti...");
+    initModals();
+    initAccordions();
+    initGalleries();
+    initCardGalleries();  // card
+    initShopifyCartButtons();
+    console.log("✅ [CATALOGUE] Comportamenti inizializzati");
+  }
 
 /*
   function initBehaviour() {
@@ -554,7 +744,6 @@ function initBehaviour() {
 })();
 
 
-
 ===== certificati.js =====
 // certificati.js
 (function () {
@@ -563,6 +752,33 @@ function initBehaviour() {
   const FALLBACK_IMG = "images/giftcard.jpg"; // fallback già presente nel tuo sito
 
   async function loadCsv() {
+    try {
+      const res = await fetch("catalogue/certificati.ods", { cache: "no-store" });
+      if (!res.ok) {
+        console.error("Impossibile caricare catalogue/certificati.ods");
+        return [];
+      }
+  
+      const arrayBuffer = await res.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: "array" });
+  
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+  
+      const data = XLSX.utils.sheet_to_json(worksheet, {
+        raw: false,
+        defval: ""
+      });
+  
+      console.log("Dati caricati da certificati.ods:", data.length, "righe");
+      return data;
+    } catch (error) {
+      console.error("Errore nel caricamento di certificati.ods:", error);
+      return [];
+    }
+  }
+
+  async function load1Csv() {
     const res = await fetch("catalogue/certificati.csv", { cache: "no-store" });
     if (!res.ok) {
       console.error("Impossibile caricare catalogue/certificati.csv");
@@ -1115,6 +1331,67 @@ h1, h2, h3, h4, h5, h6 {
   background:#f5f5f5;
 }
 
+/* Card carousel */
+.media-carousel{
+  position:relative;
+  width:100%;
+  aspect-ratio:3/4;
+  overflow:hidden;
+  touch-action: pan-y;
+}
+
+.card-gallery{
+  position:absolute;
+  inset:0;
+}
+
+.card-img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:0;
+  transition:opacity .2s ease;
+}
+
+.card-img.active{
+  opacity:1;
+}
+
+.card-gallery-btn{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:36px;
+  height:36px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.65);
+  background:rgba(0,0,0,.25);
+  color:#fff;
+  font-size:22px;
+  line-height:1;
+  display:none !important;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+
+.card-gallery-btn.prev{ left:10px; }
+.card-gallery-btn.next{ right:10px; }
+
+.card-gallery-counter{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:10px;
+  font-size:12px;
+  padding:4px 8px;
+  border-radius:999px;
+  background:rgba(0,0,0,.35);
+  color:#fff;
+}
+
 
 
 ===== css/components.css =====
@@ -1293,6 +1570,120 @@ footer{
 .giftcards-title{ text-transform:none; }
 .catalogue-header .giftcards-title{ text-transform:none; }
 
+/* ───────── Cart drawer ───────── */
+.cart-drawer{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.35);
+  display:none;
+  z-index:99999;
+}
+.cart-drawer.is-open{ display:block; }
+
+.cart-drawer__panel{
+  position:absolute;
+  top:0; right:0;
+  height:100%;
+  width:min(420px, 92vw);
+  background:#fff;
+  border-left:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+}
+
+.cart-drawer__header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 16px;
+  border-bottom:1px solid var(--border);
+}
+.cart-drawer__title{ font-size:18px; letter-spacing:.08em; }
+.cart-drawer__close{
+  border:none; background:transparent;
+  font-size:26px; cursor:pointer;
+}
+
+.cart-drawer__items{
+  padding:14px 16px;
+  overflow:auto;
+  flex:1;
+}
+.cart-item{
+  display:flex;
+  gap:12px;
+  padding:10px 0;
+  border-bottom:1px solid var(--border);
+}
+.cart-item__img{
+  width:64px; height:64px;
+  object-fit:cover;
+  border:1px solid var(--border);
+}
+.cart-item__meta{ flex:1; }
+.cart-item__title{ font-size:14px; margin:0 0 4px; }
+.cart-item__sub{ font-size:13px; color:var(--muted); }
+
+.cart-drawer__footer{
+  border-top:1px solid var(--border);
+  padding:14px 16px;
+}
+.cart-drawer__total{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:12px;
+}
+.cart-drawer__checkout{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:46px;
+  border-radius:12px;
+  background:var(--btn-primary);
+  color:#fff;
+  text-decoration:none;
+}
+
+.nav-icon-btn{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:transparent;
+  border:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.nav-icon-btn img{
+  width:18px;
+  height:18px;
+  color:#444;
+}
+
+/* Language selector – same style as nav text */
+.lang select{
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: var(--text);          /* stesso grigio del testo */
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+
+  /* rimuove stile browser */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.lang{
+  margin-right:6px;
+}
+
+
 
 
 ===== css/layout.css =====
@@ -1346,7 +1737,7 @@ footer{
    MOBILE.CSS (pulito, no duplicati)
    Supporta:
    - body.mobile-view (view forzata)
-   - responsive automatico (<=1024px)
+   - responsive automatico (<=768px)
    Menu: dropdown assoluto sotto la barra (stabile Safari)
 ═════════════════════════════════════════════ */
 
@@ -1397,6 +1788,16 @@ body.mobile-view header{
 
 body.mobile-view main{
   padding-top:72px; /* coerente con header */
+}
+
+/* HERO: evita che DORONINA esca dai bordi su Safari iPhone */
+body.mobile-view .hero-logo{
+  max-width:100%;
+  font-size:clamp(44px, 10vw, 58px);
+  letter-spacing:0.32em;
+  padding:0 12px;
+  box-sizing:border-box;
+  white-space:nowrap;
 }
 
 /* mostra hamburger */
@@ -1457,13 +1858,32 @@ body.mobile-view nav ul li:last-child{
   border-bottom:none;
 }
 
-/* layout mobile: sezioni a 1 colonna */
-body.mobile-view .about,
-body.mobile-view .workshops,
-body.mobile-view .giftcards{
+/* layout mobile: sezioni a 1 colonna (target corretto: container + class) */
+body.mobile-view .container.about{
   grid-template-columns:1fr !important;
-  gap:24px;
+  gap:24px !important;
 }
+
+/* workshops/giftcards: in mobile passa a FLEX per evitare collassi/sparizioni */
+body.mobile-view .container.workshops,
+body.mobile-view .container.giftcards{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:24px !important;
+}
+
+/* ordine: immagine sopra testo */
+body.mobile-view .workshops-img,
+body.mobile-view .giftcards-img{ order:1 !important; }
+
+body.mobile-view .workshops-text,
+body.mobile-view .giftcards-text{ order:2 !important; }
+
+/* reset padding-top della colonna destra dell'about */
+body.mobile-view .about-col-right{
+  padding-top:0 !important;
+}
+
 body.mobile-view .catalogue-header{
   flex-direction:column;
   align-items:flex-start;
@@ -1483,7 +1903,7 @@ body.mobile-view .catalogue-grid{
    C) RESPONSIVE AUTOMATICO (senza mobile-view)
    (utile su iPhone/Android senza forzare view)
 ──────────────────────────────────────────────*/
-@media (max-width: 1024px){
+@media (max-width: 768px){
 
   /* attiva hamburger anche senza mobile-view */
   .nav-toggle-btn,
@@ -1537,6 +1957,44 @@ body.mobile-view .catalogue-grid{
   }
 
   body.nav-open nav ul{ display:flex; }
+  /* ABOUT: 1 colonna anche senza mobile-view */
+  .container.about{
+    grid-template-columns:1fr !important;
+    gap:24px !important;
+  }
+  .about-col-right{
+    padding-top:0 !important;
+  }
+
+  /* WORKSHOPS/GIFTCARDS: flex colonna anche senza mobile-view */
+  .container.workshops,
+  .container.giftcards{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:24px !important;
+  }
+
+  .section h3{
+    font-size:28px !important;
+    line-height:1.15 !important;
+    }
+    .lead{
+      font-size:15px !important;
+      line-height:1.5 !important;
+    }
+
+  .workshops-img, .giftcards-img{ order:1 !important; }
+  .workshops-text, .giftcards-text{ order:2 !important; }
+
+  .hero-logo{
+    font-size:clamp(44px, 10vw, 58px);
+    letter-spacing:0.32em;
+    padding:0 12px;
+    max-width:100%;
+    box-sizing:border-box;
+    white-space:nowrap;
+  }
+
 }
 
 /* phone: 1 colonna */
@@ -1545,8 +2003,219 @@ body.mobile-view .catalogue-grid{
 }
 
 /* tablet: 2 colonne */
-@media (min-width: 769px) and (max-width: 1024px){
+@media (min-width: 769px) and (max-width: 768px){
   .catalogue-grid{ grid-template-columns:repeat(2,1fr) !important; }
+}
+
+/* Mod */
+
+/* ==========================================
+   WORKSHOPS + GIFTCARDS: mobile safe layout
+   (niente grid-template-areas, no collapse)
+========================================== */
+
+/* mobile-view forzata */
+body.mobile-view .container.workshops,
+body.mobile-view .container.giftcards{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:24px !important;
+}
+
+/* responsive automatico */
+@media (max-width: 768px){
+  .container.workshops,
+  .container.giftcards{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:24px !important;
+  }
+}
+
+/* ordine: immagine sopra testo */
+body.mobile-view .workshops-img,
+body.mobile-view .giftcards-img{
+  order:1 !important;
+}
+
+body.mobile-view .workshops-text,
+body.mobile-view .giftcards-text{
+  order:2 !important;
+}
+
+/* anche per responsive */
+@media (max-width: 768px){
+  .workshops-img, .giftcards-img{ order:1 !important; }
+  .workshops-text, .giftcards-text{ order:2 !important; }
+}
+
+/* assicurati che l'immagine non collassi */
+.workshops-img img,
+.giftcards-img img{
+  display:block;
+  width:100%;
+  height:auto;
+}
+
+/* Modal: mobile = gallery sopra testo */
+body.mobile-view .modal-body-inner{
+  flex-direction:column !important;
+}
+body.mobile-view .modal-gallery{ order:1 !important; }
+body.mobile-view .vase-detail-panel{ order:2 !important; min-width:0 !important; }
+
+@media (max-width: 768px){
+  .modal-body-inner{ flex-direction:column !important; }
+  .modal-gallery{ order:1 !important; }
+  .vase-detail-panel{ order:2 !important; min-width:0 !important; }
+}
+
+/* Tipografia: evita effetto "tutto minuscolo" nelle sezioni */
+body.mobile-view .section h3{
+  font-size:28px !important;
+  line-height:1.15 !important;
+}
+
+body.mobile-view .lead{
+  font-size:15px !important;
+  line-height:1.5 !important;
+}
+
+/* =========================
+   CONTACT: mobile = 1 colonna + tutto centrato
+========================= */
+
+/* Mobile view forzata */
+body.mobile-view .contact-list{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:6px !important;
+  justify-items:center !important;   /* centra ogni "card" nella colonna */
+  text-align:center !important;
+}
+
+body.mobile-view .contact-item{
+  width:100% !important;
+  justify-content:center !important; /* centra contenuto (flex) */
+  text-align:center !important;
+}
+
+/* centra anche il blocco studio + mappa */
+body.mobile-view .contact-studio{
+  text-align:center !important;
+}
+
+/* Responsive automatico (telefono senza toggle) */
+@media (max-width: 768px){
+  .contact-list{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:6px !important;
+    justify-items:center !important;
+    text-align:center !important;
+  }
+
+  .contact-item{
+    width:100% !important;
+    justify-content:center !important;
+    text-align:center !important;
+  }
+
+  .contact-studio{
+    text-align:center !important;
+  }
+}
+
+/* CONTACT: desktop 2 colonne / mobile 1 colonna */
+.contact-grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:40px;
+  align-items:start;
+}
+
+.contact-lines{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.contact-line{
+  margin:0;
+  color:var(--text);
+}
+
+.contact-line strong{
+  color:var(--text);
+}
+
+.contact-mapwrap .contact-open{
+  margin:12px 0 0;
+  text-align:center;
+}
+
+/* icone sotto */
+.contact-icons{
+  margin-top:24px;
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:14px;
+}
+.contact-icon{
+  background: var(--btn-primary);
+  color: #fff;
+  text-align:center;
+  padding:14px 12px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:600;
+}
+
+/* MOBILE: 1 colonna */
+body.mobile-view .contact-grid{
+  grid-template-columns: 1fr !important;
+  gap:24px !important;
+}
+body.mobile-view .contact-icons{
+  grid-template-columns: 1fr !important;
+}
+
+@media (max-width: 768px){
+  .contact-icon-btn{ width:64px; height:64px; }
+  .contact-icon-btn img{ width:52px; height:52px; }
+}
+
+/* FORCE icon size inside contact circles */
+.contact-icon-btn img{
+  width:64px !important;
+  height:64px !important;
+  max-width:none !important;
+  max-height:none !important;
+}
+
+@media (max-width:768px){
+  .contact-icon-btn{
+    width:56px;
+    height:56px;
+  }
+
+  .contact-icon-btn img{
+    width:54px !important;
+    height:54px !important;
+  }
+}
+
+@media (max-width:768px){
+  #cart-open-btn{
+    width:44px;
+    height:44px;
+  }
+  #cart-open-btn img{
+    width:22px;
+    height:22px;
+  }
 }
 
 
@@ -1590,8 +2259,8 @@ body.mobile-view .catalogue-grid{
 
 .hero-logo{
   font-size:clamp(64px,9vw,140px);
-  letter-spacing:0.22em;
-  font-weight:400;
+  letter-spacing:0.28em;
+  font-weight:450;
   margin:0 0 20px;
   color:var(--white);
 }
@@ -1634,6 +2303,17 @@ body.mobile-view .catalogue-grid{
   .desktop-only{ display:none; }
   .mobile-only{ display:block; }
 }
+
+@media (max-width: 768px){
+  .hero-logo{
+    font-size: clamp(48px, 10vw, 64px);
+    letter-spacing: 0.20em; /* riduce la larghezza totale */
+    padding: 0 14px;        /* evita “taglio” ai bordi */
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
 
 /* ─────────────────────────────────────────────
    ABOUT
@@ -1724,67 +2404,129 @@ body.mobile-view .catalogue-grid{
   border-radius:0;
   object-fit:cover;
 }
-
 /* ─────────────────────────────────────────────
-   CONTACT
+   CONTACT (layout come screenshot)
 ──────────────────────────────────────────────*/
-.contact-list{
+.contact-block h3{
+  margin:0 0 22px 0;
+}
+
+.contact-grid-2{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:20px;
+  grid-template-columns: 1fr 1.1fr;
+  gap:40px;
+  align-items:start;
 }
 
-/* qui l’aspetto “come testo” (non bottone) */
-.contact-item{
-  border:none;
-  border-radius:0;
-  padding:0;
+.contact-row{
+  margin-bottom:18px;
+}
+
+.contact-label{
   font-size:16px;
-  line-height:1.6;
-  display:flex;
-  align-items:center;
-  gap:6px;
-  background:transparent;
+  color:var(--text);
+  margin-bottom:2px;
 }
 
-/* centra SOLO WhatsApp se usi la classe */
-.contact-item--center{
-  justify-content:center;
-  text-align:center;
-}
-
-.contact-studio{
-  margin-top:28px;
-  text-align:center;
-}
-.contact-studio-line{
-  font-size:22px;
+.contact-value{
+  font-size:16px;
+  color:var(--muted);
   line-height:1.35;
-  margin:0 0 10px 0;
 }
 
-.contact-maplink{ text-decoration:none; color:inherit; }
-
-.contact-open{
-  margin:0 0 16px 0;
-}
-.contact-openlink{
-  text-decoration:underline;
-  text-underline-offset:4px;
+.contact-maplink{
+  text-decoration:none;
   color:inherit;
 }
 
+.contact-maplink,
+.contact-maplink:visited,
+.contact-maplink:hover,
+.contact-maplink:active{
+  color: var(--muted);
+}
+
+
+.contact-hours{
+  margin-top:6px;
+  font-size:14px;
+  color:var(--muted);
+}
+
+.contact-hours-days{
+  font-size:16px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+
+.contact-hours-line{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.contact-hours-time{
+  font-size:16px;
+  color:var(--muted);
+}
+
+.contact-hours-dash{
+  height:1px;
+  width:60px;
+  background:#d1d5db;
+}
+
 .contact-map{
-  margin:0 auto;
-  max-width:980px;
-  border:0;
   border-radius:0;
   overflow:hidden;
 }
 .contact-map iframe{
   width:100%;
-  height:420px;
+  height:320px;
   border:0;
+}
+
+/* icons row */
+/* icons row: piccoli e centrati */
+.contact-icons-row{
+  margin-top:26px;
+  display:flex;
+  justify-content:center;
+  gap:18px;
+}
+
+/* bottone piccolo (non barra larga) */
+.contact-icon-btn{
+  width:64px;
+  height:64px;
+  background:var(--btn-primary);
+  border-radius:90%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* icone PNG */
+.contact-icon-btn img{
+  width:84px;
+  height:84px;
+  display:block;
+  object-fit:contain;
+}
+
+
+/* mobile: 1 colonna */
+@media (max-width: 768px){
+  .contact-grid-2{
+    grid-template-columns: 1fr;
+    gap:22px;
+  }
+  .contact-map iframe{
+    height:260px;
+  }
+  .contact-icons-row{
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ─────────────────────────────────────────────
@@ -1795,6 +2537,51 @@ body.mobile-view .catalogue-grid{
   margin-top:32px;
 }
 
+#giftcards h3[data-i18n="giftcards.cardsTitle"]{
+  text-transform:none !important;
+  margin-top:32px;
+}
+
+
+
+.spacer{ display:block; }
+.spacer-24{ height:24px; }
+
+.contact-social{
+  display:flex;
+  justify-content:center;
+  gap:18px;
+  margin-top:24px;
+}
+
+.social-btn{
+  width:78px;          /* “corto” */
+  height:56px;
+  background:var(--btn-primary);
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.social-btn img{
+  width:30px;
+  height:30px;
+  object-fit:contain;
+  background:transparent;
+}
+
+.cart-item__remove{
+  margin-top:8px;
+  border:1px solid var(--border);
+  background:#fff;
+  border-radius:10px;
+  padding:6px 10px;
+  cursor:pointer;
+  color:var(--muted);
+}
+
+Удалить
 
 
 ===== i18n.js =====
@@ -1928,6 +2715,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   <!-- Scripts -->
   <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+  <script src="https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js"></script>
 
   <!-- Stili principali -->
   <link rel="stylesheet" href="css/base.css">
@@ -2020,6 +2808,29 @@ console.warn = function(...args) {
   <!-- Script importer che carica i partial e poi chiama appInit() -->
   <script src="importer.js" defer></script>
 
+  <div id="shopify-cart"></div>
+  <!-- CART DRAWER -->
+  <div id="cart-drawer" class="cart-drawer" aria-hidden="true">
+    <div class="cart-drawer__panel">
+      <div class="cart-drawer__header">
+        <div class="cart-drawer__title">Cart</div>
+        <button id="cart-close-btn" class="cart-drawer__close" type="button" aria-label="Close cart">×</button>
+      </div>
+  
+      <div id="cart-items" class="cart-drawer__items"></div>
+  
+      <div class="cart-drawer__footer">
+        <div class="cart-drawer__total">
+          <span>Total</span>
+          <span id="cart-total">—</span>
+        </div>
+        <a id="cart-checkout-btn" class="cart-drawer__checkout" href="#" target="_blank" rel="noopener">
+          Checkout
+        </a>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
 
@@ -2031,6 +2842,33 @@ console.warn = function(...args) {
 
   // Carica il CSV delle masterclass
   async function loadCsv() {
+    try {
+      const res = await fetch("catalogue/masterclass.ods", { cache: "no-store" });
+      if (!res.ok) {
+        console.error("Impossibile caricare masterclass.ods");
+        return [];
+      }
+  
+      const arrayBuffer = await res.arrayBuffer();
+      const workbook = XLSX.read(arrayBuffer, { type: "array" });
+  
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+  
+      const data = XLSX.utils.sheet_to_json(worksheet, {
+        raw: false,
+        defval: ""
+      });
+  
+      console.log("Dati caricati da masterclass.ods:", data.length, "righe");
+      return data;
+    } catch (error) {
+      console.error("Errore nel caricamento di masterclass.ods:", error);
+      return [];
+    }
+  }
+
+  async function loadOldCsv() {
     // se preferisci un’altra cartella, cambia il path qui
     const res = await fetch("catalogue/masterclass.csv", { cache: "no-store" });
     if (!res.ok) {
@@ -2235,29 +3073,27 @@ const messages = {
       contact: "Контакты"
     },
     hero: {
-  	h1: {
-    		it: "Ceramica artistica contemporanea fatta a mano – Ceramics Doronina",
-    		en: "Handmade contemporary artistic ceramics – Ceramics Doronina",
-    		ru: "Современная художественная керамика ручной работы – Ceramics Doronina"
-  	},
-      tagline: "Тактильная интерьерная керамика с бисерной вышивкой, которая превратит ваш дом в место силы и вдохновения."
+      h1: "Современная художественная керамика ручной работы – Ceramics Doronina",
+      tagline:
+        "Тактильная интерьерная керамика с бисерной вышивкой, которая превратит ваш дом в место силы и вдохновения."
     },
     about: {
       title: "О бренде",
-      intro1: "Меня зовут Анна, и я создаю интерьерную керамику как объект искусства, который поддерживает, вдохновляет и становится частью вашего личного пространства силы.",
+      intro1:
+        "Меня зовут Анна, и я создаю интерьерную керамику как объект искусства, который поддерживает, вдохновляет и становится частью вашего личного пространства силы.",
       intro2: "Я верю, что предметы, с которыми мы живём, влияют на наше состояние.",
       btnCatalogue: "Каталог",
       btnWorkshops: "Мастер-классы",
       btnGiftCards: "Подарочные сертификаты",
       text1: "Мои вазы — это не просто формы, а предметы, которые меняют атмосферу дома.",
-      text2: "В каждой работе — высокотемпературная глина, тактильные текстуры, бисерная вышивка и сочетание несовершенных форм с ощущением роскоши."
+      text2:
+        "В каждой работе — высокотемпературная глина, тактильные текстуры, бисерная вышивка и сочетание несовершенных форм с ощущением роскоши."
     },
     catalogue: {
       title: "Каталог",
       lead: "Каждое изделие — это уникальная эмоция для вашего пространства",
-      // BOTTONI CARD
-      addToCart: "Купить",        // bottone pieno rosso
-      viewPhotos: "Подробнее",    // bottone bianco bordo rosso
+      addToCart: "Купить",
+      viewPhotos: "Подробнее",
       spec: {
         height: "Высота",
         diameter: "Диаметр",
@@ -2275,7 +3111,8 @@ const messages = {
     workshops: {
       title: "Мастер-Классы",
       scheduleTitle: "Ближайшие мастер-классы",
-      scheduleLead: "Выберите дату и напишите мне, чтобы присоединиться к мастер-классу в небольших группах в моей студии в Генуе.",
+      scheduleLead:
+        "Выберите дату и напишите мне, чтобы присоединиться к мастер-классу в небольших группах в моей студии в Генуе.",
       lead: "Керамические мастер-классы в маленьких группах в атмосфере внимания и спокойствия.",
       list1: "Индивидуальные и групповые занятия в студии в Генуе.",
       list2: "Формы, тактильные поверхности, работа с глазурями и декором.",
@@ -2296,20 +3133,34 @@ const messages = {
       buy: "Купить",
       details: "Подробнее",
       modalTitle: "Подарочный сертификат",
-      cta: "Написать насчёт сертификата"
+      cta: "Написать"
     },
     status: {
       sold: "Продано"
     },
     contact: {
       title: "Контакты",
-      emailLabel: "Email:",
-      instagramLabel: "Instagram:",
-      whatsappLabel: "WhatsApp:",
-      whatsappCta: "Написать",
-      studioTitle: "Мастерская:",
-      studioAddress: "Via San Lorenzo 7/5 Sc. Dx, 16123 Genova, Италия",
-      openInMaps: "Открыть в Google Maps"
+      addressLabel: "Адрес",
+      addressValue: "Via San Lorenzo 7/5 Sc. Dx, 16123 Генуя",
+      countrySuffix: ", Италия",
+      phoneLabel: "Телефонный номер",
+      emailLabel: "Почта",
+      hoursLabel: "График работы",
+      hoursDays: "Пн–Пт",
+      hoursFrom: "10:00",
+      hoursTo: "19:00"
+    },
+    cart: {
+      title: "Корзина",
+      total: "Итого",
+      empty: "Корзина пуста",
+      checkout: "Оформить",
+      remove: "Удалить",
+      qty: "Кол-во"
+    },
+    checkoutStatus: {
+      success: "Ваш заказ обрабатывается. Скоро вы получите сообщение",
+      fail: "Возникла проблема при оформлении заказа"
     },
     footer: {
       made: "Сайт на GitHub Pages"
@@ -2326,23 +3177,27 @@ const messages = {
       contact: "Contatti"
     },
     hero: {
-      tagline: "Ceramica tattile da interno con ricami di perle che trasforma la tua casa in un luogo di forza e ispirazione."
+      h1: "Ceramica artistica contemporanea fatta a mano – Ceramics Doronina",
+      tagline:
+        "Ceramica tattile da interno con ricami di perle che trasforma la tua casa in un luogo di forza e ispirazione."
     },
     about: {
       title: "Il brand",
-      intro1: "Mi chiamo Anna e creo ceramiche d’interni come oggetti d’arte che sostengono, ispirano e diventano parte del tuo spazio personale di forza.",
+      intro1:
+        "Mi chiamo Anna e creo ceramiche d’interni come oggetti d’arte che sostengono, ispirano e diventano parte del tuo spazio personale di forza.",
       intro2: "Credo che gli oggetti con cui viviamo influenzino il nostro stato interiore.",
       btnCatalogue: "Catalogo",
       btnWorkshops: "Masterclass",
       btnGiftCards: "Carte Regalo",
       text1: "I miei vasi non sono solo forme, ma oggetti che trasformano l’atmosfera della casa.",
-      text2: "In ogni pezzo ci sono argille ad alta temperatura, superfici tattili, ricami di perle e l’unione di forme imperfette con una sensazione di lusso."
+      text2:
+        "In ogni pezzo ci sono argille ad alta temperatura, superfici tattili, ricami di perle e l’unione di forme imperfette con una sensazione di lusso."
     },
     catalogue: {
       title: "Catalogo",
       lead: "Ogni pezzo è un’emozione unica per il tuo spazio.",
-      addToCart: "Compra",      // rosso pieno
-      viewPhotos: "Dettagli",   // bianco bordo rosso
+      addToCart: "Compra",
+      viewPhotos: "Dettagli",
       spec: {
         height: "Altezza",
         diameter: "Diametro",
@@ -2360,7 +3215,8 @@ const messages = {
     workshops: {
       title: "Workshop",
       scheduleTitle: "Workshop in programma",
-      scheduleLead: "Scegli una data e scrivimi per partecipare a una masterclass in piccoli gruppi nel mio studio a Genova.",
+      scheduleLead:
+        "Scegli una data e scrivimi per partecipare a una masterclass in piccoli gruppi nel mio studio a Genova.",
       lead: "Workshop di ceramica in piccoli gruppi, in un’atmosfera di cura e tranquillità.",
       list1: "Percorsi individuali e di gruppo nel mio studio a Genova.",
       list2: "Forme, superfici tattili, lavoro con smalti e decorazioni.",
@@ -2371,7 +3227,8 @@ const messages = {
     },
     giftcards: {
       title: "CARTE REGALO",
-      lead: "Regala l’emozione di lavorare con l’argilla o di scegliere un oggetto in ceramica per la casa.",
+      lead:
+        "Regala l’emozione di lavorare con l’argilla o di scegliere un oggetto in ceramica per la casa.",
       list1: "Buono per partecipare a un workshop.",
       list2: "Buono per un pezzo finito o per una commissione su misura.",
       list3: "Formato digitale o stampata pronta da regalare.",
@@ -2381,20 +3238,34 @@ const messages = {
       buy: "Compra",
       details: "Dettagli",
       modalTitle: "Carte regalo",
-      cta: "Scrivimi per una carta regalo"
+      cta: "Scrivimi"
     },
     status: {
       sold: "Venduto"
     },
     contact: {
       title: "Contatti",
-      emailLabel: "Email:",
-      instagramLabel: "Instagram:",
-      whatsappLabel: "WhatsApp:",
-      whatsappCta: "Scrivimi",
-      studioTitle: "Studio:",
-      studioAddress: "Via San Lorenzo 7/5 Sc. Dx, 16123 Genova",
-      openInMaps: "Apri in Google Maps"
+      addressLabel: "Indirizzo",
+      addressValue: "Via San Lorenzo 7/5 Sc. Dx, 16123 Genova",
+      countrySuffix: " (Italia)",
+      phoneLabel: "Numero di telefono",
+      emailLabel: "Email",
+      hoursLabel: "Orari",
+      hoursDays: "Lun–Ven",
+      hoursFrom: "10:00",
+      hoursTo: "19:00"
+    },
+    cart: {
+      title: "Carrello",
+      total: "Totale",
+      empty: "Il carrello è vuoto",
+      checkout: "Checkout",
+      remove: "Elimina",
+      qty: "Quantità"
+    },
+    checkoutStatus: {
+      success: "Il tuo ordine è in fase di processamento, a breve riceverai un messaggio",
+      fail: "C'è stato un problema nella finalizzazione del tuo ordine"
     },
     footer: {
       made: "Realizzato con GitHub Pages"
@@ -2411,17 +3282,21 @@ const messages = {
       contact: "Contact"
     },
     hero: {
-      tagline: "Tactile interior ceramics with pearl embroidery that turns your home into a place of strength and inspiration."
+      h1: "Handmade contemporary artistic ceramics – Ceramics Doronina",
+      tagline:
+        "Tactile interior ceramics with pearl embroidery that turns your home into a place of strength and inspiration."
     },
     about: {
       title: "About the brand",
-      intro1: "My name is Anna, and I create interior ceramics as art objects that support, inspire, and become part of your personal space of strength.",
+      intro1:
+        "My name is Anna, and I create interior ceramics as art objects that support, inspire, and become part of your personal space of strength.",
       intro2: "I believe that the objects we live with influence our inner state.",
       btnCatalogue: "Catalogue",
       btnWorkshops: "Masterclass",
       btnGiftCards: "Gift Cards",
       text1: "My vases are not just shapes, but objects that transform the atmosphere of a home.",
-      text2: "Each piece combines high-temperature clays, tactile textures, bead embroidery, and the meeting of imperfect forms with a sense of luxury."
+      text2:
+        "Each piece combines high-temperature clays, tactile textures, bead embroidery, and the meeting of imperfect forms with a sense of luxury."
     },
     catalogue: {
       title: "Catalogue",
@@ -2443,9 +3318,10 @@ const messages = {
       deliveryText: "We ship worldwide from Liguria, Italy."
     },
     workshops: {
-      title: "workshops",
+      title: "Workshops",
       scheduleTitle: "Upcoming workshops",
-      scheduleLead: "Choose a date and write to me to join a small group masterclass in my studio in Genoa.",
+      scheduleLead:
+        "Choose a date and write to me to join a small group masterclass in my studio in Genoa.",
       lead: "Ceramic workshops in small groups, in a calm and attentive atmosphere.",
       list1: "Individual and group sessions in my studio in Genoa.",
       list2: "Forms, tactile surfaces, working with glazes and decoration.",
@@ -2466,20 +3342,34 @@ const messages = {
       buy: "Buy",
       details: "Details",
       modalTitle: "Gift Card",
-      cta: "Write for a Gift Card"
+      cta: "Write me"
     },
     status: {
       sold: "Sold out"
     },
     contact: {
       title: "Contact",
-      emailLabel: "Email:",
-      instagramLabel: "Instagram:",
-      whatsappLabel: "WhatsApp:",
-      whatsappCta: "Write me",
-      studioTitle: "Studio:",
-      studioAddress: "Via San Lorenzo 7/5 Sc. Dx, 16123 Genoa, Italy",
-      openInMaps: "Open in Google Maps"
+      addressLabel: "Address",
+      addressValue: "Via San Lorenzo 7/5 Sc. Dx, 16123 Genoa",
+      countrySuffix: ", Italy",
+      phoneLabel: "Phone number",
+      emailLabel: "Email",
+      hoursLabel: "Opening hours",
+      hoursDays: "Mon–Fri",
+      hoursFrom: "10:00",
+      hoursTo: "19:00"
+    },
+    cart: {
+      title: "Cart",
+      total: "Total",
+      empty: "Your cart is empty",
+      checkout: "Checkout",
+      remove: "Remove",
+      qty: "Quantity"
+    },
+    checkoutStatus: {
+      success: "Your order is being processed. You will receive a message shortly",
+      fail: "There was a problem finalizing your order"
     },
     footer: {
       made: "Made with GitHub Pages"
@@ -2646,73 +3536,99 @@ window.messages = messages;
 
 ===== partials/contact.html =====
 <section id="contact" class="section">
-  <div class="container contact">
+  <div class="container contact-block">
 
-    <h3 data-i18n="contact.title">Contatti</h3>
+    <!-- TITLE -->
+    <h3 class="section-title" data-i18n="contact.title">Contacts</h3>
 
-    <div class="contact-list">
-      <!-- Email (left) -->
-      <a class="contact-item"
-         href="mailto:ceramist.doronina@gmail.com"
-         style="text-align:center;">
-        <span style="white-space:nowrap;">
-          <strong data-i18n="contact.emailLabel">Email:</strong>
-          <span>ceramist.doronina@gmail.com</span>
-        </span>
-      </a>
+    <!-- GRID -->
+    <div class="contact-grid-2">
 
-      <!-- WhatsApp (center) -->
-      <a class="contact-item contact-item--center"
-         href="https://wa.me/393806836745"
-         target="_blank" rel="noopener"
-         style="text-align:center;">
-        <span style="white-space:nowrap;">
-          <strong data-i18n="contact.whatsappLabel">WhatsApp:</strong>
-          <span>+39 380 683 6745</span>
-        </span>
-      </a>
+      <!-- LEFT: TEXT -->
+      <div class="contact-left">
 
-      <!-- Instagram (right) -->
-      <a class="contact-item"
-         href="https://instagram.com/ceramicsdoronina"
-         target="_blank" rel="noopener"
-         style="text-align:center;">
-        <span style="white-space:nowrap;">
-          <strong data-i18n="contact.instagramLabel">Instagram:</strong>
-          <span>@ceramicsdoronina</span>
-        </span>
-      </a>
+        <div class="contact-row">
+          <div class="contact-label" data-i18n="contact.addressLabel">Address</div>
+          <a class="contact-value contact-maplink"
+             href="https://maps.app.goo.gl/DEw15dcPELNibQ2n9"
+             target="_blank" rel="noopener">
+            <span data-i18n="contact.addressValue">
+              Via San Lorenzo 7/5 Sc. Dx, 16123 Genova
+            </span>
+            <span data-i18n="contact.countrySuffix">, Italy</span>
+          </a>
+        </div>
+
+        <div class="contact-row">
+          <div class="contact-label" data-i18n="contact.phoneLabel">Phone number</div>
+          <div class="contact-value">
+            <a href="tel:+393806836745">+39 380 683 6745</a>
+          </div>
+        </div>
+
+        <div class="contact-row">
+          <div class="contact-label" data-i18n="contact.emailLabel">Email</div>
+          <div class="contact-value">
+            <a href="mailto:ceramist.doronina@gmail.com">
+              ceramist.doronina@gmail.com
+            </a>
+          </div>
+        </div>
+
+        <div class="contact-row">
+          <div class="contact-label" data-i18n="contact.hoursLabel">Opening hours</div>
+          <div class="contact-hours">
+            <div class="contact-hours-days" data-i18n="contact.hoursDays">
+              Mon–Fri
+            </div>
+            <div class="contact-hours-line">
+              <span class="contact-hours-time" data-i18n="contact.hoursFrom">10:00</span>
+              <span class="contact-hours-dash" aria-hidden="true"></span>
+              <span class="contact-hours-time" data-i18n="contact.hoursTo">19:00</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: MAP -->
+      <div class="contact-right">
+        <div class="contact-map">
+          <iframe
+            src="https://www.google.com/maps?q=Via%20San%20Lorenzo%207%2F5%20Sc.%20Dx%2C%2016123%20Genova&output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen
+            title="Studio map">
+          </iframe>
+        </div>
+      </div>
+
     </div>
 
-    <div class="contact-studio" style="text-align:center;">
-      <!-- riga studio cliccabile -->
-      <a class="contact-maplink"
-         href="https://maps.app.goo.gl/DEw15dcPELNibQ2n9"
+    <!-- ICONS BOTTOM -->
+    <div class="contact-icons-row">
+
+      <a class="contact-icon-btn"
+         href="https://instagram.com/ceramics_doronina"
          target="_blank" rel="noopener"
-         style="text-decoration:none; color:inherit;">
-        <strong data-i18n="contact.studioLabel">Studio:</strong>
-        <span data-i18n="contact.address">Via San Lorenzo 7/5 Sc. Dx, 16123 Genova</span>
-        <span data-i18n="contact.countrySuffix"></span>
+         aria-label="Instagram">
+        <img src="images/instagram.amore.s.png" alt="Instagram">
       </a>
 
-      <p class="contact-open">
-        <a class="contact-openlink"
-           href="https://maps.app.goo.gl/DEw15dcPELNibQ2n9"
-           target="_blank" rel="noopener"
-           data-i18n="contact.openMaps">
-          Apri in Google Maps
-        </a>
-      </p>
+      <a class="contact-icon-btn"
+         href="https://t.me/+393806327838"
+         aria-label="Email">
+        <img src="images/email.amore.s.png" alt="Email">
+      </a>
 
-      <div class="contact-map">
-        <iframe
-          src="https://www.google.com/maps?q=Via%20San%20Lorenzo%207%2F5%20Sc.%20Dx%2C%2016123%20Genova&output=embed"
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-          allowfullscreen
-          title="Studio map">
-        </iframe>
-      </div>
+      <a class="contact-icon-btn"
+         href="https://wa.me/393806836745"
+         target="_blank" rel="noopener"
+         aria-label="WhatsApp">
+        <img src="images/whatsapp.amore.s.png" alt="WhatsApp">
+      </a>
+
     </div>
 
   </div>
@@ -2733,11 +3649,11 @@ window.messages = messages;
 <section id="giftcards" class="section">
   <!-- TITOLO -->
   <div class="container">
-      <h3 data-i18n="giftcards.title">Carte Regalo</h3>
-      <div aria-hidden="true" style="height:24px"></div>
+    <h3 data-i18n="giftcards.title">Carte Regalo</h3>
+    <div aria-hidden="true" style="height:24px"></div>
   </div>
 
-
+  <!-- BLOCCO TESTO + FOTO INTRO GIFTCARDS (stessa struttura di workshops) -->
   <div class="container giftcards">
 
     <div class="giftcards-text">
@@ -2765,17 +3681,18 @@ window.messages = messages;
 
       <a href="mailto:ceramist.doronina@gmail.com" class="pill-btn giftcards-cta">
         <span class="pill-text" data-i18n="giftcards.cta">Scrivi per una Gift Card</span>
+        <span class="pill-arrow" aria-hidden="true"></span>
       </a>
     </div>
 
     <div class="giftcards-img">
-      <!-- Usa una foto dedicata alle gift card, se ce l’hai -->
       <div aria-hidden="true" style="height:24px"></div>
-      <img src="images/giftcard.jpg" alt="Carta regalo di  Ceramics Doronina pronta per essere regalata">
+      <img src="images/giftcard.jpg" alt="Carta regalo Ceramics Doronina pronta per essere regalata">
+      <div aria-hidden="true" style="height:24px"></div>
     </div>
-    <div aria-hidden="true" style="height:24px"></div>
 
-  </div>
+  </div><!-- /container.giftcards -->
+
   <!-- BLOCCO CERTIFICATI DINAMICI DA certificati.csv -->
   <div class="container">
     <div class="catalogue-header">
@@ -2872,6 +3789,12 @@ window.messages = messages;
       </ul>
     </nav>
 
+    <button id="cart-open-btn"
+        class="nav-icon-btn"
+        type="button"
+        aria-label="Open cart">
+      <img src="images/shopping.svg" alt="">
+    </button>
     <!-- Selettore lingua -->
     <div class="lang">
       <select id="language-selector">
@@ -2880,7 +3803,6 @@ window.messages = messages;
         <option value="en">🇬🇧 EN</option>
       </select>
     </div>
-
     <!-- Pulsante hamburger per mobile -->
     <button class="nav-toggle-btn" id="nav-toggle" aria-label="Apri/chiudi menu">
       ☰
@@ -2963,83 +3885,58 @@ window.messages = messages;
 ===== ui.js =====
 // ui.js
 (function () {
+  // ─────────────────────────────────────────────
+  // NAVBAR: hamburger open/close
+  // ─────────────────────────────────────────────
+  function initNavbarToggle() {
+    const body = document.body;
+    const toggle = document.getElementById("nav-toggle") || document.querySelector(".nav-toggle-btn");
+    const navUl = document.querySelector("header nav ul");
 
+    if (!toggle || !navUl) {
+      console.warn("[UI] nav toggle elements not found");
+      return;
+    }
+
+    // evita doppio binding
+    if (toggle.dataset.bound === "1") return;
+    toggle.dataset.bound = "1";
+
+    toggle.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const isOpen = body.classList.toggle("nav-open");
+      toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    });
+  }
+
+  // chiudi menu cliccando fuori / su link
   function initNavbarAutoClose() {
     document.addEventListener("click", (e) => {
-      if (!document.body.classList.contains("nav-open")) return;
-  
+      const body = document.body;
+      if (!body.classList.contains("nav-open")) return;
+
       const clickedToggle = e.target.closest("#nav-toggle, .nav-toggle-btn");
       const clickedInsideMenu = e.target.closest("header nav ul");
-  
-      // Non chiudere se sto cliccando sul bottone hamburger o dentro al menu
       if (clickedToggle || clickedInsideMenu) return;
-  
-      // Chiudi in tutti gli altri casi (fuori header + dentro header ma fuori menu)
-      document.body.classList.remove("nav-open");
+
+      body.classList.remove("nav-open");
     });
-  
-    // Chiudi anche quando clicchi su una voce del menu
+
     document.addEventListener("click", (e) => {
       const link = e.target.closest("header nav a");
       if (!link) return;
       document.body.classList.remove("nav-open");
     });
-  
-    // ESC
+
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        document.body.classList.remove("nav-open");
-      }
+      if (e.key === "Escape") document.body.classList.remove("nav-open");
     });
   }
 
-  function initNavbarToggle() {
-    const body = document.body;
-    const toggle = document.querySelector("header #nav-toggle") ||
-               document.querySelector("header .nav-toggle-btn");
-    const navUl = document.querySelector("header nav ul");
-  
-    console.log("🔍 [UI] Inizializzazione navbar toggle");
-    console.log("🔍 [UI] Toggle button trovato:", !!toggle);
-    console.log("🔍 [UI] Nav ul trovato:", !!navUl);
-  
-    if (!toggle) {
-      console.warn("❌ [UI] Toggle button non trovato");
-      return;
-    }
-    
-    if (!navUl) {
-      console.warn("❌ [UI] Nav ul non trovato");
-      return;
-    }
-  
-    // Evita listener duplicati
-    if (toggle.dataset.bound === "1") {
-      console.log("✅ [UI] Toggle già inizializzato");
-      return;
-    }
-    toggle.dataset.bound = "1";
-  
-    toggle.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      const wasOpen = body.classList.contains("nav-open");
-      body.classList.toggle("nav-open");
-      const isOpen = body.classList.contains("nav-open");
-      
-      console.log("🔍 [UI] Toggle cliccato");
-      console.log("🔍 [UI] Era aperto:", wasOpen);
-      console.log("🔍 [UI] Ora aperto:", isOpen);
-      console.log("🔍 [UI] Body classes:", body.className);
-      console.log("🔍 [UI] Nav ul display:", window.getComputedStyle(navUl).display);
-      
-      toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    });
-    
-    console.log("✅ [UI] Navbar toggle inizializzato");
-  }
-
+  // ─────────────────────────────────────────────
+  // VIEW TOGGLE (mobile-view class)
+  // ─────────────────────────────────────────────
   function setViewMode(mode) {
     if (mode === "mobile") document.body.classList.add("mobile-view");
     else document.body.classList.remove("mobile-view");
@@ -3048,9 +3945,7 @@ window.messages = messages;
 
   function initViewToggle() {
     const saved = localStorage.getItem("cd_view");
-    if (saved === "mobile" || saved === "desktop") {
-      setViewMode(saved);
-    }
+    if (saved === "mobile" || saved === "desktop") setViewMode(saved);
 
     const btn = document.getElementById("view-toggle-btn");
     if (!btn) return;
@@ -3062,11 +3957,395 @@ window.messages = messages;
     });
   }
 
+  // ─────────────────────────────────────────────
+  // SHOPIFY (Cart/Checkout adaptive)
+  // ─────────────────────────────────────────────
+  const SHOP_DOMAIN = "ceramicsdoronina.myshopify.com";
+  const STOREFRONT_TOKEN = "de1ab17005ca54e662d4c86543f523cd";
+  const CHECKOUT_KEY = "cd_checkout_id_v1";
+  const CART_KEY     = "cd_cart_id_v1";
+  
+  function toStorefrontVariantId(id) {
+    const s = String(id || "").trim();
+    if (!s) return "";
+    if (s.startsWith("gid://shopify/ProductVariant/")) return s;
+    if (s.startsWith("Z2lkOi8v")) return s;
+    return btoa(`gid://shopify/ProductVariant/${s}`);
+  }
+  
+  function getCheckoutUrl(obj) {
+    return (obj && (obj.checkoutUrl || obj.webUrl)) || "";
+  }
+  
+  function getLang() {
+    return (
+      window.CD?.i18n?.lang ||
+      window.CD?.i18n?.currentLang ||
+      document.documentElement.lang ||
+      "it"
+    );
+  }
+  
+  function t(keyPath) {
+    const lang = getLang();
+    const all = window.CD?.i18n?.messages || {};
+    const dict = all[lang] || all.it || {};
+    return keyPath.split(".").reduce((o, k) => (o && o[k] != null ? o[k] : null), dict);
+  }
+  
   window.CD = window.CD || {};
+  const existingShop = window.CD.shop || {};
+  
+  window.CD.shop = Object.assign(existingShop, {
+    client: existingShop.client || null,
+    storeId: existingShop.storeId || null, // cartId o checkoutId
+    mode: existingShop.mode || null,
+    isReady: existingShop.isReady || false,
+    _initPromise: null,
+    _addBusy: false,
+  
+    _api() {
+      if (this.client && this.client.cart) return { api: this.client.cart, mode: "cart", key: CART_KEY };
+      return { api: this.client.checkout, mode: "checkout", key: CHECKOUT_KEY };
+    },
+  
+    async init(force = false) {
+      if (this._initPromise && !force) return this._initPromise;
+
+      this._initPromise = (async () => {
+      
+            if (typeof ShopifyBuy === "undefined" || !ShopifyBuy.buildClient) {
+              console.error("❌ [SHOP] ShopifyBuy non disponibile (manca buy-button-storefront.min.js)");
+              return;
+            }
+        
+            if (!this.client || force) {
+              this.client = ShopifyBuy.buildClient({
+                domain: SHOP_DOMAIN,
+                storefrontAccessToken: STOREFRONT_TOKEN
+              });
+            }
+        
+            const { api, mode, key } = this._api();
+      
+            this.mode = mode;
+        
+            const saved = localStorage.getItem(key);
+      
+            if (saved) this.storeId = saved;
+        
+            if (this.storeId) {
+              try {
+                const existing = await api.fetch(this.storeId);
+                if (!existing) {
+                  console.warn("⚠️ [SHOP] api.fetch null → reset id:", this.storeId);
+                  localStorage.removeItem(key);
+                  this.storeId = null;
+                } else if (existing.completedAt) {
+                  console.warn("⚠️ [SHOP] store completato → reset id:", this.storeId);
+                  localStorage.removeItem(key);
+                  this.storeId = null;
+                }
+              } catch (e) {
+                // "Load failed" è spesso rete / troppi fetch in parallelo / Safari glitch
+                const msg = String(e && (e.message || e)).toLowerCase();
+                console.warn("⚠️ [SHOP] api.fetch errore:", e);
+              
+                if (msg.includes("load failed")) {
+                  // NON resettare: lascia l'id e riprova più tardi
+                  console.warn("⚠️ [SHOP] errore transitorio (Load failed) → NON resetto storeId");
+                  return; // esci da init senza distruggere lo stato
+                }
+              
+                // altri errori: qui sì resetti
+                localStorage.removeItem(key);
+                this.storeId = null;
+              }
+            }
+        
+            if (!this.storeId) {
+              const created = await api.create();
+              this.storeId = created.id;
+              localStorage.setItem(key, this.storeId);
+            }
+        
+            this.isReady = true;
+            console.log("✅ [SHOP] Store pronto:", this.mode, this.storeId);
+            console.log("🧪 [SHOP] mode:", this.mode, "has cart:", !!this.client.cart);
+        
+            await this.renderDrawer();
+      })();
+      const res = this._initPromise;
+      try { await res; } finally { this._initPromise = null; }
+      return res;
+    },
+  
+    async resetCart() {
+      this.closeDrawer();
+
+      const { api, mode, key } = this._api();
+      this.mode = mode;
+
+      localStorage.removeItem(key);
+      this.storeId = null;
+      this.isReady = false;
+
+      const created = await api.create();
+      this.storeId = created.id;
+      localStorage.setItem(key, this.storeId);
+
+      this.isReady = true;
+      console.log("✅ [SHOP] Store ricreato:", this.mode, this.storeId);
+    },
+  
+    async addVariant(variantId, qty = 1) {
+      if (this._addBusy) {
+        console.warn("⚠️ [SHOP] addVariant ignorato (busy)");
+        return false;
+      }
+      this._addBusy = true;
+      try {
+            await this.init();
+            const { api } = this._api();
+            if (!api || !this.storeId) return false;
+        
+            const storefrontId = toStorefrontVariantId(variantId);
+            if (!storefrontId) return false;
+        
+            try {
+              if (typeof api.addLineItems === "function") {
+                await api.addLineItems(this.storeId, [{ variantId: storefrontId, quantity: qty }]);
+              } else if (typeof api.addLines === "function") {
+                await api.addLines(this.storeId, [{ merchandiseId: storefrontId, quantity: qty }]);
+              } else {
+                console.error("❌ [SHOP] Nessun metodo addLineItems/addLines");
+                return false;
+              }
+        
+              await this.renderDrawer();
+              this.openDrawer();
+              return true;
+            } catch (err) {
+              console.error("❌ [SHOP] add FAILED:", err);
+        
+              // retry una volta
+              try {
+                await this.resetCart();
+                const { api: api2 } = this._api();
+        
+                if (typeof api2.addLineItems === "function") {
+                  await api2.addLineItems(this.storeId, [{ variantId: storefrontId, quantity: qty }]);
+                } else if (typeof api2.addLines === "function") {
+                  await api2.addLines(this.storeId, [{ merchandiseId: storefrontId, quantity: qty }]);
+                } else {
+                  return false;
+                }
+        
+                await this.renderDrawer();
+                this.openDrawer();
+                return true;
+              } catch (err2) {
+                console.error("❌ [SHOP] add retry FAILED:", err2);
+                return false;
+              }
+            }
+      } finally {
+        this._addBusy = false;
+      }
+    },
+  
+    async removeLineItem(lineId) {
+      await this.init();
+      const { api } = this._api();
+      if (!api || !this.storeId) return;
+  
+      try {
+        if (typeof api.removeLineItems === "function") {
+          await api.removeLineItems(this.storeId, [lineId]);
+        } else if (typeof api.removeLines === "function") {
+          await api.removeLines(this.storeId, [lineId]);
+        } else {
+          console.error("❌ [SHOP] Nessun metodo removeLineItems/removeLines");
+          return;
+        }
+        await this.renderDrawer();
+      } catch (err) {
+        console.error("❌ [SHOP] remove FAILED:", err);
+      }
+    },
+  
+    async renderDrawer() {
+      const itemsEl = document.getElementById("cart-items");
+      const totalEl = document.getElementById("cart-total");
+      const checkoutBtn = document.getElementById("cart-checkout-btn");
+      if (!itemsEl || !totalEl || !checkoutBtn) return;
+  
+      if (!this.client || !this.storeId) return;
+  
+      const { api } = this._api();
+  
+      const obj = await api.fetch(this.storeId);
+      if (!obj) {
+        console.warn("⚠️ [SHOP] fetch null in renderDrawer → creo store nuovo e mostro carrello vuoto");
+        await this.resetCart();
+      
+        // mostra vuoto e non loopare
+        itemsEl.innerHTML = `<div style="color:var(--muted)">${t("cart.empty") || "Il carrello è vuoto"}</div>`;
+        totalEl.textContent = "0";
+        checkoutBtn.removeAttribute("href");
+        return;
+      }
+  
+      const url = getCheckoutUrl(obj);
+      if (!url) {
+        console.warn("⚠️ [SHOP] checkoutUrl/webUrl mancante → reset");
+        await this.resetCart();
+        return;
+      }
+      checkoutBtn.href = url;
+  
+      if (!checkoutBtn.dataset.boundCheckoutTrack) {
+        checkoutBtn.dataset.boundCheckoutTrack = "1";
+        checkoutBtn.addEventListener("click", () => {
+          localStorage.setItem("cd_checkout_started", "1");
+          localStorage.setItem("cd_checkout_ts", String(Date.now()));
+        });
+      }
+  
+      checkoutBtn.textContent = (window.CD?.i18n?.messages?.[getLang()]?.cart?.checkout) || "Checkout";
+  
+      // totale (minimo)
+      const amount =
+        obj?.subtotalPriceV2?.amount ||
+        obj?.cost?.subtotalAmount?.amount ||
+        "0";
+      const currency =
+        obj?.subtotalPriceV2?.currencyCode ||
+        obj?.cost?.subtotalAmount?.currencyCode ||
+        "";
+      totalEl.textContent = `${amount} ${currency}`.trim();
+  
+      const lineItems = obj.lineItems || obj.lines || [];
+      const arr = Array.isArray(lineItems)
+        ? lineItems
+        : (lineItems?.edges ? lineItems.edges.map(e => e.node) : []);
+  
+      if (!arr.length) {
+        itemsEl.innerHTML = `<div style="color:var(--muted)">${t("cart.empty") || "Il carrello è vuoto"}</div>`;
+        return;
+      }
+  
+      const lang = getLang();
+  
+      itemsEl.innerHTML = arr.map((li) => {
+        const id = li.id;
+        const q = li.quantity || 1;
+        const title = li.title || li.merchandise?.product?.title || "Item";
+  
+        const img =
+          li?.variant?.image?.src ||
+          li?.merchandise?.image?.src ||
+          "";
+  
+        const variantNumeric =
+          li?.variant?.id ? String(li.variant.id).split("/").pop()
+          : (li?.merchandise?.id ? String(li.merchandise.id).split("/").pop() : "");
+  
+        const localName = window.CD?.shop?.nameByVariant?.[variantNumeric]?.[lang];
+        const finalTitle = localName || title;
+  
+        return `
+          <div class="cart-item">
+            ${img ? `<img class="cart-item__img" src="${img}" alt="">` : ""}
+            <div class="cart-item__meta">
+              <div class="cart-item__title">${finalTitle}</div>
+              <div class="cart-item__sub">${t("cart.qty") || "Qty"}: ${q}</div>
+              <button type="button" class="cart-item__remove" data-line-id="${id}">
+                ${t("cart.remove") || "Remove"}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    },
+  
+    openDrawer() {
+      const drawer = document.getElementById("cart-drawer");
+      if (!drawer) return;
+      drawer.classList.add("is-open");
+      drawer.setAttribute("aria-hidden", "false");
+    },
+    
+    closeDrawer() {
+      const drawer = document.getElementById("cart-drawer");
+      if (!drawer) return;
+      drawer.classList.remove("is-open");
+      drawer.setAttribute("aria-hidden", "true");
+    }
+  
+  });
+
+  // ─────────────────────────────────────────────
+  // CART OPEN/CLOSE BUTTONS
+  // ─────────────────────────────────────────────
+  function initCartOpenButton() {
+    const drawer = document.getElementById("cart-drawer");
+    if (!drawer) {
+      console.warn("[UI] #cart-drawer non trovato");
+      return;
+    }
+  
+    // evita doppio binding
+    if (drawer.dataset.bound === "1") return;
+    drawer.dataset.bound = "1";
+  
+    async function openCart(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      await window.CD.shop.init();
+      await window.CD.shop.renderDrawer();
+      window.CD.shop.openDrawer();      // <-- usa is-open
+    }
+  
+    function closeCart(e) {
+      if (e) { e.preventDefault(); e.stopPropagation(); }
+      window.CD.shop.closeDrawer();     // <-- usa is-open
+    }
+  
+    document.addEventListener("click", (e) => {
+      const openBtn = e.target.closest("#cart-open-btn");
+      if (openBtn) return openCart(e);
+  
+      const closeBtn = e.target.closest("#cart-close-btn");
+      if (closeBtn) return closeCart(e);
+  
+      // click sullo sfondo (il contenitore #cart-drawer)
+      if (e.target.closest("[data-cart-backdrop]")) return closeCart(e);
+    }, false);
+  
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeCart(e);
+    });
+  }
+
+  // delegazione remove item
+  document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".cart-item__remove");
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const lineId = btn.dataset.lineId;
+    if (!lineId) return;
+    await window.CD.shop.removeLineItem(lineId);
+  });
+
+  // ─────────────────────────────────────────────
+  // EXPORT
+  // ─────────────────────────────────────────────
   window.CD.ui = {
     initNavbarToggle,
     initNavbarAutoClose,
-    initViewToggle
+    initViewToggle,
+    initCartOpenButton
   };
 })();
 
