@@ -59,7 +59,7 @@
   </script>
 
 
-  <title>Ceramics Doronina</title>
+  <title>Ceramics Doronina · Stripe</title>
 
   <!-- SheetJS (per ODS) -->
   <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
