@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pagamento riuscito</title>
+  <meta name="robots" content="noindex" />
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; margin:0; padding:32px; color:#111;}
+    .box{max-width:720px; margin:0 auto; border:1px solid #e5e5e5; padding:18px 20px;}
+    .muted{color:#666;}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1 id="t">Pagamento riuscito</h1>
+    <p class="muted" id="p">Sto aggiornando il carrello…</p>
+  </div>
+
+  <script>
+    (function () {
+      const lang = (localStorage.getItem("cd_lang") || "it").slice(0,2);
+      const txt = {
+        it: { t:"Pagamento riuscito", p:"Grazie! Sto svuotando il carrello e ti riporto al catalogo…" },
+        en: { t:"Payment successful", p:"Thank you! Clearing the cart and redirecting you to the catalogue…" },
+        ru: { t:"Платёж прошёл успешно", p:"Спасибо! Очищаю корзину и возвращаю вас в каталог…" },
+      };
+      const d = txt[lang] || txt.it;
+      document.getElementById("t").textContent = d.t;
+      document.getElementById("p").textContent = d.p;
+
+      async function clearCartBestEffort() {
+        try {
+          // Se la tua pagina principale carica uiStripe.js, questo non ci sarà qui.
+          // Ma se in futuro includi uiStripe anche qui, funzionerà automaticamente.
+          if (window.CD && CD.shop && typeof CD.shop.resetCart === "function") {
+            await CD.shop.resetCart();
+            return;
+          }
+        } catch (e) {}
+
+        // Fallback: svuota la chiave usata da uiStripe.js
+        try { localStorage.removeItem("cd_stripe_cart_v1"); } catch(e) {}
+        // Se hai altre chiavi di tracking checkout, puoi aggiungerle qui (facoltativo)
+        try { localStorage.removeItem("cd_checkout_started"); } catch(e) {}
+        try { localStorage.removeItem("cd_checkout_ts"); } catch(e) {}
+      }
+
+      clearCartBestEffort().finally(() => {
+        // Torna al catalogo
+        const base = window.location.origin;
+        window.location.replace(base + "/#catalogue");
+      });
+    })();
+  </script>
+</body>
+</html>
+

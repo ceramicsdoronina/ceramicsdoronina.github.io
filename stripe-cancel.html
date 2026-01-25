@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pagamento annullato</title>
+  <meta name="robots" content="noindex" />
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; margin:0; padding:32px; color:#111;}
+    .box{max-width:720px; margin:0 auto; border:1px solid #e5e5e5; padding:18px 20px;}
+    .muted{color:#666;}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1 id="t">Pagamento annullato</h1>
+    <p class="muted" id="p">Nessun addebito effettuato. Ti riporto al catalogo…</p>
+  </div>
+
+  <script>
+    (function () {
+      const lang = (localStorage.getItem("cd_lang") || "it").slice(0,2);
+      const txt = {
+        it: { t:"Pagamento annullato", p:"Nessun addebito effettuato. Ti riporto al catalogo…" },
+        en: { t:"Payment cancelled", p:"No charge was made. Redirecting you to the catalogue…" },
+        ru: { t:"Платёж отменён", p:"Списания не было. Возвращаю вас в каталог…" },
+      };
+      const d = txt[lang] || txt.it;
+      document.getElementById("t").textContent = d.t;
+      document.getElementById("p").textContent = d.p;
+
+      const base = window.location.origin;
+      setTimeout(() => window.location.replace(base + "/#catalogue"), 400);
+    })();
+  </script>
+</body>
+</html>
+
