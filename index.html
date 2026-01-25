@@ -76,6 +76,60 @@
   <link rel="stylesheet" href="Stripe/css/stripe.css">
 </head>
 <body>
+  <div id="cookie-banner" style="position:fixed; left:0; right:0; bottom:0; z-index:999999;
+    background:white; border-top:1px solid #e5e5e5; padding:14px 16px; display:none;">
+    <div style="max-width:1200px; margin:0 auto; display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+      <div style="flex:1; min-width:260px;">
+        Questo sito usa cookie per statistiche (Google Analytics) e marketing (Meta Pixel).
+        <a href="/cookie-policy.html" target="_blank" rel="noopener">Cookie policy</a>
+        ·
+        <a href="/privacy-policy.html" target="_blank" rel="noopener">Privacy policy</a>
+      </div>
+      <button id="cookie-reject" style="padding:10px 12px; border:1px solid #111; background:#fff; cursor:pointer;">
+        Rifiuta
+      </button>
+      <button id="cookie-accept" style="padding:10px 12px; border:1px solid #7d0f0f; background:#7d0f0f; color:#fff; cursor:pointer;">
+        Accetta
+      </button>
+    </div>
+  </div>
+  
+  <script>
+    (function(){
+      const CONSENT_KEY = "cd_cookie_consent_v1";
+      function getConsent() {
+        try { return JSON.parse(localStorage.getItem(CONSENT_KEY) || "{}"); }
+        catch { return {}; }
+      }
+      function setConsent(obj) {
+        localStorage.setItem(CONSENT_KEY, JSON.stringify(obj || {}));
+      }
+  
+      const banner = document.getElementById("cookie-banner");
+      const btnA = document.getElementById("cookie-accept");
+      const btnR = document.getElementById("cookie-reject");
+  
+      const c = getConsent();
+      if (!c || (c.analytics == null && c.marketing == null)) {
+        banner.style.display = "block";
+      }
+  
+      btnA.addEventListener("click", () => {
+        // qui: “Accetta tutto” (analytics + marketing)
+        setConsent({ analytics: true, marketing: true, ts: Date.now() });
+        banner.style.display = "none";
+        if (window.enableGoogleAnalytics) window.enableGoogleAnalytics();
+        if (window.enableMetaPixel) window.enableMetaPixel();
+      });
+  
+      btnR.addEventListener("click", () => {
+        // rifiuto totale
+        setConsent({ analytics: false, marketing: false, ts: Date.now() });
+        banner.style.display = "none";
+      });
+    })();
+  </script>
+
   <!-- Navbar -->
   <div id="import-navbar"></div>
 
