@@ -53,12 +53,14 @@
   }
 
   function parseEuroToCents(v) {
-    const s = String(v || "").trim();
-    if (!s || s === "-") return null;
-    // gestisce "1.234,56" e "1234.56"
-    const norm = s.replace(/\./g, "").replace(",", ".");
-    const n = Number(norm);
-    if (!isFinite(n)) return null;
+    const s = String(v ?? "")
+      .replace(/\s/g, "")
+      .replace("€", "")
+      .replace(/\./g, "")     // separatori migliaia
+      .replace(",", ".");     // virgola decimale
+  
+    const n = Number(s);
+    if (!isFinite(n)) return 0;
     return Math.round(n * 100);
   }
 

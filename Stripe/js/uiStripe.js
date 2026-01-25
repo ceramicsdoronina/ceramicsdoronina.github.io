@@ -90,7 +90,7 @@
   // STRIPE CART (client-side) + checkout via endpoint server-side
   // ─────────────────────────────────────────────
   const CART_KEY = "cd_stripe_cart_v1";
-  const CHECKOUT_ENDPOINT = "/.netlify/functions/create-checkout"; // Netlify Functions
+  const CHECKOUT_ENDPOINT = "https://ceramicsdoronina.netlify.app/.netlify/functions/create-checkout";
 
   function readCart() {
     try {
@@ -117,11 +117,15 @@
     return c === "EUR" ? `${v} €` : `${v} ${c}`;
   }
 
-  async function createCheckoutSession(lineItems) {
+  async function createCheckoutSession(items) {
     const res = await fetch(CHECKOUT_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ lineItems, locale: getLang() })
+      body: JSON.stringify({
+        origin: window.location.origin,
+        items: items,
+        locale: getLang()
+      })
     });
     if (!res.ok) {
       const txt = await res.text().catch(() => "");
@@ -210,7 +214,12 @@
         const qty = Math.max(1, Number(ci.qty || 1));
         totalCents += (Number(p.priceCents || 0) * qty);
 
-        const title = (p.titles && (p.titles[lang] || p.titles.it || p.titles.en || p.titles.ru)) || ci.id;
+        const title =
+          (p.titleByLang && (p.titleByLang[lang] || p.titleByLang.it || p.titleByLang.en || p.titleByLang.ru)) ||
+          (p.nameByLang  && (p.nameByLang[lang]  || p.nameByLang.it  || p.nameByLang.en  || p.nameByLang.ru))  ||
+          (p.titles      && (p.titles[lang]      || p.titles.it      || p.titles.en      || p.titles.ru))      ||
+          p.title ||
+          ci.id;
         const price = formatMoney(Number(p.priceCents || 0) * qty, currency);
 
         return `
@@ -248,11 +257,18 @@
             const lineItems = readCart().map(ci => {
               const p = this.products[normalizeId(ci.id)];
               if (!p) return null;
+              const lang = getLang();
+              const title =
+                (p.titleByLang && (p.titleByLang[lang] || p.titleByLang.it || p.titleByLang.en || p.titleByLang.ru)) ||
+                (p.nameByLang  && (p.nameByLang[lang]  || p.nameByLang.it  || p.nameByLang.en  || p.nameByLang.ru))  ||
+                (p.titles      && (p.titles[lang]      || p.titles.it      || p.titles.en      || p.titles.ru))      ||
+                p.title ||
+                normalizeId(ci.id);
+              
               return {
                 id: normalizeId(ci.id),
                 quantity: Math.max(1, Number(ci.qty || 1)),
-                // metadata utili per creare il prodotto in checkout
-                name: (p.titles && (p.titles[getLang()] || p.titles.it || p.titles.en || p.titles.ru)) || normalizeId(ci.id),
+                name: title,                       // <-- QUI la fix
                 currency: (p.currency || "EUR").toLowerCase(),
                 unit_amount: Number(p.priceCents || 0),
                 image: p.img || ""
