@@ -3,61 +3,31 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-CK9T9455XR"></script>
   <script>
-    // --- Consent state (persistito) ---
-    const CONSENT_KEY = "cd_cookie_consent_v1";
-    function getConsent() {
-      try { return JSON.parse(localStorage.getItem(CONSENT_KEY) || "{}"); }
-      catch { return {}; }
-    }
-    function setConsent(obj) {
-      localStorage.setItem(CONSENT_KEY, JSON.stringify(obj || {}));
-    }
-  
-    // --- Lazy loaders (caricati SOLO dopo consenso) ---
-    function loadScriptOnce(id, src) {
-      if (document.getElementById(id)) return;
-      const s = document.createElement("script");
-      s.id = id;
-      s.async = true;
-      s.src = src;
-      document.head.appendChild(s);
-    }
-  
-    function enableGoogleAnalytics() {
-      // carica gtag solo dopo consenso
-      loadScriptOnce("ga-gtag", "https://www.googletagmanager.com/gtag/js?id=G-CK9T9455XR");
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){ dataLayer.push(arguments); }
-      window.gtag = gtag;
-      gtag("js", new Date());
-      gtag("config", "G-CK9T9455XR", { anonymize_ip: true });
-    }
-  
-    function enableMetaPixel() {
-      // carica pixel solo dopo consenso
-      if (window.fbq) return;
-      !function(f,b,e,v,n,t,s){
-        if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-        n.queue=[];t=b.createElement(e);t.async=!0;
-        t.src=v;s=b.getElementsByTagName(e)[0];
-        s.parentNode.insertBefore(t,s)
-      }(window, document,'script','https://connect.facebook.net/en_US/fbevents.js');
-  
-      fbq("init", "1422337862632630");
-      fbq("track", "PageView");
-    }
-  
-    // Avvio automatico se già accettato in passato
-    document.addEventListener("DOMContentLoaded", () => {
-      const c = getConsent();
-      if (c.analytics) enableGoogleAnalytics();
-      if (c.marketing) enableMetaPixel();
-    });
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-CK9T9455XR');
   </script>
-
+  <!-- Meta Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1422337862632630');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1422337862632630&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
 
   <title>Ceramics Doronina · Stripe</title>
 
