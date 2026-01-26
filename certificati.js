@@ -4,6 +4,57 @@
   const CERT_IMG_DIR = "images/certificati";
   const FALLBACK_IMG = "images/giftcard.jpg"; // fallback già presente nel tuo sito
 
+  function getLang() {
+    return (
+      window.CD?.i18n?.lang ||
+      window.CD?.i18n?.currentLang ||
+      document.documentElement.lang ||
+      "it"
+    );
+  }
+
+  function moneyToCents(priceStr) {
+    const s = String(priceStr || "").trim();
+    if (!s || s === "-") return 0;
+    const cleaned = s.replace(/\s/g, "").replace("€", "").replace(",", ".");
+    const num = Number(cleaned);
+    if (!Number.isFinite(num)) return 0;
+    return Math.round(num * 100);
+  }
+  
+  function ensureGiftcardRegistered(gc) {
+    // id separato dai vasi e dalle masterclass
+    const pid = `gc:${String(gc.id || "").trim()}`;
+    if (!pid || pid === "gc:") return null;
+  
+    window.CD = window.CD || {};
+    window.CD.shop = window.CD.shop || {};
+    window.CD.shop.products = window.CD.shop.products || {};
+  
+    if (window.CD.shop.products[pid]) return pid;
+  
+    const titles = {
+      it: pickLangField(gc, "name", "it", "it"),
+      en: pickLangField(gc, "name", "en", "it"),
+      ru: pickLangField(gc, "name", "ru", "it"),
+    };
+  
+    const img = safeImg(gc.img1);
+    const priceCents = moneyToCents(gc.amount_eur);
+    const currency = "eur";
+  
+    window.CD.shop.products[pid] = {
+      id: pid,
+      type: "digital",     // <-- IMPORTANTISSIMO: no shipping
+      titles,
+      priceCents,
+      currency,
+      img
+    };
+  
+    return pid;
+  }
+
   async function loadCsv() {
     try {
       const res = await fetch("catalogue/certificati.ods", { cache: "no-store" });
@@ -113,6 +164,7 @@
     const buyLabel     = msgs?.giftcards?.buy     || "Buy";
     const detailsLabel = msgs?.giftcards?.details || "Details";
     const modalTitle   = msgs?.giftcards?.modalTitle || "Gift Card";
+    const ctaMailLabel = msgs?.giftcards?.cta || "Write me";
 
     grid.innerHTML = "";
     if (modalRoot) modalRoot.innerHTML = "";
@@ -124,6 +176,9 @@
 
       const img = safeImg(gc.img1);
       const amount = gc.amount_eur && gc.amount_eur !== "-" ? `${gc.amount_eur}€` : "";
+      const productId = ensureGiftcardRegistered(gc);
+      const canBuy = !!(productId && window.CD?.shop?.addItem);
+      const priceCents = moneyToCents(gc.amount_eur);
 
       const subject = `${modalTitle} ${amount}`.trim();
       const body = `${name}${amount ? " — " + amount : ""}`.trim();
@@ -143,7 +198,11 @@
           <p>${shortText}</p>
           ${amount ? `<div class="card-price"><span class="price-current">${amount}</span></div>` : ""}
           <div class="card-actions">
-            <a class="card-btn primary" href="${mailtoHref}" data-i18n="giftcards.buy">${buyLabel}</a>
+            ${
+              canBuy && priceCents > 0
+                ? `<button class="card-btn primary" type="button" data-add-giftcard="${productId}">${buyLabel}</button>`
+                : `<a class="card-btn primary" href="${mailtoHref}" data-i18n="giftcards.buy">${buyLabel}</a>`
+            }
             <button class="card-btn secondary" data-modal-target="gc-modal-${gc.id}" data-i18n="giftcards.details">${detailsLabel}</button>
           </div>
         </div>
@@ -168,7 +227,11 @@
                 <h3 class="vase-subtitle">${shortText}</h3>
                 ${amount ? `<div class="vase-price-row"><span class="vase-price">${amount}</span></div>` : ""}
                 <div class="vase-actions">
-                  <a class="vase-btn-primary" href="${mailtoHref}" data-i18n="giftcards.buy">${buyLabel}</a>
+                   ${
+                     canBuy && priceCents > 0
+                       ? `<button type="button" class="vase-btn-primary" data-add-giftcard="${productId}">${buyLabel}</button>`
+                       : `<a class="vase-btn-primary" href="${mailtoHref}" data-i18n="giftcards.buy">${buyLabel}</a>`
+                   }
                 </div>
                 <div class="accordion-panel active">
                   <p>${longText}</p>
@@ -187,6 +250,49 @@
       `;
       modalRoot.appendChild(modal);
     });
+    initBuyGiftcardOnce();
+  }
+
+  function initBuyGiftcardOnce() {
+    if (window.__cd_giftcard_buy_inited) return;
+    window.__cd_giftcard_buy_inited = true;
+  
+    document.addEventListener("click", async (e) => {
+      const btn = e.target.closest("[data-add-giftcard]");
+      if (!btn) return;
+  
+      e.preventDefault();
+      e.stopPropagation();
+  
+      const pid = String(btn.dataset.addGiftcard || "").trim();
+      if (!pid) return;
+  
+      if (!window.CD?.shop?.addItem) {
+        console.warn("CD.shop.addItem non disponibile");
+        return;
+      }
+  
+      const p = window.CD?.shop?.products?.[pid];
+      if (!p || !p.priceCents) {
+        console.warn("Giftcard non registrata o priceCents mancante:", pid);
+        return;
+      }
+  
+      try {
+        const lang = getLang();
+        await window.CD.shop.addItem({
+          id: pid,
+          type: "digital",
+          quantity: 1,
+          name: (p.titles && (p.titles[lang] || p.titles.it || p.titles.en || p.titles.ru)) || pid,
+          currency: (p.currency || "eur").toLowerCase(),
+          unit_amount: Number(p.priceCents),
+          image: p.img || ""
+        });
+      } catch (err) {
+        console.error("[GIFTCARDS] Errore add-to-cart", err);
+      }
+    }, false);
   }
 
   window.CD = window.CD || {};

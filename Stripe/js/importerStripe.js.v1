@@ -151,40 +151,6 @@
       return true;
     },
 
-    async addItem(item) {
-      const id = normalizeId(item?.id);
-      if (!id) return false;
-    
-      const cart = readCart();
-      const idx = cart.findIndex(x => normalizeId(x.id) === id);
-    
-      const q = Math.max(1, Number(item.quantity ?? item.qty ?? 1));
-      const unit = Number(item.unit_amount);
-    
-      if (!Number.isFinite(unit) || !Number.isInteger(unit) || unit <= 0) {
-        console.warn("⚠️ [STRIPE] unit_amount invalido per", id, unit);
-        return false;
-      }
-    
-      const normalized = {
-        id,
-        type: item.type === "digital" ? "digital" : "physical",
-        quantity: q,
-        name: String(item.name || id),
-        currency: String(item.currency || "eur").toLowerCase(),
-        unit_amount: unit,
-        image: item.image ? String(item.image) : ""
-      };
-    
-      if (idx >= 0) cart[idx].quantity = Math.min(99, Number(cart[idx].quantity || 1) + q);
-      else cart.push(normalized);
-    
-      writeCart(cart);
-      await this.renderDrawer();
-      this.openDrawer();
-      return true;
-    },
-
     async resetCart() {
       writeCart([]);
       await this.renderDrawer();
@@ -194,42 +160,18 @@
     async addVariant(productId, qty = 1) {
       const id = normalizeId(productId);
       if (!id) return false;
-    
+
       const p = this.products[id];
       if (!p) {
         console.warn("⚠️ [STRIPE] prodotto non registrato:", id);
         return false;
       }
-    
-      const lang = getLang();
-      const title =
-        (p.titleByLang && (p.titleByLang[lang] || p.titleByLang.it || p.titleByLang.en || p.titleByLang.ru)) ||
-        (p.nameByLang  && (p.nameByLang[lang]  || p.nameByLang.it  || p.nameByLang.en  || p.nameByLang.ru))  ||
-        (p.titles      && (p.titles[lang]      || p.titles.it      || p.titles.en      || p.titles.ru))      ||
-        p.title ||
-        id;
-    
+
       const cart = readCart();
       const idx = cart.findIndex(x => normalizeId(x.id) === id);
-    
-      const addQty = Math.max(1, Number(qty || 1));
-    
-      const baseItem = {
-        id,
-        type: "physical", // vasi = fisici
-        quantity: addQty,
-        name: title,
-        currency: (p.currency || "EUR").toLowerCase(),
-        unit_amount: Number(p.priceCents || 0),
-        image: p.img || ""
-      };
-    
-      if (idx >= 0) {
-        cart[idx].quantity = Math.min(99, Number(cart[idx].quantity || 1) + addQty);
-      } else {
-        cart.push(baseItem);
-      }
-    
+      if (idx >= 0) cart[idx].qty = Math.min(99, Number(cart[idx].qty || 1) + Number(qty || 1));
+      else cart.push({ id, qty: Math.max(1, Number(qty || 1)) });
+
       writeCart(cart);
       await this.renderDrawer();
       this.openDrawer();
@@ -242,7 +184,6 @@
       writeCart(cart);
       await this.renderDrawer();
     },
-
 
     async renderDrawer() {
       const itemsEl = document.getElementById("cart-items");
@@ -266,16 +207,24 @@
 
       const lang = getLang();
       const rows = cart.map((ci) => {
-        const qty = Math.max(1, Number(ci.quantity || 1));
-        const title = String(ci.name || ci.id);
-        const price = formatMoney(Number(ci.unit_amount || 0) * qty, (ci.currency || "eur").toUpperCase());
-      
-        totalCents += (Number(ci.unit_amount || 0) * qty);
-        currency = (ci.currency || "eur").toUpperCase();
-      
+        const p = this.products[normalizeId(ci.id)];
+        if (!p) return "";
+
+        currency = p.currency || currency;
+        const qty = Math.max(1, Number(ci.qty || 1));
+        totalCents += (Number(p.priceCents || 0) * qty);
+
+        const title =
+          (p.titleByLang && (p.titleByLang[lang] || p.titleByLang.it || p.titleByLang.en || p.titleByLang.ru)) ||
+          (p.nameByLang  && (p.nameByLang[lang]  || p.nameByLang.it  || p.nameByLang.en  || p.nameByLang.ru))  ||
+          (p.titles      && (p.titles[lang]      || p.titles.it      || p.titles.en      || p.titles.ru))      ||
+          p.title ||
+          ci.id;
+        const price = formatMoney(Number(p.priceCents || 0) * qty, currency);
+
         return `
           <div class="cart-item">
-            ${ci.image ? `<img class="cart-item__img" src="${ci.image}" alt="">` : ""}
+            ${p.img ? `<img class="cart-item__img" src="${p.img}" alt="">` : ""}
             <div class="cart-item__meta">
               <div class="cart-item__title">${title}</div>
               <div class="cart-item__sub">${t("cart.qty") || "Qty"}: ${qty} · ${price}</div>
@@ -285,7 +234,7 @@
             </div>
           </div>
         `;
-      }).join("");
+      }).filter(Boolean).join("");
 
       itemsEl.innerHTML = rows || `<div style="color:var(--muted)">${t("cart.empty") || "Il carrello e' vuoto"}</div>`;
       totalEl.textContent = formatMoney(totalCents, currency);
@@ -305,16 +254,26 @@
 
           try {
             // costruisci lineItems per backend
-            const lineItems = readCart().map(ci => ({
-              id: normalizeId(ci.id),
-              type: ci.type || "physical",
-              requires_shipping: (String(ci.type || "physical").toLowerCase() !== "digital"), // <-- QUI
-              quantity: Math.max(1, Number(ci.quantity || 1)),
-              name: String(ci.name || normalizeId(ci.id)),
-              currency: String(ci.currency || "eur").toLowerCase(),
-              unit_amount: Number(ci.unit_amount || 0),
-              image: ci.image ? String(ci.image) : ""
-            }));
+            const lineItems = readCart().map(ci => {
+              const p = this.products[normalizeId(ci.id)];
+              if (!p) return null;
+              const lang = getLang();
+              const title =
+                (p.titleByLang && (p.titleByLang[lang] || p.titleByLang.it || p.titleByLang.en || p.titleByLang.ru)) ||
+                (p.nameByLang  && (p.nameByLang[lang]  || p.nameByLang.it  || p.nameByLang.en  || p.nameByLang.ru))  ||
+                (p.titles      && (p.titles[lang]      || p.titles.it      || p.titles.en      || p.titles.ru))      ||
+                p.title ||
+                normalizeId(ci.id);
+              
+              return {
+                id: normalizeId(ci.id),
+                quantity: Math.max(1, Number(ci.qty || 1)),
+                name: title,                       // <-- QUI la fix
+                currency: (p.currency || "EUR").toLowerCase(),
+                unit_amount: Number(p.priceCents || 0),
+                image: p.img || ""
+              };
+            }).filter(Boolean);
 
             // tracking "best effort" come prima
             localStorage.setItem("cd_checkout_started", "1");
