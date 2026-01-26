@@ -120,8 +120,9 @@
         return;
       }
 
-      if (e.target.matches("[data-modal-close]")) {
-        e.target.closest(".modal")?.classList.remove("open");
+      const close = e.target.closest("[data-modal-close]");
+      if (close) {
+        close.closest(".modal")?.classList.remove("open");
         return;
       }
 
