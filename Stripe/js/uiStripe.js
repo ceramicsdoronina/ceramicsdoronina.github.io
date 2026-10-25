@@ -3,7 +3,7 @@
   const SUPPORTED_LOCALES = ["it", "en", "ru"];
 
   // ─────────────────────────────────────────────
-  // NAVBAR + VIEW TOGGLE (copiati dal tuo ui.js)
+  // NAVBAR + VIEW TOGGLE
   // ─────────────────────────────────────────────
   function initNavbarToggle() {
     const body = document.body;
@@ -101,44 +101,24 @@
   }
 
   // ─────────────────────────────────────────────
-  // STRIPE CART (client-side) + checkout via endpoint server-side
+  // STRIPE CART (strato DOM/localStorage; la logica pura sta in cart.js) + checkout via endpoint
   // Il server possiede prezzi, immagini, spedizione e stato "venduto":
   // il client invia solo {id, quantity} + locale. I campi di prezzo/nome
   // salvati nel carrello servono solo per la visualizzazione.
   // ─────────────────────────────────────────────
-  const CART_KEY = "cd_stripe_cart_v1";            // stessa chiave in stripe-success.html
-  const PENDING_KEY = "cd_checkout_pending";       // {session_id, ids, ts}
-  const DEFAULT_DIGITAL_MAX_QTY = 6;
-  const MAX_LINE_QTY = 99;
+  const cartLib = window.CD.cart;                  // Stripe/js/cart.js (caricato prima di questo file)
+  const CART_KEY = cartLib.CART_KEY;               // stessa chiave in stripe-success.html
+  const PENDING_KEY = cartLib.PENDING_KEY;         // mappa {"<session_id>": {ids, ts}}
   const CHECKOUT_TIMEOUT_MS = 20000;
-  const STRIPE_URL_PREFIX = "https://checkout.stripe.com/";
+  const REDIRECT_FALLBACK_MS = 12000;
 
   const util = () => window.CD.util;
-  const isValidId = (id) => util().isValidId(id);
+  const isValidId = (id) => cartLib.isValidId(id);
 
   // Fallback in memoria se localStorage non e' disponibile (modalita' privata, quota, ...)
   let memoryCart = null;
   let storageBroken = false;
   let droppedOnRead = 0;
-
-  function sanitizeLine(raw) {
-    if (!raw || typeof raw !== "object") return null;
-    const id = typeof raw.id === "string" ? raw.id.trim() : "";
-    if (!isValidId(id)) return null;
-    const quantity = raw.quantity;
-    if (!Number.isInteger(quantity) || quantity <= 0) return null;
-    const unit = Number.isInteger(raw.unit_amount) && raw.unit_amount > 0 ? raw.unit_amount : 0;
-    const image = typeof raw.image === "string" && /^images\/[^\s"'<>]+$/.test(raw.image) ? raw.image : "";
-    return {
-      id,
-      type: raw.type === "digital" ? "digital" : "physical",
-      quantity: Math.min(MAX_LINE_QTY, quantity),
-      name: typeof raw.name === "string" && raw.name ? raw.name.slice(0, 200) : id,
-      currency: "eur",
-      unit_amount: unit,   // solo visualizzazione
-      image
-    };
-  }
 
   function readCart() {
     let arr = [];
@@ -154,16 +134,9 @@
         arr = memoryCart || [];
       }
     }
-    const seen = new Set();
-    const clean = [];
-    droppedOnRead = 0;
-    for (const raw of arr) {
-      const line = sanitizeLine(raw);
-      if (!line || seen.has(line.id)) { droppedOnRead++; continue; }
-      seen.add(line.id);
-      clean.push(line);
-    }
-    return clean;
+    const res = cartLib.sanitizeCart(arr);
+    droppedOnRead = res.dropped;
+    return res.cart;
   }
 
   function writeCart(arr) {
@@ -181,19 +154,8 @@
     return String(x || "").trim();
   }
 
-  function positiveInt(n) {
-    return Number.isInteger(n) && n > 0 ? n : 0;
-  }
-
-  function validPrice(c) {
-    return Number.isInteger(c) && c > 0;
-  }
-
-  function formatMoney(amountCents, currency) {
-    const c = (currency || "EUR").toUpperCase();
-    const v = (Number(amountCents || 0) / 100).toFixed(2);
-    // stile semplice (evita Intl per compat)
-    return c === "EUR" ? `${v} €` : `${v} ${c}`;
+  function formatMoney(amountCents) {
+    return window.CD.money.format(amountCents, getLang());
   }
 
   function productTitle(p, id) {
@@ -202,10 +164,9 @@
     return titles[lang] || titles.it || titles.en || titles.ru || id;
   }
 
-  function maxQtyFor(p) {
-    if (!p || p.type !== "digital") return 1;            // pezzi unici: 1
-    return positiveInt(p.maxQty) || DEFAULT_DIGITAL_MAX_QTY;
-  }
+  // firma delle righe: serve a rilevare un carrello cambiato (altra scheda) tra drawer e click
+  const lineSig = (cart) => JSON.stringify(cart.map((c) => [c.id, c.quantity]));
+  let renderedSig = null;
 
   // ── messaggi nel drawer ──
   let noticeTimer = null;
@@ -222,6 +183,7 @@
   // ── checkout ──
   let checkoutBusy = false;
   let redirecting = false;
+  let redirectTimer = null;
 
   function applyCheckoutButtonState() {
     const btn = document.getElementById("cart-checkout-btn");
@@ -238,9 +200,21 @@
     btn.style.opacity = disabled ? "0.6" : "";
   }
 
+  function readPendingMap() {
+    try {
+      const raw = localStorage.getItem(PENDING_KEY);
+      return cartLib.normalizePending(raw ? JSON.parse(raw) : null);
+    } catch (err) {
+      console.warn("[CHECKOUT] cd_checkout_pending non leggibile:", err);
+      return {};
+    }
+  }
+
+  // Aggiunge la voce di QUESTA sessione alla mappa (le altre restano; voci > 24 h potate).
   function storePending(sessionId, ids) {
     try {
-      localStorage.setItem(PENDING_KEY, JSON.stringify({ session_id: sessionId, ids, ts: Date.now() }));
+      const map = cartLib.addPending(readPendingMap(), sessionId, ids, Date.now());
+      localStorage.setItem(PENDING_KEY, JSON.stringify(map));
     } catch (err) {
       console.warn("[CHECKOUT] cd_checkout_pending non salvato:", err);
     }
@@ -265,15 +239,40 @@
       err.status = res.status;
       err.requestId = data && data.request_id;
       err.serverError = data && data.error;
+      err.itemId = data && typeof data.item_id === "string" ? data.item_id : null;
       throw err;
     }
     return data;
+  }
+
+  // 400 con item_id: toglie quella riga dal carrello e, se il server dice "item_sold", segna
+  // l'articolo venduto per questa sessione (ri-render: niente piu' pulsante Compra).
+  async function dropUnavailableItem(itemId, serverError) {
+    writeCart(cartLib.removeLine(readCart(), itemId));
+    if (serverError === "item_sold") {
+      util().markSold(itemId);
+      try {
+        if (window.CD?.app?.renderData) window.CD.app.renderData(getLang());
+      } catch (err) {
+        console.error("[CHECKOUT] ri-render dopo articolo venduto fallito:", err);
+      }
+    }
+    await shop.renderDrawer();
+    showNotice(t("cart.removedUnavailable") || "Some items are no longer available and were removed.");
   }
 
   async function startCheckout() {
     if (checkoutBusy) return;
     const cart = readCart();
     if (!cart.length) return;
+
+    // il carrello letto ora deve coincidere con le righe mostrate nel drawer
+    // (altrimenti e' cambiato altrove, es. altra scheda): ridisegna e avvisa invece di inviare
+    if (renderedSig !== null && lineSig(cart) !== renderedSig) {
+      await shop.renderDrawer();
+      showNotice(t("cart.changed") || "Your cart was updated. Please review it and try again.");
+      return;
+    }
 
     checkoutBusy = true;
     applyCheckoutButtonState();
@@ -286,17 +285,29 @@
       const out = await createCheckoutSession(items, ctrl.signal);
 
       const url = out && typeof out.url === "string" ? out.url : "";
-      if (!url.startsWith(STRIPE_URL_PREFIX) || typeof out.session_id !== "string") {
+      if (!cartLib.isStripeUrl(url) || typeof out.session_id !== "string") {
         throw new Error("Risposta checkout non valida");
       }
 
       storePending(out.session_id, items.map((i) => i.id));
       redirecting = true;
       window.location.href = url;
+
+      // se la pagina e' ancora viva dopo 12 s (redirect bloccato, ecc.) sblocca il pulsante
+      clearTimeout(redirectTimer);
+      redirectTimer = setTimeout(() => {
+        redirecting = false;
+        checkoutBusy = false;
+        applyCheckoutButtonState();
+      }, REDIRECT_FALLBACK_MS);
     } catch (err) {
       console.error("[CHECKOUT] errore:", err && err.message, err && err.requestId ? `request_id=${err.requestId}` : "");
-      const key = err && err.status === 400 ? "checkoutStatus.itemUnavailable" : "checkoutStatus.error";
-      showNotice(t(key) || "Could not start payment, please try again or contact me.");
+      if (err && err.status === 400 && isValidId(err.itemId)) {
+        await dropUnavailableItem(err.itemId, err.serverError);
+      } else {
+        const key = err && err.status === 400 ? "checkoutStatus.itemUnavailable" : "checkoutStatus.error";
+        showNotice(t(key) || "Could not start payment. Please try again or contact me.");
+      }
     } finally {
       clearTimeout(timer);
       if (!redirecting) {
@@ -309,27 +320,15 @@
   window.CD = window.CD || {};
   const existingShop = window.CD.shop || {};
 
-  // CD.shop espone: addProduct (+ alias addVariant/addItem), removeLineItem, renderDrawer,
-  // resetCart, reconcileCart, openDrawer/closeDrawer, showNotice.
+  // CD.shop espone: addProduct, removeLineItem, renderDrawer, reconcileCart,
+  // openDrawer/closeDrawer, showNotice, products.
   const shop = Object.assign(existingShop, {
-    isReady: true,
-
-    // Registro prodotti (popolato da catalogueStripe.js, masterclass.js, certificati.js).
-    // Forma unica: products[id] = { id, type: "physical"|"digital", titles: {it,en,ru},
-    //                               priceCents, currency, img, maxQty?, sold? }
+    // Registro prodotti (popolato da catalogueStripe.js, masterclass.js, certificati.js via
+    // CD.util.registerProduct). Forma unica: products[id] = { id, type: "physical"|"digital",
+    //   titles: {it,en,ru}, priceCents, currency, img, maxQty?, sold?, source }
     products: existingShop.products || {},
 
-    async init() {
-      // no-op (il carrello e' locale)
-      return true;
-    },
-
     showNotice,
-
-    async resetCart() {
-      writeCart([]);
-      await shop.renderDrawer();
-    },
 
     // Aggiunge un prodotto del registro al carrello. Ritorna true se il carrello e' coerente
     // (anche se la riga esisteva gia'), false se il prodotto non e' acquistabile.
@@ -345,87 +344,38 @@
         console.warn("[CART] prodotto non registrato:", id);
         return false;
       }
-      if (p.sold) {
-        console.warn("[CART] prodotto venduto:", id);
+
+      const res = cartLib.mergeAdd(readCart(), p, qty, { name: productTitle(p, id) });
+
+      if (res.status === "invalid") {
+        console.warn("[CART] prodotto non acquistabile (venduto o prezzo non valido):", id);
         return false;
       }
-      if (!validPrice(p.priceCents)) {
-        console.warn("[CART] prezzo non valido per", id, p.priceCents);
-        return false;
+      if (res.status === "already") {
+        showNotice(t("cart.alreadyInCart") || "Already in your cart.");
+        await shop.renderDrawer();
+        return true;
+      }
+      if (res.status === "max") {
+        showNotice(t("cart.maxQty") || "Maximum quantity reached.");
+        return true;
       }
 
-      const type = p.type === "digital" ? "digital" : "physical";
-      const maxQty = maxQtyFor(p);
-      const addQty = positiveInt(qty) || 1;
-
-      const cart = readCart();
-      const line = cart.find((x) => x.id === id);
-
-      if (line) {
-        if (type === "physical") {
-          showNotice(t("cart.alreadyInCart") || "Already in your cart.");
-          await shop.renderDrawer();
-          return true;
-        }
-        if (line.quantity >= maxQty) {
-          showNotice(t("cart.maxQty") || "Maximum quantity reached.");
-          return true;
-        }
-        line.quantity = Math.min(maxQty, line.quantity + addQty);
-      } else {
-        cart.push({
-          id,
-          type,
-          quantity: Math.min(maxQty, addQty),
-          name: productTitle(p, id),
-          currency: "eur",
-          unit_amount: p.priceCents,   // solo visualizzazione
-          image: typeof p.img === "string" ? p.img : ""
-        });
-      }
-
-      writeCart(cart);
+      writeCart(res.cart);
       await shop.renderDrawer();
       shop.openDrawer();
       return true;
     },
 
-    // Alias per compatibilita' con codice che usa i vecchi nomi
-    async addVariant(productId, qty = 1) {
-      return shop.addProduct(productId, qty);
-    },
-
-    async addItem(item) {
-      return shop.addProduct(item && item.id, item && (item.quantity ?? item.qty) || 1);
-    },
-
     // Allinea il carrello salvato al registro: scarta prodotti sconosciuti/venduti e avvisa.
-    // opts.physicalKnown / opts.digitalKnown = false se il relativo catalogo non e' stato caricato
+    // opts.physicalKnown / opts.digitalKnown = false se il relativo catalogo non e' noto
     // (in quel caso non si tocca nulla di quel tipo).
     reconcileCart(opts = {}) {
       const cart = readCart();
-      let removed = droppedOnRead;
-      let changed = droppedOnRead > 0;
-      const out = [];
+      const res = cartLib.reconcile(cart, shop.products, Object.assign({}, opts, { nameFor: productTitle }));
+      const removed = droppedOnRead + res.removed;
 
-      for (const line of cart) {
-        const p = shop.products[line.id];
-        const known = line.type === "physical" ? opts.physicalKnown !== false : opts.digitalKnown !== false;
-
-        if (!known) { out.push(line); continue; }
-        if (!p || p.sold || !validPrice(p.priceCents) || (p.type || "physical") !== line.type) {
-          removed++;
-          changed = true;
-          continue;
-        }
-
-        const quantity = Math.min(line.quantity, maxQtyFor(p));
-        const name = productTitle(p, line.id);
-        if (quantity !== line.quantity || name !== line.name || p.priceCents !== line.unit_amount) changed = true;
-        out.push(Object.assign({}, line, { quantity, name, unit_amount: p.priceCents }));
-      }
-
-      if (changed) writeCart(out);
+      if (res.changed || droppedOnRead > 0) writeCart(res.cart);
       shop.renderDrawer();
       if (removed > 0) showNotice(t("cart.removedUnavailable") || "Some items are no longer available.");
       return removed;
@@ -433,7 +383,7 @@
 
     async removeLineItem(productId) {
       const id = normalizeId(productId);
-      writeCart(readCart().filter((x) => x.id !== id));
+      writeCart(cartLib.removeLine(readCart(), id));
       await shop.renderDrawer();
     },
 
@@ -445,11 +395,12 @@
 
       const esc = util().escapeHtml;
       const cart = readCart();
+      renderedSig = lineSig(cart);
       const emptyHtml = () => `<div style="color:var(--muted)">${esc(t("cart.empty") || "Il carrello e' vuoto")}</div>`;
 
       if (!cart.length) {
         itemsEl.innerHTML = emptyHtml();
-        totalEl.textContent = "0";
+        totalEl.textContent = formatMoney(0);
         applyCheckoutButtonState();
         return;
       }
@@ -458,7 +409,7 @@
       const rows = cart.map((ci) => {
         const p = shop.products[ci.id];
         const title = p ? productTitle(p, ci.id) : ci.name;
-        const unit = p && validPrice(p.priceCents) ? p.priceCents : ci.unit_amount;
+        const unit = p && cartLib.validPrice(p.priceCents) ? p.priceCents : ci.unit_amount;
         const lineCents = unit * ci.quantity;
         totalCents += lineCents;
 
@@ -467,7 +418,7 @@
             ${ci.image ? `<img class="cart-item__img" src="${esc(ci.image)}" alt="">` : ""}
             <div class="cart-item__meta">
               <div class="cart-item__title">${esc(title)}</div>
-              <div class="cart-item__sub">${esc(t("cart.qty") || "Qty")}: ${ci.quantity} · ${esc(formatMoney(lineCents, "EUR"))}</div>
+              <div class="cart-item__sub">${esc(t("cart.qty") || "Qty")}: ${ci.quantity} · <span class="nowrap">${esc(formatMoney(lineCents))}</span></div>
               <button type="button" class="cart-item__remove" data-line-id="${esc(ci.id)}">
                 ${esc(t("cart.remove") || "Remove")}
               </button>
@@ -477,7 +428,7 @@
       }).join("");
 
       itemsEl.innerHTML = rows || emptyHtml();
-      totalEl.textContent = formatMoney(totalCents, "EUR");
+      totalEl.textContent = formatMoney(totalCents);
       applyCheckoutButtonState();
     },
 
@@ -512,7 +463,6 @@
 
     async function openCart(e) {
       if (e) { e.preventDefault(); e.stopPropagation(); }
-      await shop.init();
       await shop.renderDrawer();
       shop.openDrawer();
     }
@@ -558,8 +508,14 @@
       closeCart(e);
     });
 
+    // carrello modificato in un'altra scheda: ridisegna il drawer (key null = storage svuotato)
+    window.addEventListener("storage", (e) => {
+      if (e.key === null || e.key === CART_KEY) shop.renderDrawer();
+    });
+
     // bfcache (Back dopo il redirect a Stripe): sblocca il pulsante e ridisegna
     window.addEventListener("pageshow", () => {
+      clearTimeout(redirectTimer);
       redirecting = false;
       checkoutBusy = false;
       shop.renderDrawer();

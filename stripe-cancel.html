@@ -21,7 +21,6 @@
 
   <script>
     (function () {
-      const PENDING_KEY = "cd_checkout_pending";   // stessa chiave di Stripe/js/uiStripe.js
       const REDIRECT_DELAY_MS = 1500;
 
       let lang = "it";
@@ -39,9 +38,8 @@
       if (dict.cancelBody) document.getElementById("p").textContent = dict.cancelBody;
       if (dict.backToCatalogue) document.getElementById("back").textContent = dict.backToCatalogue;
 
-      // Il carrello non si tocca: si elimina solo il marcatore del checkout in sospeso.
-      try { localStorage.removeItem(PENDING_KEY); }
-      catch (err) { console.warn("[cancel] rimozione cd_checkout_pending fallita:", err); }
+      // Il carrello e i marcatori dei checkout in sospeso non si toccano: l'URL di annullo non ha
+      // il session_id, quindi non si sa quale checkout sia stato annullato (le voci scadono dopo 24 h).
 
       setTimeout(function () {
         window.location.replace(window.location.origin + "/#catalogue");

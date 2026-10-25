@@ -11,20 +11,22 @@
     .muted{color:#666;}
   </style>
   <script src="messages.js"></script>
+  <script src="Stripe/js/cart.js"></script>
 </head>
 <body>
   <div class="box" role="status" aria-live="polite">
     <h1 id="t">Pagamento riuscito</h1>
-    <p class="muted" id="p">Il tuo ordine è in fase di processamento, a breve riceverai un messaggio.</p>
+    <p class="muted" id="p">Pagamento ricevuto. Stripe ti invierà la ricevuta via email. Ti contatterò per la consegna.</p>
+    <p class="muted" id="ref" hidden></p>
     <p><a id="back" href="/#catalogue">Torna al catalogo</a></p>
   </div>
 
   <script>
     (function () {
-      // Stesse chiavi di Stripe/js/uiStripe.js
-      const CART_KEY = "cd_stripe_cart_v1";
-      const PENDING_KEY = "cd_checkout_pending";
-      const REDIRECT_DELAY_MS = 2500;
+      // Chiavi e logica da Stripe/js/cart.js (stesse di Stripe/js/uiStripe.js)
+      const cartLib = window.CD && window.CD.cart;
+      const CART_KEY = cartLib ? cartLib.CART_KEY : "cd_stripe_cart_v1";
+      const PENDING_KEY = cartLib ? cartLib.PENDING_KEY : "cd_checkout_pending";
 
       function readJson(key, fallback) {
         try {
@@ -51,31 +53,33 @@
       if (dict.success) document.getElementById("p").textContent = dict.success;
       if (dict.backToCatalogue) document.getElementById("back").textContent = dict.backToCatalogue;
 
-      // Rimuove dal carrello SOLO le righe dell'ordine pagato, e solo se il session_id
-      // dell'URL coincide con quello salvato all'avvio del checkout.
-      try {
-        const pending = readJson(PENDING_KEY, null);
-        const sid = new URLSearchParams(window.location.search).get("session_id");
+      const sid = new URLSearchParams(window.location.search).get("session_id");
 
-        if (pending && typeof pending.session_id === "string" && sid && sid === pending.session_id
-            && Array.isArray(pending.ids)) {
-          const ids = new Set(pending.ids.map(String));
-          const cart = readJson(CART_KEY, []);
-          if (Array.isArray(cart)) {
-            const rest = cart.filter(function (line) { return !(line && ids.has(String(line.id))); });
-            localStorage.setItem(CART_KEY, JSON.stringify(rest));
-          }
+      // Riferimento ordine breve: ultimi 8 caratteri dopo il prefisso "cs_test_/cs_live_"
+      // (i primi 8 sarebbero sempre il prefisso). Utile per cercare la sessione nella Dashboard Stripe.
+      if (typeof sid === "string" && /^cs_(test|live)_[A-Za-z0-9]{8,}$/.test(sid)) {
+        const ref = document.getElementById("ref");
+        ref.textContent = (dict.orderRef || "Order reference") + ": " + sid.slice(-8);
+        ref.hidden = false;
+      }
+
+      // Rimuove dal carrello SOLO le righe dell'ordine pagato e SOLO la voce di questa sessione
+      // nella mappa cd_checkout_pending; un session_id che non corrisponde non cambia nulla.
+      try {
+        if (!cartLib) throw new Error("cart.js non caricato");
+        const map = cartLib.normalizePending(readJson(PENDING_KEY, null));
+        const cart = readJson(CART_KEY, []);
+        const res = cartLib.pendingAfterSuccess(map, sid, Array.isArray(cart) ? cart : []);
+        if (res.matched) {
+          // prima il carrello (id dell'ordine), poi la voce del marcatore
+          if (Array.isArray(cart)) localStorage.setItem(CART_KEY, JSON.stringify(res.cart));
+          if (Object.keys(res.map).length) localStorage.setItem(PENDING_KEY, JSON.stringify(res.map));
+          else localStorage.removeItem(PENDING_KEY);
         }
       } catch (err) {
         console.warn("[success] aggiornamento carrello fallito:", err);
       }
-
-      try { localStorage.removeItem(PENDING_KEY); }
-      catch (err) { console.warn("[success] rimozione cd_checkout_pending fallita:", err); }
-
-      setTimeout(function () {
-        window.location.replace(window.location.origin + "/#catalogue");
-      }, REDIRECT_DELAY_MS);
+      // nessun redirect automatico: la pagina resta finche' l'utente non usa il link
     })();
   </script>
 </body>
