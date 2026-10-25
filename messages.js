@@ -10,7 +10,8 @@ const messages = {
       catalogue: "Каталог",
       workshops: "Мастер-классы",
       giftcards: "Подарочные сертификаты",
-      contact: "Контакты"
+      contact: "Контакты",
+      menu: "Меню"
     },
     hero: {
       h1: "Современная художественная керамика ручной работы – Ceramics Doronina",
@@ -34,6 +35,7 @@ const messages = {
       lead: "Каждое изделие — это уникальная эмоция для вашего пространства",
       addToCart: "Купить",
       viewPhotos: "Подробнее",
+      unavailable: "Каталог временно недоступен. Пожалуйста, обновите страницу.",
       spec: {
         height: "Высота",
         diameter: "Диаметр",
@@ -96,11 +98,31 @@ const messages = {
       empty: "Корзина пуста",
       checkout: "Оформить",
       remove: "Удалить",
-      qty: "Кол-во"
+      qty: "Кол-во",
+      open: "Открыть корзину",
+      close: "Закрыть корзину",
+      alreadyInCart: "Это изделие уже в вашей корзине.",
+      addFailed: "Не удалось добавить товар в корзину. Попробуйте ещё раз.",
+      maxQty: "Достигнуто максимальное количество для этого товара.",
+      processing: "Переход к оплате…",
+      removedUnavailable: "Некоторые товары в корзине больше недоступны и были удалены."
     },
     checkoutStatus: {
-      success: "Ваш заказ обрабатывается. Скоро вы получите сообщение",
-      fail: "Возникла проблема при оформлении заказа"
+      success: "Ваш заказ обрабатывается. Скоро вы получите сообщение.",
+      fail: "Возникла проблема при оформлении заказа.",
+      error: "Не удалось начать оплату. Попробуйте ещё раз или свяжитесь со мной.",
+      itemUnavailable: "Один из товаров больше недоступен. Обновите страницу и проверьте корзину.",
+      successTitle: "Платёж прошёл успешно",
+      cancelTitle: "Платёж отменён",
+      cancelBody: "Списания не было. Возвращаю вас в каталог…",
+      backToCatalogue: "Вернуться в каталог"
+    },
+    partials: {
+      loadFailed: "Часть страницы не загрузилась. Пожалуйста, обновите страницу."
+    },
+    view: {
+      mobile: "Моб. версия",
+      desktop: "Версия для ПК"
     },
     footer: {
       made: "Сайт на GitHub Pages"
@@ -114,7 +136,8 @@ const messages = {
       catalogue: "Catalogo",
       workshops: "Workshop",
       giftcards: "Carte Regalo",
-      contact: "Contatti"
+      contact: "Contatti",
+      menu: "Apri/chiudi menu"
     },
     hero: {
       h1: "Ceramica artistica contemporanea fatta a mano – Ceramics Doronina",
@@ -138,6 +161,7 @@ const messages = {
       lead: "Ogni pezzo è un’emozione unica per il tuo spazio.",
       addToCart: "Compra",
       viewPhotos: "Dettagli",
+      unavailable: "Catalogo non disponibile al momento. Ricarica la pagina.",
       spec: {
         height: "Altezza",
         diameter: "Diametro",
@@ -201,11 +225,31 @@ const messages = {
       empty: "Il carrello è vuoto",
       checkout: "Checkout",
       remove: "Elimina",
-      qty: "Quantità"
+      qty: "Quantità",
+      open: "Apri il carrello",
+      close: "Chiudi il carrello",
+      alreadyInCart: "Questo pezzo è già nel tuo carrello.",
+      addFailed: "Impossibile aggiungere l’articolo al carrello. Riprova.",
+      maxQty: "Hai raggiunto la quantità massima per questo articolo.",
+      processing: "Reindirizzamento al pagamento…",
+      removedUnavailable: "Alcuni articoli del carrello non sono più disponibili e sono stati rimossi."
     },
     checkoutStatus: {
-      success: "Il tuo ordine è in fase di processamento, a breve riceverai un messaggio",
-      fail: "C'è stato un problema nella finalizzazione del tuo ordine"
+      success: "Il tuo ordine è in fase di processamento, a breve riceverai un messaggio.",
+      fail: "C’è stato un problema nella finalizzazione del tuo ordine.",
+      error: "Impossibile avviare il pagamento, riprova o contattami.",
+      itemUnavailable: "Uno degli articoli non è più disponibile. Aggiorna la pagina e controlla il carrello.",
+      successTitle: "Pagamento riuscito",
+      cancelTitle: "Pagamento annullato",
+      cancelBody: "Nessun addebito effettuato. Ti riporto al catalogo…",
+      backToCatalogue: "Torna al catalogo"
+    },
+    partials: {
+      loadFailed: "Una parte della pagina non è stata caricata. Ricarica la pagina."
+    },
+    view: {
+      mobile: "Mobile",
+      desktop: "Desktop"
     },
     footer: {
       made: "Realizzato con GitHub Pages"
@@ -219,7 +263,8 @@ const messages = {
       catalogue: "Catalogue",
       workshops: "Masterclass",
       giftcards: "Gift Cards",
-      contact: "Contact"
+      contact: "Contact",
+      menu: "Open/close menu"
     },
     hero: {
       h1: "Handmade contemporary artistic ceramics – Ceramics Doronina",
@@ -243,6 +288,7 @@ const messages = {
       lead: "Each piece is a unique emotion for your space.",
       addToCart: "Buy",
       viewPhotos: "Details",
+      unavailable: "The catalogue is currently unavailable. Please reload the page.",
       spec: {
         height: "Height",
         diameter: "Diameter",
@@ -305,11 +351,31 @@ const messages = {
       empty: "Your cart is empty",
       checkout: "Checkout",
       remove: "Remove",
-      qty: "Quantity"
+      qty: "Quantity",
+      open: "Open cart",
+      close: "Close cart",
+      alreadyInCart: "This piece is already in your cart.",
+      addFailed: "Could not add the item to your cart. Please try again.",
+      maxQty: "You have reached the maximum quantity for this item.",
+      processing: "Redirecting to payment…",
+      removedUnavailable: "Some items in your cart are no longer available and were removed."
     },
     checkoutStatus: {
-      success: "Your order is being processed. You will receive a message shortly",
-      fail: "There was a problem finalizing your order"
+      success: "Your order is being processed. You will receive a message shortly.",
+      fail: "There was a problem finalizing your order.",
+      error: "Could not start payment, please try again or contact me.",
+      itemUnavailable: "One of the items is no longer available. Please refresh the page and check your cart.",
+      successTitle: "Payment successful",
+      cancelTitle: "Payment cancelled",
+      cancelBody: "No charge was made. Redirecting you to the catalogue…",
+      backToCatalogue: "Back to the catalogue"
+    },
+    partials: {
+      loadFailed: "Part of the page could not be loaded. Please reload the page."
+    },
+    view: {
+      mobile: "Mobile",
+      desktop: "Desktop"
     },
     footer: {
       made: "Made with GitHub Pages"

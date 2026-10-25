@@ -10,29 +10,43 @@
     .box{max-width:720px; margin:0 auto; border:1px solid #e5e5e5; padding:18px 20px;}
     .muted{color:#666;}
   </style>
+  <script src="messages.js"></script>
 </head>
 <body>
-  <div class="box">
+  <div class="box" role="status" aria-live="polite">
     <h1 id="t">Pagamento annullato</h1>
     <p class="muted" id="p">Nessun addebito effettuato. Ti riporto al catalogo…</p>
+    <p><a id="back" href="/#catalogue">Torna al catalogo</a></p>
   </div>
 
   <script>
     (function () {
-      const lang = (localStorage.getItem("cd_lang") || "it").slice(0,2);
-      const txt = {
-        it: { t:"Pagamento annullato", p:"Nessun addebito effettuato. Ti riporto al catalogo…" },
-        en: { t:"Payment cancelled", p:"No charge was made. Redirecting you to the catalogue…" },
-        ru: { t:"Платёж отменён", p:"Списания не было. Возвращаю вас в каталог…" },
-      };
-      const d = txt[lang] || txt.it;
-      document.getElementById("t").textContent = d.t;
-      document.getElementById("p").textContent = d.p;
+      const PENDING_KEY = "cd_checkout_pending";   // stessa chiave di Stripe/js/uiStripe.js
+      const REDIRECT_DELAY_MS = 1500;
 
-      const base = window.location.origin;
-      setTimeout(() => window.location.replace(base + "/#catalogue"), 400);
+      let lang = "it";
+      try { lang = (localStorage.getItem("cd_lang") || "it").slice(0, 2); }
+      catch (err) { console.warn("[cancel] cd_lang non leggibile:", err); }
+      const all = window.messages || {};
+      if (!all[lang]) lang = "it";
+      const dict = (all[lang] && all[lang].checkoutStatus) || {};
+
+      document.documentElement.lang = lang;
+      if (dict.cancelTitle) {
+        document.title = dict.cancelTitle;
+        document.getElementById("t").textContent = dict.cancelTitle;
+      }
+      if (dict.cancelBody) document.getElementById("p").textContent = dict.cancelBody;
+      if (dict.backToCatalogue) document.getElementById("back").textContent = dict.backToCatalogue;
+
+      // Il carrello non si tocca: si elimina solo il marcatore del checkout in sospeso.
+      try { localStorage.removeItem(PENDING_KEY); }
+      catch (err) { console.warn("[cancel] rimozione cd_checkout_pending fallita:", err); }
+
+      setTimeout(function () {
+        window.location.replace(window.location.origin + "/#catalogue");
+      }, REDIRECT_DELAY_MS);
     })();
   </script>
 </body>
 </html>
-

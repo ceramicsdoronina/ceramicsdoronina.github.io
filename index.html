@@ -61,8 +61,17 @@
 
   <title>Ceramics Doronina</title>
 
-  <!-- SheetJS (per ODS) -->
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+  <!-- Configurazione client (unico punto): endpoint della funzione Netlify che crea la sessione Stripe -->
+  <script>
+    window.CD = window.CD || {};
+    window.CD.config = {
+      checkoutEndpoint: "https://ceramicsdoronina.netlify.app/.netlify/functions/create-checkout"
+    };
+  </script>
+
+  <!-- SheetJS (per ODS): defer, resta prima di catalogueStripe.js cosi' l'ordine di esecuzione e' garantito -->
+  <link rel="preconnect" href="https://cdn.sheetjs.com">
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js" defer></script>
 
   <!-- Stili principali (riuso gli stessi del sito) -->
   <link rel="stylesheet" href="css/base.css">
@@ -151,8 +160,10 @@
     <div class="cart-drawer__panel">
       <div class="cart-drawer__header">
         <div class="cart-drawer__title" data-i18n="cart.title">Cart</div>
-        <button id="cart-close-btn" class="cart-drawer__close" type="button" aria-label="Close cart">×</button>
+        <button id="cart-close-btn" class="cart-drawer__close" type="button" data-i18n-aria-label="cart.close" aria-label="Close cart">×</button>
       </div>
+
+      <div id="cart-notice" class="cart-drawer__notice" role="status" aria-live="polite" hidden></div>
 
       <div id="cart-items" class="cart-drawer__items"></div>
 
@@ -173,6 +184,8 @@
   <script src="i18n.js" defer></script>
 
   <!-- Versioni Stripe (non toccano Shopify) -->
+  <script src="Stripe/js/util.js" defer></script>
+  <script src="Stripe/js/money.js" defer></script>
   <script src="Stripe/js/catalogueStripe.js" defer></script>
   <script src="masterclass.js" defer></script>
   <script src="certificati.js" defer></script>

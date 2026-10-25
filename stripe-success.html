@@ -10,49 +10,73 @@
     .box{max-width:720px; margin:0 auto; border:1px solid #e5e5e5; padding:18px 20px;}
     .muted{color:#666;}
   </style>
+  <script src="messages.js"></script>
 </head>
 <body>
-  <div class="box">
+  <div class="box" role="status" aria-live="polite">
     <h1 id="t">Pagamento riuscito</h1>
-    <p class="muted" id="p">Sto aggiornando il carrello…</p>
+    <p class="muted" id="p">Il tuo ordine è in fase di processamento, a breve riceverai un messaggio.</p>
+    <p><a id="back" href="/#catalogue">Torna al catalogo</a></p>
   </div>
 
   <script>
     (function () {
-      const lang = (localStorage.getItem("cd_lang") || "it").slice(0,2);
-      const txt = {
-        it: { t:"Pagamento riuscito", p:"Grazie! Sto svuotando il carrello e ti riporto al catalogo…" },
-        en: { t:"Payment successful", p:"Thank you! Clearing the cart and redirecting you to the catalogue…" },
-        ru: { t:"Платёж прошёл успешно", p:"Спасибо! Очищаю корзину и возвращаю вас в каталог…" },
-      };
-      const d = txt[lang] || txt.it;
-      document.getElementById("t").textContent = d.t;
-      document.getElementById("p").textContent = d.p;
+      // Stesse chiavi di Stripe/js/uiStripe.js
+      const CART_KEY = "cd_stripe_cart_v1";
+      const PENDING_KEY = "cd_checkout_pending";
+      const REDIRECT_DELAY_MS = 2500;
 
-      async function clearCartBestEffort() {
+      function readJson(key, fallback) {
         try {
-          // Se la tua pagina principale carica uiStripe.js, questo non ci sarà qui.
-          // Ma se in futuro includi uiStripe anche qui, funzionerà automaticamente.
-          if (window.CD && CD.shop && typeof CD.shop.resetCart === "function") {
-            await CD.shop.resetCart();
-            return;
-          }
-        } catch (e) {}
-
-        // Fallback: svuota la chiave usata da uiStripe.js
-        try { localStorage.removeItem("cd_stripe_cart_v1"); } catch(e) {}
-        // Se hai altre chiavi di tracking checkout, puoi aggiungerle qui (facoltativo)
-        try { localStorage.removeItem("cd_checkout_started"); } catch(e) {}
-        try { localStorage.removeItem("cd_checkout_ts"); } catch(e) {}
+          const raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : fallback;
+        } catch (err) {
+          console.warn("[success] lettura " + key + " fallita:", err);
+          return fallback;
+        }
       }
 
-      clearCartBestEffort().finally(() => {
-        // Torna al catalogo
-        const base = window.location.origin;
-        window.location.replace(base + "/#catalogue");
-      });
+      let lang = "it";
+      try { lang = (localStorage.getItem("cd_lang") || "it").slice(0, 2); }
+      catch (err) { console.warn("[success] cd_lang non leggibile:", err); }
+      const all = window.messages || {};
+      if (!all[lang]) lang = "it";
+      const dict = (all[lang] && all[lang].checkoutStatus) || {};
+
+      document.documentElement.lang = lang;
+      if (dict.successTitle) {
+        document.title = dict.successTitle;
+        document.getElementById("t").textContent = dict.successTitle;
+      }
+      if (dict.success) document.getElementById("p").textContent = dict.success;
+      if (dict.backToCatalogue) document.getElementById("back").textContent = dict.backToCatalogue;
+
+      // Rimuove dal carrello SOLO le righe dell'ordine pagato, e solo se il session_id
+      // dell'URL coincide con quello salvato all'avvio del checkout.
+      try {
+        const pending = readJson(PENDING_KEY, null);
+        const sid = new URLSearchParams(window.location.search).get("session_id");
+
+        if (pending && typeof pending.session_id === "string" && sid && sid === pending.session_id
+            && Array.isArray(pending.ids)) {
+          const ids = new Set(pending.ids.map(String));
+          const cart = readJson(CART_KEY, []);
+          if (Array.isArray(cart)) {
+            const rest = cart.filter(function (line) { return !(line && ids.has(String(line.id))); });
+            localStorage.setItem(CART_KEY, JSON.stringify(rest));
+          }
+        }
+      } catch (err) {
+        console.warn("[success] aggiornamento carrello fallito:", err);
+      }
+
+      try { localStorage.removeItem(PENDING_KEY); }
+      catch (err) { console.warn("[success] rimozione cd_checkout_pending fallita:", err); }
+
+      setTimeout(function () {
+        window.location.replace(window.location.origin + "/#catalogue");
+      }, REDIRECT_DELAY_MS);
     })();
   </script>
 </body>
 </html>
-
