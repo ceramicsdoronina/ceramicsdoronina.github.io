@@ -26,17 +26,18 @@
     return currentLang;
   }
 
-  // Traduzione per chiave "a.b.c" nella lingua corrente (fallback it); null se assente.
-  function t(keyPath, lang) {
-    const dict = messages[lang || currentLang] || messages.it || {};
-    const val = String(keyPath).split(".").reduce((o, k) => (o && o[k] != null ? o[k] : null), dict);
-    return typeof val === "string" ? val : null;
-  }
-
+  // Unica funzione di lookup per chiave "a.b.c"; null se assente.
   function lookup(dict, keyPath) {
     let cur = dict;
     for (const p of String(keyPath).split(".")) cur = cur && cur[p];
     return typeof cur === "string" ? cur : null;
+  }
+
+  // Traduzione per chiave nella lingua indicata (default: corrente); se manca, fallback it.
+  function t(keyPath, lang) {
+    const dict = messages[lang || currentLang] || messages.it || {};
+    const val = lookup(dict, keyPath);
+    return val !== null ? val : lookup(messages.it || {}, keyPath);
   }
 
   function applyTranslations(lang) {
@@ -69,22 +70,16 @@
     // 1) prima applico le traduzioni statiche (data-i18n)
     applyTranslations(lang);
 
-    // 2) poi ricostruisco le parti dinamiche nella nuova lingua
-    if (window.__catalogueData && window.CD && CD.catalogue) {
-      CD.catalogue.render(window.__catalogueData, lang);
-      CD.catalogue.initBehaviour();  // modali/gallerie dei nuovi nodi
+    // 2) poi ricostruisco le parti dinamiche nella nuova lingua (ogni sezione in try/catch dentro
+    //    CD.app.renderData; i dati non caricati mostrano il messaggio "non disponibile" tradotto)
+    // 3) infine il drawer del carrello, anche se il rendering e' fallito
+    try {
+      if (window.CD && CD.app && CD.app.renderData) CD.app.renderData(lang);
+    } catch (err) {
+      console.error("[i18n] rendering dopo cambio lingua fallito:", err);
+    } finally {
+      if (window.CD && CD.shop && CD.shop.renderDrawer) CD.shop.renderDrawer();
     }
-
-    if (window.__masterclassData && window.CD && CD.masterclass) {
-      CD.masterclass.render(window.__masterclassData, lang);
-    }
-
-    if (window.__certificatiData && window.CD && CD.certificati) {
-      CD.certificati.render(window.__certificatiData, lang);
-    }
-
-    // 3) infine il drawer del carrello (testi, nomi righe, pulsante)
-    if (window.CD && CD.shop && CD.shop.renderDrawer) CD.shop.renderDrawer();
   }
 
   function initLanguage() {

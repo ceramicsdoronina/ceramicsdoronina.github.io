@@ -11,12 +11,14 @@ const messages = {
       workshops: "Мастер-классы",
       giftcards: "Подарочные сертификаты",
       contact: "Контакты",
-      menu: "Меню"
+      menu: "Открыть/закрыть меню",
+      primary: "Основная навигация"
     },
     hero: {
       h1: "Современная художественная керамика ручной работы – Ceramics Doronina",
       tagline:
-        "Тактильная интерьерная керамика с бисерной вышивкой, которая превратит ваш дом в место силы и вдохновения."
+        "Тактильная интерьерная керамика с бисерной вышивкой, которая превратит ваш дом в место силы и вдохновения.",
+      scroll: "Перейти к разделу «О бренде»"
     },
     about: {
       title: "О бренде",
@@ -48,7 +50,7 @@ const messages = {
       description: "Описание",
       characteristics: "Характеристики",
       delivery: "Доставка",
-      deliveryText: "Отправляем по всему миру из Лигурии, надёжно упаковывая каждое изделие."
+      deliveryText: "Отправляем из Лигурии в страны Европейского союза, Норвегию и Швейцарию, надёжно упаковывая каждое изделие."
     },
     workshops: {
       title: "Мастер-Классы",
@@ -61,7 +63,8 @@ const messages = {
       list3: "Формат для компаний и частных мероприятий по запросу.",
       details: "Подробнее",
       note: "За актуальным расписанием и для организации частного мастер-класса напишите мне.",
-      cta: "Записаться"
+      cta: "Записаться",
+      noEvents: "Сейчас дат в расписании нет — напишите мне, и мы договоримся о занятии."
     },
     giftcards: {
       title: "ПОДАРОЧНЫЕ СЕРТИФИКАТЫ",
@@ -105,11 +108,12 @@ const messages = {
       addFailed: "Не удалось добавить товар в корзину. Попробуйте ещё раз.",
       maxQty: "Достигнуто максимальное количество для этого товара.",
       processing: "Переход к оплате…",
-      removedUnavailable: "Некоторые товары в корзине больше недоступны и были удалены."
+      removedUnavailable: "Некоторые товары в корзине больше недоступны и были удалены.",
+      changed: "Корзина была изменена в другой вкладке. Проверьте её и попробуйте снова."
     },
     checkoutStatus: {
-      success: "Ваш заказ обрабатывается. Скоро вы получите сообщение.",
-      fail: "Возникла проблема при оформлении заказа.",
+      success: "Оплата получена. Stripe пришлёт вам чек по электронной почте. Я свяжусь с вами по поводу доставки.",
+      orderRef: "Номер заказа",
       error: "Не удалось начать оплату. Попробуйте ещё раз или свяжитесь со мной.",
       itemUnavailable: "Один из товаров больше недоступен. Обновите страницу и проверьте корзину.",
       successTitle: "Платёж прошёл успешно",
@@ -121,8 +125,15 @@ const messages = {
       loadFailed: "Часть страницы не загрузилась. Пожалуйста, обновите страницу."
     },
     view: {
-      mobile: "Моб. версия",
+      mobile: "Мобильная версия",
       desktop: "Версия для ПК"
+    },
+    gallery: {
+      prev: "Предыдущее фото",
+      next: "Следующее фото"
+    },
+    modal: {
+      close: "Закрыть"
     },
     footer: {
       made: "Сайт на GitHub Pages"
@@ -137,12 +148,14 @@ const messages = {
       workshops: "Workshop",
       giftcards: "Carte Regalo",
       contact: "Contatti",
-      menu: "Apri/chiudi menu"
+      menu: "Apri/chiudi menu",
+      primary: "Navigazione principale"
     },
     hero: {
       h1: "Ceramica artistica contemporanea fatta a mano – Ceramics Doronina",
       tagline:
-        "Ceramica tattile da interno con ricami di perle che trasforma la tua casa in un luogo di forza e ispirazione."
+        "Ceramica tattile da interno con ricami di perle che trasforma la tua casa in un luogo di forza e ispirazione.",
+      scroll: "Scorri alla sezione Il brand"
     },
     about: {
       title: "Il brand",
@@ -174,7 +187,7 @@ const messages = {
       description: "Descrizione",
       characteristics: "Caratteristiche",
       delivery: "Spedizione",
-      deliveryText: "Spediamo in tutto il mondo dalla Liguria, con imballaggio protettivo."
+      deliveryText: "Spediamo dalla Liguria nei paesi dell’Unione Europea, in Norvegia e in Svizzera, con imballaggio protettivo."
     },
     workshops: {
       title: "Workshop",
@@ -187,7 +200,8 @@ const messages = {
       list3: "Format per aziende ed eventi privati su richiesta.",
       note: "Per il calendario aggiornato o per organizzare una masterclass privata, scrivimi.",
       details: "Dettagli",
-      cta: "Scrivimi"
+      cta: "Scrivimi",
+      noEvents: "Al momento non ci sono date in programma: scrivimi per organizzarne una."
     },
     giftcards: {
       title: "CARTE REGALO",
@@ -232,12 +246,13 @@ const messages = {
       addFailed: "Impossibile aggiungere l’articolo al carrello. Riprova.",
       maxQty: "Hai raggiunto la quantità massima per questo articolo.",
       processing: "Reindirizzamento al pagamento…",
-      removedUnavailable: "Alcuni articoli del carrello non sono più disponibili e sono stati rimossi."
+      removedUnavailable: "Alcuni articoli del carrello non sono più disponibili e sono stati rimossi.",
+      changed: "Il carrello è stato modificato in un’altra scheda. Controllalo e riprova."
     },
     checkoutStatus: {
-      success: "Il tuo ordine è in fase di processamento, a breve riceverai un messaggio.",
-      fail: "C’è stato un problema nella finalizzazione del tuo ordine.",
-      error: "Impossibile avviare il pagamento, riprova o contattami.",
+      success: "Pagamento ricevuto. Stripe ti invierà la ricevuta via email. Ti contatterò per la consegna.",
+      orderRef: "Riferimento ordine",
+      error: "Impossibile avviare il pagamento. Riprova o contattami.",
       itemUnavailable: "Uno degli articoli non è più disponibile. Aggiorna la pagina e controlla il carrello.",
       successTitle: "Pagamento riuscito",
       cancelTitle: "Pagamento annullato",
@@ -250,6 +265,13 @@ const messages = {
     view: {
       mobile: "Mobile",
       desktop: "Desktop"
+    },
+    gallery: {
+      prev: "Immagine precedente",
+      next: "Immagine successiva"
+    },
+    modal: {
+      close: "Chiudi"
     },
     footer: {
       made: "Realizzato con GitHub Pages"
@@ -264,12 +286,14 @@ const messages = {
       workshops: "Masterclass",
       giftcards: "Gift Cards",
       contact: "Contact",
-      menu: "Open/close menu"
+      menu: "Open/close menu",
+      primary: "Primary navigation"
     },
     hero: {
       h1: "Handmade contemporary artistic ceramics – Ceramics Doronina",
       tagline:
-        "Tactile interior ceramics with pearl embroidery that turns your home into a place of strength and inspiration."
+        "Tactile interior ceramics with pearl embroidery that turns your home into a place of strength and inspiration.",
+      scroll: "Scroll to the About section"
     },
     about: {
       title: "About the brand",
@@ -301,7 +325,7 @@ const messages = {
       description: "Description",
       characteristics: "Characteristics",
       delivery: "Shipping",
-      deliveryText: "We ship worldwide from Liguria, Italy."
+      deliveryText: "We ship from Liguria, Italy, to EU countries, Norway and Switzerland."
     },
     workshops: {
       title: "Workshops",
@@ -314,7 +338,8 @@ const messages = {
       list3: "Formats for companies and private events upon request.",
       note: "For the updated calendar or to organise a private masterclass, write to me.",
       details: "Details",
-      cta: "Write me to join"
+      cta: "Write me to join",
+      noEvents: "No dates scheduled right now, write to me to arrange one."
     },
     giftcards: {
       title: "GIFT CARDS",
@@ -358,12 +383,13 @@ const messages = {
       addFailed: "Could not add the item to your cart. Please try again.",
       maxQty: "You have reached the maximum quantity for this item.",
       processing: "Redirecting to payment…",
-      removedUnavailable: "Some items in your cart are no longer available and were removed."
+      removedUnavailable: "Some items in your cart are no longer available and were removed.",
+      changed: "Your cart was changed in another tab. Please review it and try again."
     },
     checkoutStatus: {
-      success: "Your order is being processed. You will receive a message shortly.",
-      fail: "There was a problem finalizing your order.",
-      error: "Could not start payment, please try again or contact me.",
+      success: "Payment received. Stripe will email you the receipt. I will contact you about delivery.",
+      orderRef: "Order reference",
+      error: "Could not start payment. Please try again or contact me.",
       itemUnavailable: "One of the items is no longer available. Please refresh the page and check your cart.",
       successTitle: "Payment successful",
       cancelTitle: "Payment cancelled",
@@ -376,6 +402,13 @@ const messages = {
     view: {
       mobile: "Mobile",
       desktop: "Desktop"
+    },
+    gallery: {
+      prev: "Previous image",
+      next: "Next image"
+    },
+    modal: {
+      close: "Close"
     },
     footer: {
       made: "Made with GitHub Pages"
