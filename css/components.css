@@ -27,7 +27,7 @@ header{
 .brand-logo{
   width:40px;height:40px;
   border-radius:50%;
-  background:#eee url('images/logo.png') center/cover no-repeat;
+  background:#eee url('../images/logo.png') center/cover no-repeat;
 }
 
 .brand h1{
