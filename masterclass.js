@@ -4,24 +4,23 @@
   // ─────────────────────────────────────────────
   // Helpers
   // ─────────────────────────────────────────────
-  function getLang() {
-    return (
-      window.CD?.i18n?.lang ||
-      window.CD?.i18n?.currentLang ||
-      document.documentElement.lang ||
-      "it"
-    );
+  const IMG_DIR = "images/masterclass";
+  const PLACEHOLDER_IMG = "images/placeholder.svg";
+  const DEFAULT_SEATS = 6;
+
+  function imgUrl(mc) {
+    const fn = String(mc.img1 == null ? "" : mc.img1).trim();
+    return fn && fn !== "-" ? `${IMG_DIR}/${encodeURIComponent(fn)}` : PLACEHOLDER_IMG;
   }
 
-  function moneyToCents(priceStr) {
-    // Accetta "100€", "100", "100.00", "100,00", "€100"
-    const s = String(priceStr || "").trim();
-    if (!s || s === "-") return 0;
-    const cleaned = s.replace(/\s/g, "").replace("€", "").replace(",", ".");
-    const num = Number(cleaned);
-    if (!Number.isFinite(num)) return 0;
-    return Math.round(num * 100);
+  // Posti massimi: primo numero in "spots" (es. "Max 6 persone"), altrimenti 6
+  function seatsOf(mc) {
+    const m = String(mc.spots || "").match(/\d+/);
+    const n = m ? parseInt(m[0], 10) : DEFAULT_SEATS;
+    return n > 0 ? n : DEFAULT_SEATS;
   }
+
+  let registeredIds = [];
 
   function pickLangField(obj, base, lang, fallback = "it") {
     const v1 = obj[`${base}_${lang}`];
@@ -32,16 +31,16 @@
   }
 
   function ensureShopProductRegistered(mc) {
-    // crea un id separato dai vasi
-    const pid = `mc:${String(mc.id || "").trim()}`;
-    if (!pid || pid === "mc:") return null;
+    // gli id dei prodotti sono unici fra vasi (v*), masterclass (mc*) e carte regalo (gc-*)
+    const pid = String(mc.id == null ? "" : mc.id).trim();
+    if (!pid || !CD.util.isValidId(pid)) {
+      console.error("[MASTERCLASS] id mancante o non valido, riga saltata:", JSON.stringify(mc.id));
+      return null;
+    }
 
     window.CD = window.CD || {};
     window.CD.shop = window.CD.shop || {};
     window.CD.shop.products = window.CD.shop.products || {};
-
-    // già registrato
-    if (window.CD.shop.products[pid]) return pid;
 
     const titles = {
       it: pickLangField(mc, "name", "it", "it"),
@@ -49,21 +48,16 @@
       ru: pickLangField(mc, "name", "ru", "it"),
     };
 
-    const img = (mc.img1 && mc.img1 !== "-")
-      ? `images/masterclass/${mc.img1}`
-      : "images/placeholder.jpg";
-
-    const priceCents = moneyToCents(mc.price);
-    const currency = "EUR";
-
-    // Registra come prodotto "non fisico" (utile dopo per shipping)
+    // Registro (forma unica): masterclass = servizio digitale, quantita' max = posti
     window.CD.shop.products[pid] = {
       id: pid,
-      type: "digital",          // <-- masterclass = servizio
+      type: "digital",
+      sold: CD.util.isSoldFlag(mc.venduto),
       titles,
-      priceCents,
-      currency,
-      img
+      priceCents: CD.money.cellToCents(mc, "price"),
+      currency: "EUR",
+      img: imgUrl(mc),
+      maxQty: seatsOf(mc)
     };
 
     return pid;
@@ -72,30 +66,11 @@
   // ─────────────────────────────────────────────
   // Carica ODS
   // ─────────────────────────────────────────────
+  // Lancia in caso di errore (nessun fallback silenzioso a lista vuota)
   async function loadCsv() {
-    try {
-      const res = await fetch("catalogue/masterclass.ods", { cache: "no-store" });
-      if (!res.ok) {
-        console.error("Impossibile caricare masterclass.ods");
-        return [];
-      }
-
-      const arrayBuffer = await res.arrayBuffer();
-      const workbook = XLSX.read(arrayBuffer, { type: "array" });
-      const firstSheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[firstSheetName];
-
-      const data = XLSX.utils.sheet_to_json(worksheet, {
-        raw: false,
-        defval: ""
-      });
-
-      console.log("Dati caricati da masterclass.ods:", data.length, "righe");
-      return data;
-    } catch (error) {
-      console.error("Errore nel caricamento di masterclass.ods:", error);
-      return [];
-    }
+    const data = await CD.util.loadOdsRows("catalogue/masterclass.ods", ["price"]);
+    console.log("Dati caricati da masterclass.ods:", data.length, "righe");
+    return data;
   }
 
   // ─────────────────────────────────────────────
@@ -146,17 +121,28 @@
     const detailsLabel = msgs?.workshops?.details || "Dettagli";
     const ctaMailLabel = msgs?.workshops?.cta || "Scrivimi";
 
+    const esc = CD.util.escapeHtml;
+
     grid.innerHTML = "";
     if (modalRoot) modalRoot.innerHTML = "";
 
-    items.forEach(mc => {
+    // ripulisce i prodotti registrati al render precedente (eventi nel frattempo scaduti)
+    registeredIds.forEach(id => { if (window.CD?.shop?.products) delete window.CD.shop.products[id]; });
+    registeredIds = [];
+
+    (Array.isArray(items) ? items : []).forEach(mc => {
+      // eventi con data (dd.mm.yyyy) gia' passata: non mostrati ne' acquistabili
+      if (CD.util.isPastEvent(mc.date)) return;
+
+      const productId = ensureShopProductRegistered(mc);
+      if (!productId) return;
+      registeredIds.push(productId);
+
       const name = pickLangField(mc, "name", lang, "it");
       const shortText = pickLangField(mc, "short", lang, "it");
       const longText  = pickLangField(mc, "long", lang, "it");
 
-      const img = (mc.img1 && mc.img1 !== "-")
-        ? `images/masterclass/${mc.img1}`
-        : "images/placeholder.jpg";
+      const img = imgUrl(mc);
 
       const date = mc.date || "";
       const time = mc.time || "";
@@ -165,38 +151,39 @@
       const price = mc.price || "";
 
       let metaHtml = "";
-      if (date || time) metaHtml += `<p><strong>${date}</strong>${time ? " · " + time : ""}</p>`;
-      if (level) metaHtml += `<p>${level}</p>`;
-      if (spots) metaHtml += `<p>${spots}</p>`;
-      if (price) metaHtml += `<p><strong>${price}</strong></p>`;
+      if (date || time) metaHtml += `<p><strong>${esc(date)}</strong>${time ? " · " + esc(time) : ""}</p>`;
+      if (level) metaHtml += `<p>${esc(level)}</p>`;
+      if (spots) metaHtml += `<p>${esc(spots)}</p>`;
+      if (price) metaHtml += `<p><strong>${esc(price)}</strong></p>`;
 
-      // registra prodotto per Stripe-cart (se c'è CD.shop)
-      const productId = ensureShopProductRegistered(mc);
-      const canBuy = !!(productId && window.CD?.shop?.addItem);
+      const p = window.CD.shop.products[productId];
+      const canBuy = !!(window.CD?.shop?.addProduct && p && !p.sold && p.priceCents > 0);
+      const pidAttr = esc(productId);
 
       // CARD
       const card = document.createElement("article");
       card.className = "card";
 
-      const mailtoHref =
-        `mailto:ceramist.doronina@gmail.com?subject=Masterclass: ${encodeURIComponent(name)}`;
+      const mailtoHref = esc(
+        `mailto:ceramist.doronina@gmail.com?subject=${encodeURIComponent("Masterclass: " + name)}`
+      );
 
       card.innerHTML = `
-        <div class="media media-single" data-modal-target="mc-modal-${mc.id}">
-          <img src="${img}" alt="${name}">
+        <div class="media media-single" data-modal-target="mc-modal-${pidAttr}">
+          <img src="${esc(img)}" alt="${esc(name)}" loading="lazy" decoding="async">
         </div>
         <div class="body">
-          <h4>${name}</h4>
-          <p>${shortText}</p>
+          <h4>${esc(name)}</h4>
+          <p>${esc(shortText)}</p>
           ${metaHtml}
           <div class="card-actions">
             ${
               canBuy
-                ? `<button class="card-btn primary" type="button" data-add-masterclass="${productId}">${buyLabel}</button>`
-                : `<a class="card-btn primary" href="${mailtoHref}" data-i18n="workshops.cta">${ctaMailLabel}</a>`
+                ? `<button class="card-btn primary" type="button" data-add-masterclass="${pidAttr}">${esc(buyLabel)}</button>`
+                : `<a class="card-btn primary" href="${mailtoHref}" data-i18n="workshops.cta">${esc(ctaMailLabel)}</a>`
             }
-            <button class="card-btn secondary" data-modal-target="mc-modal-${mc.id}" data-i18n="workshops.details">
-              ${detailsLabel}
+            <button class="card-btn secondary" data-modal-target="mc-modal-${pidAttr}" data-i18n="workshops.details">
+              ${esc(detailsLabel)}
             </button>
           </div>
         </div>
@@ -208,34 +195,34 @@
 
       const modal = document.createElement("div");
       modal.className = "modal";
-      modal.id = `mc-modal-${mc.id}`;
+      modal.id = `mc-modal-${productId}`;
 
       modal.innerHTML = `
         <div class="modal-dialog">
           <div class="modal-header">
-            <h2 class="vase-title">${name}</h2>
+            <h2 class="vase-title">${esc(name)}</h2>
             <button type="button" data-modal-close>×</button>
           </div>
           <div class="modal-body">
             <div class="modal-body-inner">
               <div class="vase-detail-panel">
-                <h3 class="vase-subtitle">${shortText}</h3>
+                <h3 class="vase-subtitle">${esc(shortText)}</h3>
                 ${metaHtml}
                 <div class="vase-actions">
                   ${
                     canBuy
-                      ? `<button type="button" class="vase-btn-primary" data-add-masterclass="${productId}">${buyLabel}</button>`
-                      : `<a class="vase-btn-primary" href="${mailtoHref}" data-i18n="workshops.cta">${ctaMailLabel}</a>`
+                      ? `<button type="button" class="vase-btn-primary" data-add-masterclass="${pidAttr}">${esc(buyLabel)}</button>`
+                      : `<a class="vase-btn-primary" href="${mailtoHref}" data-i18n="workshops.cta">${esc(ctaMailLabel)}</a>`
                   }
                 </div>
                 <div class="accordion-panel active">
-                  <p>${longText}</p>
+                  <p>${esc(longText)}</p>
                 </div>
               </div>
 
               <div class="modal-gallery">
                 <div class="modal-gallery-main">
-                  <img src="${img}" alt="${name}">
+                  <img src="${esc(img)}" alt="${esc(name)}" loading="lazy" decoding="async">
                 </div>
               </div>
             </div>
@@ -263,26 +250,28 @@
       const pid = String(btn.dataset.addMasterclass || "").trim();
       if (!pid) return;
 
-      if (!window.CD?.shop?.addVariant) {
-        console.warn("CD.shop.addVariant non disponibile");
+      const notifyFail = () => {
+        const msg = window.CD?.i18n?.t?.("cart.addFailed") || "Could not add the item to your cart. Please try again.";
+        if (window.CD?.shop?.showNotice) window.CD.shop.showNotice(msg);
+        else window.alert(msg);
+      };
+
+      // si controlla l'API effettivamente usata: addProduct
+      if (!window.CD?.shop?.addProduct) {
+        console.warn("CD.shop.addProduct non disponibile");
+        notifyFail();
         return;
       }
 
       try {
-        const p = window.CD.shop.products[pid];
-        if (!p) return;
-        
-        await window.CD.shop.addItem({
-          id: pid,
-          type: "digital",
-          quantity: 1,
-          name: p.titles[getLang()] || p.titles.it || pid,
-          currency: p.currency,
-          unit_amount: p.priceCents,
-          image: p.img
-        });
+        const ok = await window.CD.shop.addProduct(pid, 1);
+        if (!ok) {
+          console.warn("[MASTERCLASS] Non aggiunto:", pid);
+          notifyFail();
+        }
       } catch (err) {
         console.error("[MASTERCLASS] Errore add-to-cart", err);
+        notifyFail();
       }
     }, false);
   }
@@ -294,4 +283,3 @@
     render
   };
 })();
-

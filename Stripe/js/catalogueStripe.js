@@ -3,71 +3,53 @@
 // aggiungono al carrello locale (CD.shop) invece che a Shopify.
 (function () {
 
-  // Carica il file ODS (identico)
+  const IMG_DIR = "images/catalogue";
+  const PLACEHOLDER_IMG = "images/placeholder.svg";
+  const PRICE_KEYS = ["price_old", "price_new"];
+
+  // Carica il file ODS. Lancia in caso di errore: il chiamante distingue
+  // "catalogo vuoto" da "catalogo non caricato".
   async function loadCsv() {
-    try {
-      const res = await fetch("catalogue/vasi.ods", { cache: "no-store" });
-      if (!res.ok) {
-        console.error("Impossibile caricare vasi.ods");
-        return [];
-      }
-
-      const arrayBuffer = await res.arrayBuffer();
-      const workbook = XLSX.read(arrayBuffer, { type: "array" });
-      const firstSheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[firstSheetName];
-
-      const data = XLSX.utils.sheet_to_json(worksheet, {
-        raw: false,
-        defval: ""
-      });
-
-      console.log("Dati caricati dal file ODS:", data.length, "righe");
-      return data;
-
-    } catch (error) {
-      console.error("Errore nel caricamento del file ODS:", error);
-      return [];
-    }
-  }
-
-  function pickFieldByLang(vase, baseKey, lang) {
-    if (lang === "en") return (vase[`${baseKey}-en`] || "").trim();
-    if (lang === "ru") return (vase[`${baseKey}-ru`] || "").trim();
-    return (vase[baseKey] || "").trim();
+    const data = await CD.util.loadOdsRows("catalogue/vasi.ods", PRICE_KEYS);
+    console.log("Dati caricati dal file ODS:", data.length, "righe");
+    return data;
   }
 
   function getLang() {
-    return (
-      window.CD?.i18n?.getCurrentLang?.() ||
-      document.documentElement.lang ||
-      "it"
-    );
+    return window.CD?.i18n?.getCurrentLang?.() || document.documentElement.lang || "it";
   }
 
-  function t(keyPath) {
-    const lang = getLang();
-    const all = window.CD?.i18n?.messages || {};
-    const dict = all[lang] || all.it || {};
-    return keyPath.split(".").reduce((o, k) => (o && o[k] != null ? o[k] : null), dict);
+  // Valore di una colonna spec: vuoto se "-" o se uguale al nome della colonna (placeholder)
+  function specValue(vase, column) {
+    const v = String(vase[column] == null ? "" : vase[column]).trim();
+    if (!v || v === "-" || v.toLowerCase() === column.toLowerCase()) return "";
+    return v;
   }
 
-  function parseEuroToCents(v) {
-    const s = String(v ?? "")
-      .replace(/\s/g, "")
-      .replace("€", "")
-      .replace(/\./g, "")     // separatori migliaia
-      .replace(",", ".");     // virgola decimale
-  
-    const n = Number(s);
-    if (!isFinite(n)) return 0;
-    return Math.round(n * 100);
+  function pickFieldByLang(vase, baseKey, lang) {
+    if (lang === "en") return specValue(vase, `${baseKey}-en`);
+    if (lang === "ru") return specValue(vase, `${baseKey}-ru`);
+    return specValue(vase, baseKey);
   }
 
-  function firstImgPath(vase) {
-    const fn = [vase.img1, vase.img2, vase.img3, vase.img4, vase.img5, vase.img6]
-      .find(x => x && x !== "-");
-    return fn ? `images/catalogue/${fn}` : "images/placeholder.jpg";
+  function imgUrl(fn) {
+    return `${IMG_DIR}/${encodeURIComponent(fn)}`;
+  }
+
+  function vaseImages(vase) {
+    return [vase.img1, vase.img2, vase.img3, vase.img4, vase.img5, vase.img6]
+      .map(x => String(x == null ? "" : x).trim())
+      .filter(x => x && x !== "-")
+      .map(imgUrl);
+  }
+
+  function textOrFallback(vase, base, lang) {
+    const v = vase[`${base}_${lang}`];
+    return v && v !== "-" ? v : (vase[`${base}_ru`] || "");
+  }
+
+  function formatEuroCents(cents) {
+    return (cents % 100 === 0 ? String(cents / 100) : (cents / 100).toFixed(2));
   }
 
   // Rende il catalogo nella griglia e crea i modali
@@ -86,11 +68,12 @@
       return;
     }
     const msgs = allMessages[lang] || allMessages.it;
+    const esc = CD.util.escapeHtml;
 
-    // ordina: prima non venduti
-    items.sort((a, b) => {
-      const aSold = (a.venduto || "").trim().toLowerCase() === "si";
-      const bSold = (b.venduto || "").trim().toLowerCase() === "si";
+    // ordina una COPIA: prima non venduti (sort stabile)
+    const sorted = (Array.isArray(items) ? items : []).slice().sort((a, b) => {
+      const aSold = CD.util.isSoldFlag(a.venduto);
+      const bSold = CD.util.isSoldFlag(b.venduto);
       if (aSold === bSold) return 0;
       return aSold ? 1 : -1;
     });
@@ -98,54 +81,73 @@
     grid.innerHTML = "";
     if (modalRoot) modalRoot.innerHTML = "";
 
-    // registra prodotti per Stripe-cart
+    // registra prodotti per Stripe-cart (si ricostruisce ad ogni render)
     window.CD = window.CD || {};
     window.CD.shop = window.CD.shop || {};
     window.CD.shop.products = window.CD.shop.products || {};
+    Object.keys(window.CD.shop.products).forEach(k => {
+      if (window.CD.shop.products[k].type === "physical") delete window.CD.shop.products[k];
+    });
 
-    items.forEach(vase => {
-      const name  = vase[`name_${lang}`]  && vase[`name_${lang}`]  !== "-" ? vase[`name_${lang}`]  : vase.name_ru;
-      const short = vase[`short_${lang}`] && vase[`short_${lang}`] !== "-" ? vase[`short_${lang}`] : vase.short_ru;
-      const long  = vase[`long_${lang}`]  && vase[`long_${lang}`]  !== "-" ? vase[`long_${lang}`]  : vase.long_ru;
+    const seenIds = new Set();
+    let firstCardDone = false;
 
-      const sold = (vase.venduto || "").trim().toLowerCase() === "si";
+    sorted.forEach(vase => {
+      const productId = String(vase.id == null ? "" : vase.id).trim();
+      if (!productId || !CD.util.isValidId(productId)) {
+        console.error("[CATALOGUE] id mancante o non valido, riga saltata:", JSON.stringify(vase.id), vase.name_it || vase.name_ru || "");
+        return;
+      }
+      if (seenIds.has(productId)) {
+        console.error("[CATALOGUE] id duplicato, riga saltata:", productId, vase.name_it || vase.name_ru || "");
+        return;
+      }
+      seenIds.add(productId);
+
+      const name  = textOrFallback(vase, "name", lang);
+      const short = textOrFallback(vase, "short", lang);
+      const long  = textOrFallback(vase, "long", lang);
+
+      const sold = CD.util.isSoldFlag(vase.venduto);
       const priceOldStr = vase.price_old && vase.price_old !== "-" ? vase.price_old : null;
       const priceNewStr = vase.price_new && vase.price_new !== "-" ? vase.price_new : null;
 
-      const priceCents = sold ? null : parseEuroToCents(priceNewStr);
+      const newCents = CD.money.cellToCents(vase, "price_new");
+      const oldCents = CD.money.cellToCents(vase, "price_old");
+      const priceCents = sold ? null : newCents;
 
-      const productId = String(vase.id || "").trim();
-      const img = firstImgPath(vase);
+      const cardImgs = vaseImages(vase);
+      const img = cardImgs[0] || PLACEHOLDER_IMG;
 
-      if (productId) {
-        window.CD.shop.products[productId] = {
-          id: productId,
-          sold: !!sold,
-          priceCents,
-          currency: "EUR",
-          img,
-          nameByLang: {
-            it: (vase.name_it && vase.name_it !== "-") ? vase.name_it : (vase.name_ru || ""),
-            en: (vase.name_en && vase.name_en !== "-") ? vase.name_en : (vase.name_ru || ""),
-            ru: (vase.name_ru && vase.name_ru !== "-") ? vase.name_ru : ""
-          }
-        };
-      }
+      const pick = (l) => {
+        const v = vase[`name_${l}`];
+        return v && v !== "-" ? v : (vase.name_ru || "");
+      };
+      window.CD.shop.products[productId] = {
+        id: productId,
+        type: "physical",
+        sold: !!sold,
+        priceCents,
+        currency: "EUR",
+        img,
+        maxQty: 1,
+        titles: { it: pick("it"), en: pick("en"), ru: vase.name_ru && vase.name_ru !== "-" ? vase.name_ru : "" }
+      };
 
       let discount = null;
-      if (!sold && priceOldStr && priceNewStr) {
-        const oldNum = parseFloat(String(priceOldStr).replace(",", "."));
-        const newNum = parseFloat(String(priceNewStr).replace(",", "."));
-        if (!isNaN(oldNum) && !isNaN(newNum) && oldNum > newNum) {
-          discount = Math.round((1 - newNum / oldNum) * 100);
-        }
+      if (!sold && oldCents && newCents && oldCents > newCents) {
+        discount = Math.round((1 - newCents / oldCents) * 100);
       }
+
+      // prezzi mostrati: da centesimi validi, altrimenti il testo della cella (escaped)
+      const oldShown = oldCents ? formatEuroCents(oldCents) : (priceOldStr || "");
+      const newShown = newCents ? formatEuroCents(newCents) : (priceNewStr || "");
 
       let cardStatusBlock = "";
       if (sold) {
         cardStatusBlock = `
           <p class="card-status card-status-sold">
-            ${msgs.status.sold}
+            ${esc(msgs.status.sold)}
           </p>
         `;
       } else if (priceNewStr) {
@@ -155,93 +157,89 @@
         if (priceOldStr) {
           cardStatusBlock = `
             <div class="card-price">
-              <span class="price-old">${priceOldStr}€</span>
-              <span class="price-current">${priceNewStr}€</span>
+              <span class="price-old">${esc(oldShown)}€</span>
+              <span class="price-current">${esc(newShown)}€</span>
               ${discountBlock}
             </div>
           `;
         } else {
           cardStatusBlock = `
             <div class="card-price">
-              <span class="price-current">${priceNewStr}€</span>
+              <span class="price-current">${esc(newShown)}€</span>
               ${discountBlock}
             </div>
           `;
         }
       }
 
-      const primaryLabel   = msgs.catalogue.addToCart;
-      const secondaryLabel = msgs.catalogue.viewPhotos;
+      const primaryLabel   = esc(msgs.catalogue.addToCart);
+      const secondaryLabel = esc(msgs.catalogue.viewPhotos);
 
-      // immagini card
-      const cardImgs = [
-        vase.img1, vase.img2, vase.img3,
-        vase.img4, vase.img5, vase.img6
-      ].filter(x => x && x !== "-")
-       .map(fn => `images/catalogue/${fn}`);
+      // immagini card: la prima immagine della prima card e' eager (LCP), le altre lazy;
+      // le slide dopo la prima usano data-src e vengono caricate quando mostrate.
+      const isFirstCard = !firstCardDone;
+      firstCardDone = true;
 
       const cardGalleryHtml = cardImgs.length
-        ? cardImgs.map((src, idx) => `
-            <img src="${src}" alt="${name} ${idx + 1}" class="card-img ${idx === 0 ? "active" : ""}">
-          `).join("")
-        : `<img src="images/placeholder.jpg" alt="${name}" class="card-img active">`;
+        ? cardImgs.map((src, idx) => {
+            const alt = esc(`${name} ${idx + 1}`);
+            const cls = `card-img ${idx === 0 ? "active" : ""}`;
+            if (idx === 0) {
+              const lazy = isFirstCard ? "" : ` loading="lazy" decoding="async"`;
+              return `<img src="${esc(src)}" alt="${alt}" class="${cls}"${lazy}>`;
+            }
+            return `<img data-src="${esc(src)}" alt="${alt}" class="${cls}" loading="lazy" decoding="async">`;
+          }).join("")
+        : `<img src="${PLACEHOLDER_IMG}" alt="${esc(name)}" class="card-img active" loading="lazy" decoding="async">`;
 
       const hasMultiple = cardImgs.length > 1;
+      const vid = esc(productId);
 
       let actionsHtml = "";
-      if (sold) {
+      // ✅ Vendibile via Stripe solo se ho id + prezzo valido e non e' venduto
+      const canSell = !sold && !!(priceCents && priceCents > 0);
+
+      if (!canSell) {
         actionsHtml = `
           <div class="card-actions">
-            <button class="card-btn secondary" data-modal-target="modal-${vase.id}">
+            <button class="card-btn secondary" data-modal-target="modal-${vid}">
               ${secondaryLabel}
             </button>
           </div>`;
       } else {
-        // ✅ Vendibile via Stripe solo se ho id + prezzo
-        const canSell = !!(productId && priceCents != null && priceCents > 0);
-
-        if (!canSell) {
-          actionsHtml = `
-            <div class="card-actions">
-              <button class="card-btn secondary" data-modal-target="modal-${vase.id}">
-                ${secondaryLabel}
-              </button>
-            </div>`;
-        } else {
-          actionsHtml = `
-            <div class="card-actions">
-              <button class="card-btn primary"
-                      type="button"
-                      data-add-to-cart="${productId}"
-                      data-vase-name="${name}">
-                ${primaryLabel}
-              </button>
-              <button class="card-btn secondary" data-modal-target="modal-${vase.id}">
-                ${secondaryLabel}
-              </button>
-            </div>`;
-        }
+        actionsHtml = `
+          <div class="card-actions">
+            <button class="card-btn primary"
+                    type="button"
+                    data-add-to-cart="${vid}"
+                    data-vase-name="${esc(name)}">
+              ${primaryLabel}
+            </button>
+            <button class="card-btn secondary" data-modal-target="modal-${vid}">
+              ${secondaryLabel}
+            </button>
+          </div>`;
       }
 
       const card = document.createElement("article");
       card.className = "card";
 
       card.innerHTML = `
-        <div class="media media-carousel" data-card-gallery="${vase.id}">
+        <div class="media media-carousel" data-card-gallery="${vid}">
           <div class="card-gallery">
             ${cardGalleryHtml}
           </div>
 
           ${hasMultiple ? `
-            <button type="button" class="card-gallery-btn prev" data-card-prev="${vase.id}" aria-label="Previous image">‹</button>
-            <button type="button" class="card-gallery-btn next" data-card-next="${vase.id}" aria-label="Next image">›</button>
-            <div class="card-gallery-counter" data-card-counter="${vase.id}">1/${cardImgs.length}</div>
+            <button type="button" class="card-gallery-btn prev" data-card-prev="${vid}" aria-label="Previous image">‹</button>
+            <button type="button" class="card-gallery-btn next" data-card-next="${vid}" aria-label="Next image">›</button>
+            <div class="card-gallery-counter" data-card-counter="${vid}">1/${cardImgs.length}</div>
           ` : ``}
         </div>
 
         <div class="body">
-          <h4>${name}</h4>
-          <p>${short}</p>
+          <h4>${esc(name)}</h4>
+          <p>${esc(short)}</p>
           ${cardStatusBlock}
           ${actionsHtml}
         </div>
@@ -256,13 +254,13 @@
 
       const modal = document.createElement("div");
       modal.className = "modal";
-      modal.id = `modal-${vase.id}`;
+      modal.id = `modal-${productId}`;
 
       let priceBlock = "";
       if (sold) {
         priceBlock = `
           <div class="vase-price-row">
-            <span class="vase-price">${msgs.status.sold}</span>
+            <span class="vase-price">${esc(msgs.status.sold)}</span>
           </div>
         `;
       } else if (priceNewStr) {
@@ -272,15 +270,15 @@
         if (priceOldStr) {
           priceBlock = `
             <div class="vase-price-row">
-              <span class="vase-old-price">${priceOldStr}€</span>
-              <span class="vase-price">${priceNewStr}€</span>
+              <span class="vase-old-price">${esc(oldShown)}€</span>
+              <span class="vase-price">${esc(newShown)}€</span>
               ${discountBlock}
             </div>
           `;
         } else {
           priceBlock = `
             <div class="vase-price-row">
-              <span class="vase-price">${priceNewStr}€</span>
+              <span class="vase-price">${esc(newShown)}€</span>
               ${discountBlock}
             </div>
           `;
@@ -289,73 +287,65 @@
 
       const spec = msgs.catalogue.spec;
 
+      // immagini del modale: data-src, il src viene impostato all'apertura del modale
       const galleryImgsHtml = imgs.map((src, idx) => `
-        <img src="${src}" alt="${name} ${idx + 1}" data-index="${idx}" class="${idx === 0 ? "active" : ""}">
+        <img data-src="${esc(src)}" alt="${esc(`${name} ${idx + 1}`)}" data-index="${idx}" class="${idx === 0 ? "active" : ""}" decoding="async">
       `).join("");
 
-      const canSellModal = !!(productId && priceCents != null && priceCents > 0 && !sold);
+      const specRow = (label, value) => value ? `<dt>${esc(label)}</dt><dd>${esc(value)}</dd>` : "";
 
       modal.innerHTML = `
         <div class="modal-dialog">
           <div class="modal-header">
-            <h2 class="vase-title">${name}</h2>
+            <h2 class="vase-title">${esc(name)}</h2>
             <button type="button" data-modal-close>×</button>
           </div>
           <div class="modal-body">
             <div class="modal-body-inner">
               <div class="vase-detail-panel">
-                <h3 class="vase-subtitle">${short}</h3>
+                <h3 class="vase-subtitle">${esc(short)}</h3>
                 ${priceBlock}
                 <div class="vase-actions">
-                  ${canSellModal ? `
+                  ${canSell ? `
                     <button type="button" class="vase-btn-primary"
-                            data-add-to-cart="${productId}"
-                            data-vase-name="${name}">
+                            data-add-to-cart="${vid}"
+                            data-vase-name="${esc(name)}">
                       ${primaryLabel}
                     </button>
                   ` : ""}
                   <button class="vase-btn-outline">${secondaryLabel}</button>
                 </div>
 
-                <button class="accordion-header" data-acc-target="desc-${vase.id}">
-                  <span>${msgs.detail.description}</span>
+                <button class="accordion-header" data-acc-target="desc-${vid}">
+                  <span>${esc(msgs.detail.description)}</span>
                   <span>›</span>
                 </button>
-                <div class="accordion-panel" id="desc-${vase.id}">
-                  <p>${long}</p>
+                <div class="accordion-panel" id="desc-${vid}">
+                  <p>${esc(long)}</p>
                 </div>
 
-                <button class="accordion-header" data-acc-target="spec-${vase.id}">
-                  <span>${msgs.detail.characteristics}</span>
+                <button class="accordion-header" data-acc-target="spec-${vid}">
+                  <span>${esc(msgs.detail.characteristics)}</span>
                   <span>›</span>
                 </button>
-                <div class="accordion-panel" id="spec-${vase.id}">
+                <div class="accordion-panel" id="spec-${vid}">
                   <div class="vase-specs">
                     <dl>
-                      ${vase.height && vase.height !== "-" ? `<dt>${spec.height}</dt><dd>${vase.height}</dd>` : ""}
-                      ${vase.diameter && vase.diameter !== "-" ? `<dt>${spec.diameter}</dt><dd>${vase.diameter}</dd>` : ""}
-                      ${(() => {
-                        const v = pickFieldByLang(vase, "material", lang);
-                        return v && v !== "-" ? `<dt>${spec.material}</dt><dd>${v}</dd>` : "";
-                      })()}
-                      ${(() => {
-                        const v = pickFieldByLang(vase, "technique", lang);
-                        return v && v !== "-" ? `<dt>${spec.technique}</dt><dd>${v}</dd>` : "";
-                      })()}
-                      ${(() => {
-                        const v = pickFieldByLang(vase, "finish", lang);
-                        return v && v !== "-" ? `<dt>${spec.finish}</dt><dd>${v}</dd>` : "";
-                      })()}
+                      ${specRow(spec.height, specValue(vase, "height"))}
+                      ${specRow(spec.diameter, specValue(vase, "diameter"))}
+                      ${specRow(spec.material, pickFieldByLang(vase, "material", lang))}
+                      ${specRow(spec.technique, pickFieldByLang(vase, "technique", lang))}
+                      ${specRow(spec.finish, pickFieldByLang(vase, "finish", lang))}
                     </dl>
                   </div>
                 </div>
 
-                <button class="accordion-header" data-acc-target="del-${vase.id}">
-                  <span>${msgs.detail.delivery}</span>
+                <button class="accordion-header" data-acc-target="del-${vid}">
+                  <span>${esc(msgs.detail.delivery)}</span>
                   <span>›</span>
                 </button>
-                <div class="accordion-panel" id="del-${vase.id}">
-                  <p>${msgs.detail.deliveryText}</p>
+                <div class="accordion-panel" id="del-${vid}">
+                  <p>${esc(msgs.detail.deliveryText)}</p>
                 </div>
               </div>
 
@@ -363,10 +353,10 @@
                 <div class="modal-gallery-main">
                   ${galleryImgsHtml}
                 </div>
-                <div class="modal-gallery-counter" data-gallery-counter="${vase.id}">
+                <div class="modal-gallery-counter" data-gallery-counter="${vid}">
                   ${imgs.length ? `1 / ${imgs.length}` : ""}
                 </div>
-                <div class="modal-gallery-controls" data-gallery-controls="${vase.id}">
+                <div class="modal-gallery-controls" data-gallery-controls="${vid}">
                   <button type="button" data-gallery-prev>←</button>
                   <button type="button" data-gallery-next>→</button>
                 </div>
@@ -383,6 +373,23 @@
     if (window.CD?.shop?.renderDrawer) window.CD.shop.renderDrawer();
   }
 
+  // Mostra "catalogo non disponibile" nella griglia (caricamento fallito)
+  function renderUnavailable() {
+    const grid = document.getElementById("catalogue-grid");
+    if (!grid) return;
+    const msg = window.CD?.i18n?.t?.("catalogue.unavailable") || "The catalogue is currently unavailable. Please reload the page.";
+    grid.innerHTML = `<p class="catalogue-unavailable" role="alert">${CD.util.escapeHtml(msg)}</p>`;
+  }
+
+  // Carica src da data-src (lazy) per le immagini indicate
+  function loadLazyImgs(imgs) {
+    imgs.forEach(img => {
+      const ds = img.getAttribute("data-src");
+      if (ds && !img.getAttribute("src")) img.setAttribute("src", ds);
+    });
+  }
+
+
   // --- Card galleries (identico alla tua logica, con protezioni) ---
   function initCardGalleries() {
     document.querySelectorAll(".media-carousel").forEach(block => {
@@ -396,6 +403,7 @@
         if (i < 0) i = imgs.length - 1;
         if (i >= imgs.length) i = 0;
         index = i;
+        loadLazyImgs([imgs[index]]);
         imgs.forEach((img, k) => img.classList.toggle("active", k === index));
         if (counter) counter.textContent = `${index + 1}/${imgs.length}`;
       };
@@ -452,7 +460,10 @@
       e.stopPropagation();
       const id = modalTrigger.dataset.modalTarget;
       const modal = document.getElementById(id);
-      if (modal) modal.classList.add("open");
+      if (modal) {
+        modal.classList.add("open");
+        loadLazyImgs(Array.from(modal.querySelectorAll("img[data-src]")));
+      }
       return;
     }
 
@@ -541,8 +552,6 @@
     if (window.__cd_stripe_btns_inited) return;
     window.__cd_stripe_btns_inited = true;
 
-    console.log("🛒 [STRIPE] initCartButtons attach");
-
     document.addEventListener("click", async (e) => {
       const btn = e.target.closest("[data-add-to-cart]");
       if (!btn) return;
@@ -551,23 +560,29 @@
       e.stopPropagation();
 
       const productId = (btn.dataset.addToCart || "").trim();
-      const vaseName  = (btn.dataset.vaseName || "").trim();
-
-      console.log("🛒 [STRIPE] click Compra:", { vaseName, productId });
-
       if (!productId || productId === "-") return;
 
-      if (!window.CD?.shop?.addVariant) {
-        console.error("❌ [STRIPE] CD.shop.addVariant non disponibile (uiStripe.js non caricato?)");
+      const failMsg = () => window.CD?.i18n?.t?.("cart.addFailed") || "Could not add the item to your cart. Please try again.";
+      const notifyFail = () => {
+        if (window.CD?.shop?.showNotice) window.CD.shop.showNotice(failMsg());
+        else window.alert(failMsg());
+      };
+
+      if (!window.CD?.shop?.addProduct) {
+        console.error("[STRIPE] CD.shop.addProduct non disponibile (uiStripe.js non caricato?)");
+        notifyFail();
         return;
       }
 
       try {
-        const res = await window.CD.shop.addVariant(productId, 1);
-        if (res) console.log("[STRIPE] Aggiunto al carrello:", productId);
-        else console.warn("[STRIPE] Non aggiunto:", productId);
+        const ok = await window.CD.shop.addProduct(productId, 1);
+        if (!ok) {
+          console.warn("[STRIPE] Non aggiunto:", productId);
+          notifyFail();
+        }
       } catch (err) {
         console.error("[STRIPE] Errore add-to-cart", err);
+        notifyFail();
       }
     }, false);
   }
@@ -586,6 +601,7 @@
   window.CD.catalogue = {
     loadCsv,
     render,
+    renderUnavailable,
     initBehaviour
   };
 
