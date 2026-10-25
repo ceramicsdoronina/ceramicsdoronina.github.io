@@ -69,9 +69,26 @@
     };
   </script>
 
-  <!-- SheetJS (per ODS): defer, resta prima di catalogueStripe.js cosi' l'ordine di esecuzione e' garantito -->
+  <!-- SheetJS (per ODS): caricato in modo ASINCRONO e fuori dalla catena degli script defer, cosi' una
+       CDN lenta o bloccata non ferma navbar/hero/partial. window.__xlsxReady si risolve al load e
+       si rifiuta su errore o dopo 15 s; Stripe/js/util.js (loadOdsRows) lo attende solo per XLSX.read,
+       quindi sono le sole griglie dati a mostrare "non disponibile" se SheetJS non arriva. -->
   <link rel="preconnect" href="https://cdn.sheetjs.com">
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js" defer></script>
+  <script>
+    window.__xlsxReady = new Promise(function (resolve, reject) {
+      var timer = setTimeout(function () { reject(new Error("SheetJS: timeout 15 s")); }, 15000);
+      var s = document.createElement("script");
+      s.src = "https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js";
+      s.async = true;
+      s.onload = function () {
+        clearTimeout(timer);
+        if (typeof XLSX !== "undefined") resolve(XLSX); else reject(new Error("SheetJS: XLSX non definito"));
+      };
+      s.onerror = function () { clearTimeout(timer); reject(new Error("SheetJS: caricamento fallito")); };
+      document.head.appendChild(s);
+    });
+    window.__xlsxReady.catch(function (err) { console.error("[SheetJS]", err.message); });
+  </script>
 
   <!-- Stili principali (riuso gli stessi del sito) -->
   <link rel="stylesheet" href="css/base.css">
@@ -184,8 +201,10 @@
   <script src="i18n.js" defer></script>
 
   <!-- Versioni Stripe (non toccano Shopify) -->
+  <!-- Ordine (defer = ordine di documento): util, money, cart prima dei moduli che li usano -->
   <script src="Stripe/js/util.js" defer></script>
   <script src="Stripe/js/money.js" defer></script>
+  <script src="Stripe/js/cart.js" defer></script>
   <script src="Stripe/js/catalogueStripe.js" defer></script>
   <script src="masterclass.js" defer></script>
   <script src="certificati.js" defer></script>

@@ -50,7 +50,21 @@
     return parseEuroToCents(row[key]);
   }
 
-  const api = { parseEuroToCents, cellToCents, MAX_CENTS };
+  // Formattazione unica (carte, modali, drawer, carte regalo, masterclass):
+  //   it / ru: "120 €", "120,50 €"      en: "€120", "€120.50"
+  // Euro interi senza decimali. Ritorna "" se cents non e' un intero >= 0.
+  function format(cents, lang) {
+    if (!Number.isInteger(cents) || cents < 0) return "";
+    const euros = Math.floor(cents / 100);
+    const rem = cents % 100;
+    const en = lang === "en";
+    const num = rem === 0
+      ? String(euros)
+      : euros + (en ? "." : ",") + String(rem).padStart(2, "0");
+    return en ? "\u20AC" + num : num + " \u20AC";
+  }
+
+  const api = { parseEuroToCents, cellToCents, format, MAX_CENTS };
   root.CD = root.CD || {};
   root.CD.money = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;

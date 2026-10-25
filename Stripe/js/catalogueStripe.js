@@ -9,14 +9,10 @@
 
   // Carica il file ODS. Lancia in caso di errore: il chiamante distingue
   // "catalogo vuoto" da "catalogo non caricato".
-  async function loadCsv() {
+  async function loadRows() {
     const data = await CD.util.loadOdsRows("catalogue/vasi.ods", PRICE_KEYS);
     console.log("Dati caricati dal file ODS:", data.length, "righe");
     return data;
-  }
-
-  function getLang() {
-    return window.CD?.i18n?.getCurrentLang?.() || document.documentElement.lang || "it";
   }
 
   // Valore di una colonna spec: vuoto se "-" o se uguale al nome della colonna (placeholder)
@@ -48,27 +44,26 @@
     return v && v !== "-" ? v : (vase[`${base}_ru`] || "");
   }
 
-  function formatEuroCents(cents) {
-    return (cents % 100 === 0 ? String(cents / 100) : (cents / 100).toFixed(2));
-  }
-
-  // Rende il catalogo nella griglia e crea i modali
+  // Rende il catalogo nella griglia e crea i modali.
+  // Ritorna il numero di prodotti registrati, oppure false se il rendering non e' possibile.
   function render(items, lang) {
     const grid = document.getElementById("catalogue-grid");
     const modalRoot = document.getElementById("modal-container");
 
     if (!grid) {
       console.warn("catalogue-grid non trovato nel DOM");
-      return;
+      return false;
     }
 
     const allMessages = window.CD && CD.i18n && CD.i18n.messages ? CD.i18n.messages : null;
     if (!allMessages) {
       console.warn("Messaggi di traduzione non disponibili");
-      return;
+      return false;
     }
     const msgs = allMessages[lang] || allMessages.it;
     const esc = CD.util.escapeHtml;
+    const fmt = (cents) => CD.money.format(cents, lang);
+    const tr = (key, fallback) => CD.i18n.t(key, lang) || fallback;
 
     // ordina una COPIA: prima non venduti (sort stabile)
     const sorted = (Array.isArray(items) ? items : []).slice().sort((a, b) => {
@@ -81,16 +76,12 @@
     grid.innerHTML = "";
     if (modalRoot) modalRoot.innerHTML = "";
 
-    // registra prodotti per Stripe-cart (si ricostruisce ad ogni render)
-    window.CD = window.CD || {};
-    window.CD.shop = window.CD.shop || {};
-    window.CD.shop.products = window.CD.shop.products || {};
-    Object.keys(window.CD.shop.products).forEach(k => {
-      if (window.CD.shop.products[k].type === "physical") delete window.CD.shop.products[k];
-    });
+    // registro prodotti per il carrello: si ricostruisce ad ogni render (regola unica per sorgente)
+    CD.util.clearProducts("catalogue");
 
     const seenIds = new Set();
     let firstCardDone = false;
+    let registered = 0;
 
     sorted.forEach(vase => {
       const productId = String(vase.id == null ? "" : vase.id).trim();
@@ -108,13 +99,15 @@
       const short = textOrFallback(vase, "short", lang);
       const long  = textOrFallback(vase, "long", lang);
 
-      const sold = CD.util.isSoldFlag(vase.venduto);
+      const sold = CD.util.isSoldFlag(vase.venduto) || CD.util.isSoldOverride(productId);
       const priceOldStr = vase.price_old && vase.price_old !== "-" ? vase.price_old : null;
       const priceNewStr = vase.price_new && vase.price_new !== "-" ? vase.price_new : null;
 
       const newCents = CD.money.cellToCents(vase, "price_new");
       const oldCents = CD.money.cellToCents(vase, "price_old");
       const priceCents = sold ? null : newCents;
+      CD.util.warnBadPrice("CATALOGUE", productId, vase, "price_new", newCents, sold);
+      CD.util.warnBadPrice("CATALOGUE", productId, vase, "price_old", oldCents, sold);
 
       const cardImgs = vaseImages(vase);
       const img = cardImgs[0] || PLACEHOLDER_IMG;
@@ -123,7 +116,7 @@
         const v = vase[`name_${l}`];
         return v && v !== "-" ? v : (vase.name_ru || "");
       };
-      window.CD.shop.products[productId] = {
+      CD.util.registerProduct("catalogue", {
         id: productId,
         type: "physical",
         sold: !!sold,
@@ -132,16 +125,17 @@
         img,
         maxQty: 1,
         titles: { it: pick("it"), en: pick("en"), ru: vase.name_ru && vase.name_ru !== "-" ? vase.name_ru : "" }
-      };
+      });
+      registered++;
 
       let discount = null;
       if (!sold && oldCents && newCents && oldCents > newCents) {
         discount = Math.round((1 - newCents / oldCents) * 100);
       }
 
-      // prezzi mostrati: da centesimi validi, altrimenti il testo della cella (escaped)
-      const oldShown = oldCents ? formatEuroCents(oldCents) : (priceOldStr || "");
-      const newShown = newCents ? formatEuroCents(newCents) : (priceNewStr || "");
+      // prezzi mostrati: da centesimi validi (CD.money.format), altrimenti il testo della cella (escaped)
+      const oldShown = oldCents ? fmt(oldCents) : (priceOldStr || "");
+      const newShown = newCents ? fmt(newCents) : (priceNewStr || "");
 
       let cardStatusBlock = "";
       if (sold) {
@@ -157,15 +151,15 @@
         if (priceOldStr) {
           cardStatusBlock = `
             <div class="card-price">
-              <span class="price-old">${esc(oldShown)}€</span>
-              <span class="price-current">${esc(newShown)}€</span>
+              <span class="price-old">${esc(oldShown)}</span>
+              <span class="price-current">${esc(newShown)}</span>
               ${discountBlock}
             </div>
           `;
         } else {
           cardStatusBlock = `
             <div class="card-price">
-              <span class="price-current">${esc(newShown)}€</span>
+              <span class="price-current">${esc(newShown)}</span>
               ${discountBlock}
             </div>
           `;
@@ -231,8 +225,8 @@
           </div>
 
           ${hasMultiple ? `
-            <button type="button" class="card-gallery-btn prev" data-card-prev="${vid}" aria-label="Previous image">‹</button>
-            <button type="button" class="card-gallery-btn next" data-card-next="${vid}" aria-label="Next image">›</button>
+            <button type="button" class="card-gallery-btn prev" data-card-prev="${vid}" data-i18n-aria-label="gallery.prev" aria-label="${esc(tr("gallery.prev", "Previous image"))}">‹</button>
+            <button type="button" class="card-gallery-btn next" data-card-next="${vid}" data-i18n-aria-label="gallery.next" aria-label="${esc(tr("gallery.next", "Next image"))}">›</button>
             <div class="card-gallery-counter" data-card-counter="${vid}">1/${cardImgs.length}</div>
           ` : ``}
         </div>
@@ -270,15 +264,15 @@
         if (priceOldStr) {
           priceBlock = `
             <div class="vase-price-row">
-              <span class="vase-old-price">${esc(oldShown)}€</span>
-              <span class="vase-price">${esc(newShown)}€</span>
+              <span class="vase-old-price">${esc(oldShown)}</span>
+              <span class="vase-price">${esc(newShown)}</span>
               ${discountBlock}
             </div>
           `;
         } else {
           priceBlock = `
             <div class="vase-price-row">
-              <span class="vase-price">${esc(newShown)}€</span>
+              <span class="vase-price">${esc(newShown)}</span>
               ${discountBlock}
             </div>
           `;
@@ -298,7 +292,7 @@
         <div class="modal-dialog">
           <div class="modal-header">
             <h2 class="vase-title">${esc(name)}</h2>
-            <button type="button" data-modal-close>×</button>
+            <button type="button" data-modal-close data-i18n-aria-label="modal.close" aria-label="${esc(tr("modal.close", "Close"))}">×</button>
           </div>
           <div class="modal-body">
             <div class="modal-body-inner">
@@ -357,8 +351,8 @@
                   ${imgs.length ? `1 / ${imgs.length}` : ""}
                 </div>
                 <div class="modal-gallery-controls" data-gallery-controls="${vid}">
-                  <button type="button" data-gallery-prev>←</button>
-                  <button type="button" data-gallery-next>→</button>
+                  <button type="button" data-gallery-prev data-i18n-aria-label="gallery.prev" aria-label="${esc(tr("gallery.prev", "Previous image"))}">←</button>
+                  <button type="button" data-gallery-next data-i18n-aria-label="gallery.next" aria-label="${esc(tr("gallery.next", "Next image"))}">→</button>
                 </div>
               </div>
             </div>
@@ -369,24 +363,16 @@
       modalRoot.appendChild(modal);
     });
 
+    CD.util.bindAddToCart("[data-add-to-cart]");
+
     // aggiorna testi del drawer (es: cambio lingua)
     if (window.CD?.shop?.renderDrawer) window.CD.shop.renderDrawer();
+    return registered;
   }
 
   // Mostra "catalogo non disponibile" nella griglia (caricamento fallito)
   function renderUnavailable() {
-    const grid = document.getElementById("catalogue-grid");
-    if (!grid) return;
-    const msg = window.CD?.i18n?.t?.("catalogue.unavailable") || "The catalogue is currently unavailable. Please reload the page.";
-    grid.innerHTML = `<p class="catalogue-unavailable" role="alert">${CD.util.escapeHtml(msg)}</p>`;
-  }
-
-  // Carica src da data-src (lazy) per le immagini indicate
-  function loadLazyImgs(imgs) {
-    imgs.forEach(img => {
-      const ds = img.getAttribute("data-src");
-      if (ds && !img.getAttribute("src")) img.setAttribute("src", ds);
-    });
+    CD.util.renderUnavailable("catalogue-grid");
   }
 
 
@@ -399,12 +385,14 @@
       if (imgs.length <= 1) return;
 
       let index = 0;
-      const show = (i) => {
+      const state = {};
+      const show = (i, dir) => {
         if (i < 0) i = imgs.length - 1;
         if (i >= imgs.length) i = 0;
         index = i;
-        loadLazyImgs([imgs[index]]);
-        imgs.forEach((img, k) => img.classList.toggle("active", k === index));
+        // carica la slide richiesta e la vicina; la slide precedente resta visibile fino al load
+        CD.util.loadNeighbours(imgs, index, dir);
+        CD.util.activateSlide(imgs, index, state);
         if (counter) counter.textContent = `${index + 1}/${imgs.length}`;
       };
 
@@ -419,8 +407,8 @@
         e.preventDefault();
         e.stopPropagation();
 
-        if (isLeft) show(index - 1);
-        else show(index + 1);
+        if (isLeft) show(index - 1, -1);
+        else show(index + 1, 1);
       });
 
       let touchStartX = 0;
@@ -435,50 +423,10 @@
         const delta = touchEndX - touchStartX;
         const threshold = 30;
         if (Math.abs(delta) < threshold) return;
-        if (delta > 0) show(index - 1);
-        else show(index + 1);
+        if (delta > 0) show(index - 1, -1);
+        else show(index + 1, 1);
       }, { passive: true });
     });
-  }
-
-  // Modali con delegazione eventi (come il tuo)
-  function initModals() {
-    console.log("🔍 [CATALOGUE/STRIPE] Inizializzazione modali con delegazione eventi...");
-
-    document.removeEventListener("click", handleModalClick);
-    document.addEventListener("click", handleModalClick);
-
-    console.log("✅ [CATALOGUE/STRIPE] Modali inizializzati con delegazione");
-  }
-
-  function handleModalClick(e) {
-    const target = e.target;
-
-    const modalTrigger = target.closest("[data-modal-target]");
-    if (modalTrigger) {
-      e.preventDefault();
-      e.stopPropagation();
-      const id = modalTrigger.dataset.modalTarget;
-      const modal = document.getElementById(id);
-      if (modal) {
-        modal.classList.add("open");
-        loadLazyImgs(Array.from(modal.querySelectorAll("img[data-src]")));
-      }
-      return;
-    }
-
-    const closeBtn = target.closest("[data-modal-close]");
-    if (closeBtn) {
-      e.preventDefault();
-      e.stopPropagation();
-      const modal = closeBtn.closest(".modal");
-      if (modal) modal.classList.remove("open");
-      return;
-    }
-
-    if (target.classList.contains("modal")) {
-      target.classList.remove("open");
-    }
   }
 
   function initAccordions() {
@@ -504,16 +452,21 @@
       const galleryMain = modal.querySelector(".modal-gallery-main");
       if (!controls) return;
 
+      let current = Math.max(0, imgs.findIndex(img => img.classList.contains("active")));
+      const state = {};
+
       function getCurrentIndex() {
-        return imgs.findIndex(img => img.classList.contains("active"));
+        return current;
       }
 
-      function updateGallery(newIndex) {
+      function updateGallery(newIndex, dir) {
         if (newIndex < 0) newIndex = imgs.length - 1;
         if (newIndex >= imgs.length) newIndex = 0;
+        current = newIndex;
 
-        imgs.forEach(img => img.classList.remove("active"));
-        imgs[newIndex].classList.add("active");
+        // carica la slide richiesta e la vicina; la precedente resta visibile fino al load
+        CD.util.loadNeighbours(imgs, newIndex, dir);
+        CD.util.activateSlide(imgs, newIndex, state);
 
         if (counterEl) counterEl.textContent = `${newIndex + 1} / ${imgs.length}`;
       }
@@ -525,7 +478,7 @@
         prevBtn.addEventListener("click", (e) => {
           e.preventDefault();
           e.stopPropagation();
-          updateGallery(getCurrentIndex() - 1);
+          updateGallery(getCurrentIndex() - 1, -1);
         });
       }
 
@@ -533,73 +486,33 @@
         nextBtn.addEventListener("click", (e) => {
           e.preventDefault();
           e.stopPropagation();
-          updateGallery(getCurrentIndex() + 1);
+          updateGallery(getCurrentIndex() + 1, 1);
         });
       }
 
       if (galleryMain) {
         galleryMain.addEventListener("click", (e) => {
           e.stopPropagation();
-          updateGallery(getCurrentIndex() + 1);
+          updateGallery(getCurrentIndex() + 1, 1);
         });
         galleryMain.style.cursor = "pointer";
       }
     });
   }
 
-  // Bottone Compra: delegazione (compatibile col tuo markup)
-  function initStripeCartButtons() {
-    if (window.__cd_stripe_btns_inited) return;
-    window.__cd_stripe_btns_inited = true;
-
-    document.addEventListener("click", async (e) => {
-      const btn = e.target.closest("[data-add-to-cart]");
-      if (!btn) return;
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      const productId = (btn.dataset.addToCart || "").trim();
-      if (!productId || productId === "-") return;
-
-      const failMsg = () => window.CD?.i18n?.t?.("cart.addFailed") || "Could not add the item to your cart. Please try again.";
-      const notifyFail = () => {
-        if (window.CD?.shop?.showNotice) window.CD.shop.showNotice(failMsg());
-        else window.alert(failMsg());
-      };
-
-      if (!window.CD?.shop?.addProduct) {
-        console.error("[STRIPE] CD.shop.addProduct non disponibile (uiStripe.js non caricato?)");
-        notifyFail();
-        return;
-      }
-
-      try {
-        const ok = await window.CD.shop.addProduct(productId, 1);
-        if (!ok) {
-          console.warn("[STRIPE] Non aggiunto:", productId);
-          notifyFail();
-        }
-      } catch (err) {
-        console.error("[STRIPE] Errore add-to-cart", err);
-        notifyFail();
-      }
-    }, false);
-  }
-
   function initBehaviour() {
     console.log("🔍 [CATALOGUE/STRIPE] Inizializzazione comportamenti...");
-    initModals();
+    CD.util.bindModalDelegate();
+    CD.util.bindAddToCart("[data-add-to-cart]");
     initAccordions();
     initGalleries();
     initCardGalleries();
-    initStripeCartButtons();
     console.log("✅ [CATALOGUE/STRIPE] Comportamenti inizializzati");
   }
 
   window.CD = window.CD || {};
   window.CD.catalogue = {
-    loadCsv,
+    loadRows,
     render,
     renderUnavailable,
     initBehaviour

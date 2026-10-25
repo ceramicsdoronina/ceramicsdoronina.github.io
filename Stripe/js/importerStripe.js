@@ -1,6 +1,7 @@
 // Stripe/js/importerStripe.js
-// Avvio: i fetch degli ODS e dei partial partono subito (in parallelo); l'app
-// parte quando entrambi sono conclusi (anche con errori parziali).
+// Avvio: i fetch degli ODS e dei partial partono subito (in parallelo) e NON aspettano SheetJS
+// (caricato in modo asincrono da index.html: loadOdsRows attende window.__xlsxReady solo per
+// XLSX.read). I partial si inseriscono appena arrivano; i dati ODS vengono resi quando pronti.
 
 const PARTIAL_IMPORTS = [
   ["import-navbar",     "Stripe/partials/navbar.html"],
@@ -26,9 +27,9 @@ async function importHTML(id, file) {
 // Dati ODS: [catalogo vasi, masterclass, carte regalo] come risultati allSettled.
 // Sono letti da appInitStripe tramite window.__cdDataPromise.
 window.__cdDataPromise = Promise.allSettled([
-  CD.catalogue.loadCsv(),
-  CD.masterclass ? CD.masterclass.loadCsv() : Promise.resolve([]),
-  CD.certificati ? CD.certificati.loadCsv() : Promise.resolve([])
+  CD.catalogue.loadRows(),
+  CD.masterclass ? CD.masterclass.loadRows() : Promise.resolve([]),
+  CD.certificati ? CD.certificati.loadRows() : Promise.resolve([])
 ]);
 
 function showPartialsBanner() {
@@ -52,13 +53,17 @@ async function bootStripeSite() {
     }
   });
 
+  // letto da appInitStripe: con partial mancanti la riconciliazione del carrello e' saltata
+  window.__cdPartialsFailed = failed;
+  let bannerShown = false;
+  if (failed > 0) { showPartialsBanner(); bannerShown = true; }
+
   try {
     if (window.appInitStripe) await window.appInitStripe();
   } catch (err) {
     console.error("[IMPORTER] appInitStripe fallita:", err);
+    if (!bannerShown) showPartialsBanner();
   }
-
-  if (failed > 0) showPartialsBanner();
 }
 
 bootStripeSite();

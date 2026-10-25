@@ -1,0 +1,40 @@
+{
+  "_comment": "Shared price cases. Used by SITE test/money.test.js (JS parseEuroToCents) and by the function repo python cents() test (tools/build-catalogue.py). Strings only. 'valid' = both parsers must return the same cents. 'reject' = both must reject (JS: null, python: ValueError). 'differ' = intentionally different: JS (browser display parser) is more lenient than python (strict build-time parser, which also lets 0 through because the >= 50 cents rule is enforced separately).",
+  "valid": [
+    ["120", 12000],
+    ["120,5", 12050],
+    ["120,50", 12050],
+    ["120.50", 12050],
+    ["120.5", 12050],
+    ["0,99", 99],
+    ["0.05", 5],
+    ["1", 100],
+    ["€ 120", 12000],
+    ["120€", 12000],
+    [" 120 € ", 12000],
+    ["99999,99", 9999999]
+  ],
+  "reject": [
+    "",
+    "-",
+    "abc",
+    "12abc",
+    "1e3",
+    "-5",
+    "NaN",
+    "1.5.5",
+    "12,34,56",
+    ".5",
+    ",50",
+    "100.",
+    "120,505"
+  ],
+  "differ": [
+    { "input": "1.234,56", "js": 123456, "python": "reject", "note": "thousands separators: JS only" },
+    { "input": "1,234.56", "js": 123456, "python": "reject", "note": "thousands separators: JS only" },
+    { "input": "1.234", "js": 123400, "python": "reject", "note": "JS reads 1.234 as 1234 EUR (3 digits = thousands); python rejects (max 2 decimals)" },
+    { "input": "120 EUR", "js": 12000, "python": "reject", "note": "currency word: JS only" },
+    { "input": "0", "js": null, "python": 0, "note": "JS rejects 0; python returns 0 and the generator rejects it later (priceCents >= 50)" },
+    { "input": "100001", "js": null, "python": 10000100, "note": "JS caps at 1e7 cents; python caps later in the catalogue schema test" }
+  ]
+}

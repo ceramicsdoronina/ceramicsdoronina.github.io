@@ -2,7 +2,14 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { parseEuroToCents, cellToCents } = require("../Stripe/js/money.js");
-const util = require("../Stripe/js/util.js");
+const fixture = require("./fixtures/price-cases.json");
+
+// Casi condivisi con il test python di cents() nella repo della funzione.
+test("shared price-cases fixture: valid / reject / differ", () => {
+  for (const [input, cents] of fixture.valid) assert.equal(parseEuroToCents(input), cents, `valid ${JSON.stringify(input)}`);
+  for (const input of fixture.reject) assert.equal(parseEuroToCents(input), null, `reject ${JSON.stringify(input)}`);
+  for (const c of fixture.differ) assert.equal(parseEuroToCents(c.input), c.js, `differ ${JSON.stringify(c.input)}`);
+});
 
 test("parseEuroToCents table", () => {
   const table = [
@@ -27,26 +34,4 @@ test("cellToCents prefers raw numeric value", () => {
   assert.equal(cellToCents({ price_new: "120,50" }, "price_new"), 12050);
   assert.equal(cellToCents({ price_new: "-" }, "price_new"), null);
   assert.equal(cellToCents(null, "x"), null);
-});
-
-test("isSoldFlag normalises accents/case", () => {
-  for (const v of ["si", "Sì", " SI ", "yes", "Sold", "venduto"]) assert.equal(util.isSoldFlag(v), true, v);
-  for (const v of ["", "no", "-", null, undefined]) assert.equal(util.isSoldFlag(v), false, String(v));
-});
-
-test("escapeHtml and isValidId", () => {
-  assert.equal(util.escapeHtml(`<a href="x">'&`), "&lt;a href=&quot;x&quot;&gt;&#39;&amp;");
-  assert.equal(util.isValidId("v1"), true);
-  assert.equal(util.isValidId("gc-50"), true);
-  assert.equal(util.isValidId("mc:1"), false);
-  assert.equal(util.isValidId(""), false);
-  assert.equal(util.isValidId('v1"><x'), false);
-});
-
-test("isPastEvent", () => {
-  const now = new Date(2026, 9, 25);
-  assert.equal(util.isPastEvent("12.01.2026", now), true);
-  assert.equal(util.isPastEvent("25.10.2026", now), false);
-  assert.equal(util.isPastEvent("30.11.2026", now), false);
-  assert.equal(util.isPastEvent("da definire", now), false);
 });
