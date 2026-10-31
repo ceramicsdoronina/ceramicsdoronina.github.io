@@ -6,13 +6,22 @@ tramite una funzione serverless Netlify che vive in un **repository separato**.
 ## Architettura (due repository)
 - **Sito**: questa repo (GitHub Pages, dominio in `CNAME`). Punto d'ingresso: `index.html`.
   - Pagine di ritorno da Stripe: `stripe-success.html` e `stripe-cancel.html`.
-  - JS: `Stripe/js/` (`util.js`, `money.js`, `cart.js`, `catalogueStripe.js`, `uiStripe.js`, `appStripe.js`, `importerStripe.js`) più `masterclass.js`, `certificati.js`, `i18n.js`, `messages.js` nella radice. `cart.js` contiene la logica pura del carrello (testata in Node); `uiStripe.js` è lo strato DOM/localStorage. SheetJS (per gli ODS) è caricato in modo asincrono da `index.html` e non blocca il resto della pagina: se non arriva entro 15 s, le sole griglie dati mostrano "non disponibile".
+  - JS: `Stripe/js/` (`util.js`, `money.js`, `liveCatalogue.js`, `cart.js`, `catalogueStripe.js`, `uiStripe.js`, `appStripe.js`, `importerStripe.js`) più `masterclass.js`, `certificati.js`, `i18n.js`, `messages.js` nella radice. `cart.js` contiene la logica pura del carrello (testata in Node); `uiStripe.js` è lo strato DOM/localStorage. SheetJS (per gli ODS) è caricato in modo asincrono da `index.html` e non blocca il resto della pagina: se non arriva entro 15 s, le sole griglie dati mostrano "non disponibile".
   - Partial HTML caricati da `index.html`: `Stripe/partials/`.
 - **Funzione**: l'unica funzione distribuita sta nella repo separata **`ceramicsdoronina.netifly`** (il nome della cartella contiene un refuso: "netifly" invece di "netlify"), file `functions/create-checkout.js`. Non esiste più nessuna copia della funzione in questa repo.
 
 ## Endpoint
 L'endpoint è l'URL assoluto di Netlify, definito in un solo punto: `window.CD.config.checkoutEndpoint` in `index.html`.
 Modifica quel valore se cambi sito Netlify.
+Lo stesso blocco contiene `catalogueEndpoint` (`.../.netlify/functions/catalogue`, lettura pubblica): i due URL vanno tenuti allineati (stesso dominio) in `index.html` e qui.
+
+## Prezzi e "venduto" live (overlay)
+- Prezzi e flag venduto si modificano nel Google Sheet; la funzione `catalogue` li espone in JSON (CORS `*`, cache 60 s).
+- Il sito carica comunque l'ODS (`catalogue/vasi.ods`) e vi **sovrappone** prezzo e venduto per `id` (`Stripe/js/liveCatalogue.js`, collegato in `importerStripe.js` / `appStripe.js`). Se i dati live arrivano dopo il primo render, il catalogo viene ri-reso e il carrello riallineato (vasi diventati venduti rimossi, prezzi aggiornati).
+- Regola "venduto": se per un id esiste il dato live, **vale il live** (si può rimettere in vendita un pezzo segnato venduto nell'ODS); senza dato live vale l'ODS. Gli id sconosciuti all'ODS sono ignorati; id, immagini e testi non cambiano mai.
+- Fallback: errore di rete, HTTP non 200, timeout di 5 s o JSON non valido (versione diversa da 1, voci malformate scartate) => solo `console.warn`, il sito usa i valori ODS senza avvisi per il visitatore.
+- Descrizioni, dimensioni, finiture e immagini restano nell'ODS finché il foglio non avrà più colonne (oggi ne porta 9).
+- Il pagamento non cambia: il prezzo addebitato lo decide sempre il server.
 
 ## Variabili d'ambiente e stato "venduto" (README della funzione = fonte canonica)
 L'elenco completo e aggiornato delle variabili d'ambiente (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `ALLOWED_ORIGINS`, `SITE_URL`, `OWNER_NOTIFY_WEBHOOK_URL`, ...), la procedura "vendo un vaso / cambio un prezzo" e la checklist pre-lancio stanno nel README della repo `ceramicsdoronina.netifly`: qui non si ripetono per non farli divergere. In sintesi: i segreti vivono solo in Netlify, mai nel codice.
