@@ -61,11 +61,13 @@
 
   <title>Ceramics Doronina</title>
 
-  <!-- Configurazione client (unico punto): endpoint della funzione Netlify che crea la sessione Stripe -->
+  <!-- Configurazione client (unico punto): endpoint delle funzioni Netlify (sessione Stripe, catalogo live).
+       Tenere in sync con Stripe/README_STRIPE.md -->
   <script>
     window.CD = window.CD || {};
     window.CD.config = {
-      checkoutEndpoint: "https://ceramicsdoronina.netlify.app/.netlify/functions/create-checkout"
+      checkoutEndpoint: "https://ceramicsdoronina.netlify.app/.netlify/functions/create-checkout",
+      catalogueEndpoint: "https://ceramicsdoronina.netlify.app/.netlify/functions/catalogue"
     };
   </script>
 
@@ -204,6 +206,7 @@
   <!-- Ordine (defer = ordine di documento): util, money, cart prima dei moduli che li usano -->
   <script src="Stripe/js/util.js" defer></script>
   <script src="Stripe/js/money.js" defer></script>
+  <script src="Stripe/js/liveCatalogue.js" defer></script>
   <script src="Stripe/js/cart.js" defer></script>
   <script src="Stripe/js/catalogueStripe.js" defer></script>
   <script src="masterclass.js" defer></script>

@@ -40,6 +40,27 @@ function renderData(lang) {
   return result;
 }
 
+// Allinea il carrello salvato al catalogo (solo per le parti caricate E rese correttamente);
+// saltato del tutto se qualche partial non e' stato caricato
+function reconcileCartWith(rendered) {
+  const known = (n) => typeof n === "number";
+  if (CD.shop && CD.shop.reconcileCart && !window.__cdPartialsFailed) {
+    CD.shop.reconcileCart({
+      physicalKnown: known(rendered.catalogue),
+      digitalKnown: known(rendered.masterclass) && known(rendered.certificati)
+    });
+  }
+}
+
+// Sovrappone prezzo/venduto live alle righe ODS (una sola volta). Ritorna true se qualcosa e' cambiato.
+function applyLiveOverlay(map) {
+  if (window.__liveApplied || !map || !map.size) return false;
+  if (!Array.isArray(window.__catalogueData) || !CD.liveCatalogue) return false;
+  window.__catalogueData = CD.liveCatalogue.applyOverlay(window.__catalogueData, map);
+  window.__liveApplied = true;
+  return true;
+}
+
 async function appInitStripe() {
   // lingua e UI non dipendono dai dati ODS: partono subito
   CD.i18n.initLanguage();
@@ -66,23 +87,36 @@ async function appInitStripe() {
   window.__masterclassData = value(mcRes);
   window.__certificatiData = value(gcRes);
 
+  // se il live e' gia' arrivato lo si applica prima del primo render; altrimenti si rende subito
+  // l'ODS e si ri-rende quando arriva (max 5 s, vedi sotto)
+  const livePromise = window.__cdLivePromise || Promise.resolve(new Map());
+  let liveMap = null;
+  livePromise.then((m) => { liveMap = m; });
+  await Promise.resolve();
+  applyLiveOverlay(liveMap);
+
   // lingua letta DOPO l'attesa dei dati: l'utente puo' averla cambiata nel frattempo
   const lang = CD.i18n.getCurrentLang();
   const rendered = renderData(lang);
 
-  // allinea il carrello salvato al catalogo (solo per le parti caricate E rese correttamente);
-  // saltato del tutto se qualche partial non e' stato caricato
-  const known = (n) => typeof n === "number";
-  if (CD.shop && CD.shop.reconcileCart && !window.__cdPartialsFailed) {
-    CD.shop.reconcileCart({
-      physicalKnown: known(rendered.catalogue),
-      digitalKnown: known(rendered.masterclass) && known(rendered.certificati)
-    });
-  }
+  reconcileCartWith(rendered);
 
   // etichette del drawer/pulsanti nella lingua corrente
   CD.i18n.applyTranslations(lang);
   if (CD.shop && CD.shop.renderDrawer) CD.shop.renderDrawer();
+
+  // overlay live in ritardo: ri-rende con la lingua CORRENTE e riallinea il carrello
+  try {
+    const late = await livePromise;
+    if (applyLiveOverlay(late)) {
+      const lang2 = CD.i18n.getCurrentLang();
+      reconcileCartWith(renderData(lang2));
+      CD.i18n.applyTranslations(lang2);
+      if (CD.shop && CD.shop.renderDrawer) CD.shop.renderDrawer();
+    }
+  } catch (err) {
+    console.warn("[APP/STRIPE] overlay live non applicato:", err);
+  }
 }
 
 window.CD = window.CD || {};
