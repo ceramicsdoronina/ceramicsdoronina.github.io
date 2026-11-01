@@ -1,10 +1,13 @@
 // Stripe/js/liveCatalogue.js
-// Overlay di prezzo e stato "venduto" letti dall'endpoint pubblico del catalogo (Google Sheet)
-// sopra le righe ODS. Caricabile anche in Node (vedi test/liveCatalogue.test.js).
+// Catalogo letto dall'endpoint pubblico (Google Sheet). Caricabile anche in Node
+// (vedi test/liveCatalogue.test.js).
 //
-// L'ODS resta la sorgente di descrizioni, dimensioni, immagini e id; l'endpoint porta solo
-// prezzo e venduto. Se l'endpoint non risponde, fetchLive ritorna una mappa vuota e il sito
-// usa i valori ODS (il server resta l'unica fonte di verita' per cio' che viene addebitato).
+// Versione 2: l'endpoint porta anche le righe dei tre fogli (tabs.vasi / masterclass / certificati),
+// che il sito rende al posto degli ODS (stessa forma di riga di util.loadOdsRows, via
+// util.normalizeRow). Per ogni foglio mancante (null) o non valido si usa l'ODS (chooseData).
+// Versione 1 (solo items con prezzo/venduto): sopra le righe ODS si applica l'overlay (applyOverlay),
+// MAI sulle righe che arrivano dal foglio. Se l'endpoint non risponde il sito usa i soli ODS
+// (il server resta l'unica fonte di verita' per cio' che viene addebitato).
 (function (root) {
   const DEFAULT_TIMEOUT_MS = 5000;
   const ID_RE = /^[A-Za-z0-9_-]+$/;
@@ -13,6 +16,20 @@
     if (root.CD && root.CD.money) return root.CD.money;
     return require("./money.js");
   }
+
+  function util() {
+    if (root.CD && root.CD.util) return root.CD.util;
+    return require("./util.js");
+  }
+
+  // Colonne minime perche' un foglio sia considerato valido, e colonne prezzo (per "<col>__raw")
+  const TABS = {
+    vasi:        { required: ["id", "name_it", "price_new", "venduto", "img1"], price: ["price_old", "price_new"] },
+    masterclass: { required: ["id", "name_it", "price", "date", "img1"],        price: ["price"] },
+    certificati: { required: ["id", "name_it", "amount_eur", "img1"],           price: ["amount_eur"] }
+  };
+  const MAX_ROWS = 1000;
+  const MAX_COLS = 100;
 
   // Valida una voce; ritorna {priceCents, sold} oppure null (voce ignorata).
   function validEntry(e) {
@@ -23,19 +40,70 @@
     return { id: e.id, priceCents: e.priceCents, sold: e.sold };
   }
 
-  // Valida il payload: version 1 e items array, altrimenti null. Voci errate scartate.
-  function parsePayload(body) {
-    if (!body || typeof body !== "object" || body.version !== 1 || !Array.isArray(body.items)) return null;
+  // Valida un foglio {headers, rows}; ritorna le righe normalizzate (come loadOdsRows) oppure null
+  // (=> si usa l'ODS). Righe scartate: non oggetti, id mancante/non valido/duplicato.
+  // Se c'erano righe ma nessuna e' valida il foglio e' considerato non valido (schema rotto).
+  function parseTab(name, tab) {
+    const spec = TABS[name];
+    if (!tab || typeof tab !== "object" || !Array.isArray(tab.headers) || !Array.isArray(tab.rows)) return null;
+    const headers = tab.headers.filter((h) => typeof h === "string" && h && h !== "__proto__" && !/__raw$/.test(h));
+    if (headers.length !== tab.headers.length || headers.length > MAX_COLS) return null;
+    if (!spec.required.every((h) => headers.includes(h))) return null;
+    if (tab.rows.length > MAX_ROWS) return null;
+
+    const u = util();
+    const seen = new Set();
+    const rows = [];
+    for (const raw of tab.rows) {
+      if (!raw || typeof raw !== "object" || Array.isArray(raw)) continue;
+      const fmt = {};
+      headers.forEach((h) => { fmt[h] = Object.prototype.hasOwnProperty.call(raw, h) ? raw[h] : ""; });
+      const row = u.normalizeRow(fmt, null, spec.price);
+      if (!ID_RE.test(row.id) || seen.has(row.id)) continue;
+      seen.add(row.id);
+      rows.push(row);
+    }
+    if (tab.rows.length && !rows.length) return null;
+    return rows;
+  }
+
+  function parseItems(items) {
     const map = new Map();
-    for (const raw of body.items) {
+    for (const raw of items) {
       const e = validEntry(raw);
       if (e) map.set(e.id, { priceCents: e.priceCents, sold: e.sold });
     }
     return map;
   }
 
-  // Mai lancia: in caso di errore, timeout o forma non valida ritorna una Map vuota (console.warn).
-  async function fetchLive(fetchImpl, url, timeoutMs) {
+  function emptyLive() {
+    return { items: new Map(), tabs: { vasi: null, masterclass: null, certificati: null } };
+  }
+
+  // Valida il payload (version 1 o 2, items array obbligatorio); null se non valido.
+  // Ritorna {items: Map, tabs: {vasi, masterclass, certificati}} con ogni foglio = righe o null.
+  // Version 1 (o tabs mancante) => tutti i fogli null. Un foglio non valido non invalida gli altri.
+  function parseCatalogue(body) {
+    if (!body || typeof body !== "object" || (body.version !== 1 && body.version !== 2) || !Array.isArray(body.items)) return null;
+    const out = { items: parseItems(body.items), tabs: emptyLive().tabs };
+    if (body.version === 2 && body.tabs && typeof body.tabs === "object") {
+      Object.keys(TABS).forEach((name) => {
+        const rows = parseTab(name, body.tabs[name]);
+        if (rows === null && body.tabs[name] != null) console.warn("[LIVE] foglio non valido, uso l'ODS:", name);
+        out.tabs[name] = rows;
+      });
+    }
+    return out;
+  }
+
+  // Compatibilita': solo la mappa prezzo/venduto (null se payload non valido).
+  function parsePayload(body) {
+    const c = parseCatalogue(body);
+    return c ? c.items : null;
+  }
+
+  // Mai lancia: in caso di errore, timeout o forma non valida ritorna emptyLive() (console.warn).
+  async function fetchCatalogue(fetchImpl, url, timeoutMs) {
     const ms = Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : DEFAULT_TIMEOUT_MS;
     let timer;
     const ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
@@ -50,18 +118,23 @@
       const work = (async () => {
         const res = await fetchImpl(url, ctrl ? { signal: ctrl.signal } : undefined);
         if (!res || !res.ok) throw new Error("HTTP " + (res && res.status));
-        return parsePayload(await res.json());
+        return parseCatalogue(await res.json());
       })();
       work.catch(() => {});   // evita unhandled rejection se vince il timeout
-      const map = await Promise.race([work, timeout]);
-      if (!map) throw new Error("risposta non valida");
-      return map;
+      const live = await Promise.race([work, timeout]);
+      if (!live) throw new Error("risposta non valida");
+      return live;
     } catch (err) {
       console.warn("[LIVE] catalogo live non disponibile, uso i dati ODS:", err && err.message ? err.message : err);
-      return new Map();
+      return emptyLive();
     } finally {
       clearTimeout(timer);
     }
+  }
+
+  // Compatibilita' (versione 1): solo la mappa prezzo/venduto.
+  async function fetchLive(fetchImpl, url, timeoutMs) {
+    return (await fetchCatalogue(fetchImpl, url, timeoutMs)).items;
   }
 
   // Ritorna COPIE delle righe ODS con prezzo e venduto aggiornati per gli id presenti nella mappa.
@@ -85,7 +158,32 @@
     });
   }
 
-  const api = { fetchLive, applyOverlay, parsePayload, DEFAULT_TIMEOUT_MS };
+  // Sceglie, per ciascun foglio, la sorgente delle righe. live = risultato di fetchCatalogue (o null),
+  // ods = {vasi, masterclass, certificati} con array di righe oppure null/undefined (non caricato).
+  // Foglio presente nel live => righe del foglio (prezzo/venduto gia' dentro: nessun overlay).
+  // Altrimenti righe ODS; solo per i vasi, se ci sono items, overlay prezzo/venduto (una sola volta:
+  // parte sempre dalle righe ODS originali). Ritorna {rows, sources} con sources[k] = "sheet" | "ods" | null.
+  function chooseData(live, ods) {
+    const l = live && live.tabs ? live : emptyLive();
+    const o = ods || {};
+    const rows = {};
+    const sources = {};
+    Object.keys(TABS).forEach((name) => {
+      if (Array.isArray(l.tabs[name])) {
+        rows[name] = l.tabs[name];
+        sources[name] = "sheet";
+      } else if (Array.isArray(o[name])) {
+        rows[name] = name === "vasi" && l.items && l.items.size ? applyOverlay(o[name], l.items) : o[name];
+        sources[name] = "ods";
+      } else {
+        rows[name] = null;   // ne' foglio ne' ODS: "non disponibile"
+        sources[name] = null;
+      }
+    });
+    return { rows, sources };
+  }
+
+  const api = { fetchCatalogue, fetchLive, applyOverlay, parsePayload, parseCatalogue, parseTab, chooseData, emptyLive, TABS, DEFAULT_TIMEOUT_MS };
   root.CD = root.CD || {};
   root.CD.liveCatalogue = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;

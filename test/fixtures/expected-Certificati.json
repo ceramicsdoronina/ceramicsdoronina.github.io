@@ -1,0 +1,78 @@
+{
+ "headers": [
+  "id",
+  "name_it",
+  "name_en",
+  "name_ru",
+  "short_it",
+  "short_en",
+  "short_ru",
+  "long_it",
+  "long_en",
+  "long_ru",
+  "img1",
+  "amount_eur"
+ ],
+ "rows": [
+  {
+   "id": "gc-50",
+   "name_it": "Carta regalo da 50€",
+   "name_en": "Gift Card €50",
+   "name_ru": "Подарочный сертификат 50€",
+   "short_it": "Un regalo semplice: 50€ da usare su vasi o masterclass.",
+   "short_en": "A simple gift: €50 to use on vases or workshops.",
+   "short_ru": "Простой подарок: 50€ на вазы или мастер-классы.",
+   "long_it": "Valida per acquistare un pezzo in catalogo o partecipare a una masterclass. Voucher digitale via email o card stampata su richiesta. Per acquistare, scrivimi indicando il nome del destinatario e l’importo.",
+   "long_en": "Valid for purchasing a catalogue piece or joining a workshop. Digital voucher by email or printed card on request. To order, write me the recipient’s name and the amount.",
+   "long_ru": "Подходит для покупки изделия из каталога или участия в мастер-классе. Электронный сертификат по email или печатная карточка по запросу. Чтобы оформить, напишите имя получателя и сумму.",
+   "img1": "giftcard-50.jpg",
+   "amount_eur": "50",
+   "amount_eur__raw": 50
+  },
+  {
+   "id": "gc-150",
+   "name_it": "Carta regalo da 150€",
+   "name_en": "Gift Card €150",
+   "name_ru": "Подарочный сертификат 150€",
+   "short_it": "Un importo più ampio per un pezzo speciale o una masterclass dedicata.",
+   "short_en": "A larger amount for a special piece or a dedicated workshop.",
+   "short_ru": "Более высокий номинал для особого изделия или мастер-класса.",
+   "long_it": "Valida per acquistare un pezzo in catalogo o partecipare a una masterclass. Voucher digitale via email o card stampata su richiesta. Per acquistare, scrivimi indicando il nome del destinatario e l’importo.",
+   "long_en": "Valid for purchasing a catalogue piece or joining a workshop. Digital voucher by email or printed card on request. To order, write me the recipient’s name and the amount.",
+   "long_ru": "Подходит для покупки изделия из каталога или участия в мастер-классе. Электронный сертификат по email или печатная карточка по запросу. Чтобы оформить, напишите имя получателя и сумму.",
+   "img1": "giftcard-150.jpg",
+   "amount_eur": "150",
+   "amount_eur__raw": 150
+  },
+  {
+   "id": "gc-200",
+   "name_it": "Carta regalo da 200€",
+   "name_en": "Gift Card €200",
+   "name_ru": "Подарочный сертификат 200€",
+   "short_it": "Per un regalo importante: 200€ per un pezzo unico o un percorso su misura.",
+   "short_en": "For a meaningful gift: €200 for a unique piece or a tailored path.",
+   "short_ru": "Для особенного подарка: 200€ на уникальное изделие или индивидуальный формат.",
+   "long_it": "Valida per acquistare un pezzo in catalogo o partecipare a una masterclass. Voucher digitale via email o card stampata su richiesta. Per acquistare, scrivimi indicando il nome del destinatario e l’importo.",
+   "long_en": "Valid for purchasing a catalogue piece or joining a workshop. Digital voucher by email or printed card on request. To order, write me the recipient’s name and the amount.",
+   "long_ru": "Подходит для покупки изделия из каталога или участия в мастер-классе. Электронный сертификат по email или печатная карточка по запросу. Чтобы оформить, напишите имя получателя и сумму.",
+   "img1": "giftcard-200.jpg",
+   "amount_eur": "200",
+   "amount_eur__raw": 200
+  },
+  {
+   "id": "gc-300",
+   "name_it": "Carta regalo da 300€",
+   "name_en": "Gift Card €300",
+   "name_ru": "Подарочный сертификат 300€",
+   "short_it": "Per un regalo importante: 300€ per un pezzo unico o un percorso su misura.",
+   "short_en": "For a meaningful gift: €300 for a unique piece or a tailored path.",
+   "short_ru": "Для особенного подарка: 300€ на уникальное изделие или индивидуальный формат.",
+   "long_it": "Valida per acquistare un pezzo in catalogo o partecipare a una masterclass. Voucher digitale via email o card stampata su richiesta. Per acquistare, scrivimi indicando il nome del destinatario e l’importo.",
+   "long_en": "Valid for purchasing a catalogue piece or joining a workshop. Digital voucher by email or printed card on request. To order, write me the recipient’s name and the amount.",
+   "long_ru": "Подходит для покупки изделия из каталога или участия в мастер-классе. Электронный сертификат по email или печатная карточка по запросу. Чтобы оформить, напишите имя получателя и сумму.",
+   "img1": "giftcard-300.jpg",
+   "amount_eur": "300",
+   "amount_eur__raw": 300
+  }
+ ]
+}
