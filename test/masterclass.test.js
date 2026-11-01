@@ -57,6 +57,7 @@ function product(r) {
   const b = util.bookingFromRow(r);
   return { id: r.id, type: "digital", sold: b.sold, titles: { it: r.name_it }, priceCents: b.priceCents, tiersCents: b.tiersCents, maxQty: b.maxQty, img: "images/masterclass/x.jpg" };
 }
+const nulls = (n) => Array(n).fill(null);
 const reg = (...ps) => Object.fromEntries(ps.map((p) => [p.id, p]));
 
 // ── dati reali (fixture) ──
@@ -65,7 +66,7 @@ test("v2 fixture rows pass through the endpoint tab parser and give the 1/2-pers
   assert.equal(rows.length, 6);
   for (const r of rows) {
     const b = util.bookingFromRow(r);
-    assert.deepEqual(b.tiersCents, [10000, 18000, null, null, null, null, null, null]);
+    assert.deepEqual(b.tiersCents, [10000, 18000].concat(nulls(18)));
     assert.equal(b.legacy, false);
     assert.equal(b.seatsTotal, 8);
     assert.equal(b.seatsBooked, 0);
@@ -83,7 +84,7 @@ test("legacy fixture rows (spots / price): linear tiers, seats from the digits o
   for (const r of rows) {
     const b = util.bookingFromRow(r);
     assert.equal(b.legacy, true);
-    assert.deepEqual(b.tiersCents, [10000, 20000, 30000, 40000, 50000, 60000, 70000, 80000]);
+    assert.deepEqual(b.tiersCents, Array.from({ length: 20 }, (_, i) => 10000 * (i + 1)));
     assert.equal(b.seatsTotal, 6);
     assert.equal(b.seatsFree, 6);
     assert.equal(b.maxQty, 6);
@@ -94,7 +95,9 @@ test("legacy fixture rows (spots / price): linear tiers, seats from the digits o
 
 test("legacy row without a usable spots number defaults to 6 seats; bad price = not bookable", () => {
   assert.equal(util.bookingFromRow({ id: "a", price: "90", spots: "pochi" }).seatsTotal, 6);
-  assert.equal(util.bookingFromRow({ id: "a", price: "90", spots: "Max 12 persone" }).maxQty, 8);   // tetto 8
+  assert.equal(util.bookingFromRow({ id: "a", price: "90", spots: "Max 12 persone" }).maxQty, 12);
+  assert.equal(util.bookingFromRow({ id: "a", price: "90", spots: "Max 30 persone" }).maxQty, 20);   // tetto 20, legacy MAI illimitato
+  assert.equal(util.bookingFromRow({ id: "a", price: "90", spots: "" }).seatsFree, 6);
   const bad = util.bookingFromRow({ id: "a", price: "-", spots: "Max 4" });
   assert.equal(bad.maxQty, 0);
   assert.equal(bad.sold, true);
@@ -111,7 +114,7 @@ test("endpoint tab validation accepts the new schema (price_1) and the legacy on
 // ── tiers e posti ──
 test("tiers are taken from the sheet, never computed linearly; gaps stay null", () => {
   const b = util.bookingFromRow(row("m", { price_1: "100", price_2: "180", price_4: "320" }));
-  assert.deepEqual(b.tiersCents, [10000, 18000, null, 32000, null, null, null, null]);
+  assert.deepEqual(b.tiersCents, [10000, 18000, null, 32000].concat(nulls(16)));
   assert.equal(b.maxQty, 4);
   assert.deepEqual(cart.offeredPersons(product(row("m", { price_1: "100", price_2: "180", price_4: "320" }))), [1, 2, 4]);
   // solo gruppi >= 2: priceCents = il piu' economico offerto
@@ -139,8 +142,8 @@ test("seats_free from the sheet: the smaller of it and total - booked wins (neve
   assert.equal(util.bookingFromRow(row("m", Object.assign({ seats_booked: "2", seats_free: "3" }, TIERS))).seatsFree, 3);
   assert.equal(util.bookingFromRow(row("m", Object.assign({ seats_booked: "2", seats_free: "7" }, TIERS))).seatsFree, 6);
   assert.equal(util.bookingFromRow(row("m", Object.assign({ seats_booked: "2", seats_free: "" }, TIERS))).seatsFree, 6);
-  // seats_total vuoto: 8
-  assert.equal(util.bookingFromRow(row("m", Object.assign({ seats_total: "" }, TIERS))).seatsTotal, 8);
+  // seats_total vuoto: illimitati (vedi test dedicati)
+  assert.equal(util.bookingFromRow(row("m", Object.assign({ seats_total: "" }, TIERS))).seatsTotal, null);
 });
 
 test("selector bounds: 1..min(8, seatsFree, highest offered), only offered group sizes, none when sold", () => {
@@ -293,7 +296,7 @@ test("a saved booking line survives sanitizeCart with its kind; gift-card lines 
   assert.equal(s.kind, "masterclass");
   assert.equal(s.quantity, 2);
   assert.equal(s.line_amount, 18000);
-  assert.equal(cart.sanitizeLine(Object.assign({}, l, { quantity: 50 })).quantity, 8);   // tetto 8 persone
+  assert.equal(cart.sanitizeLine(Object.assign({}, l, { quantity: 50 })).quantity, 20);   // tetto 20 persone
   assert.equal(cart.sanitizeLine({ id: "x", type: "physical", kind: "masterclass", quantity: 1 }).kind, undefined);
   const gc = { id: "gc-1", type: "digital", priceCents: 5000, maxQty: 10, titles: { it: "GC" } };
   const g = cart.mergeAdd([], gc, 3).cart[0];
@@ -317,17 +320,18 @@ test("titles and texts fall back current -> it -> en -> ru, skipping empty and '
   assert.equal(util.pickLangField({ short_it: "", short_en: "S" }, "short", "ru", "it"), "S");
 });
 
-test("persons plural forms: it/en singular+plural, ru 1 / 2-4 / 5-8", () => {
+test("persons plural forms: it/en singular+plural, ru 1 / 2-4 / 5-20 / 21 (n%10, n%100)", () => {
   const t = (k, l) => globalThis.CD.i18n.t(k, l);
   const label = (n, l) => util.personsLabel(n, l, t);
   assert.equal(label(1, "it"), "1 persona");
-  assert.equal(label(2, "it"), "2 persone");
-  assert.equal(label(8, "it"), "8 persone");
+  for (const n of [2, 4, 5, 11, 12, 14, 20]) assert.equal(label(n, "it"), n + " persone");
   assert.equal(label(1, "en"), "1 person");
-  assert.equal(label(2, "en"), "2 people");
+  for (const n of [2, 4, 5, 11, 12, 14, 20]) assert.equal(label(n, "en"), n + " people");
   assert.equal(label(1, "ru"), "1 человек");
   for (const n of [2, 3, 4]) assert.equal(label(n, "ru"), n + " человека");
-  for (const n of [5, 6, 7, 8]) assert.equal(label(n, "ru"), n + " человек");
+  for (const n of [5, 6, 7, 8, 11, 12, 13, 14, 15, 19, 20]) assert.equal(label(n, "ru"), n + " человек");
+  assert.equal(label(21, "ru"), "21 человек");
+  assert.equal(label(22, "ru"), "22 человека");
   assert.equal(util.personsKey(11, "ru"), "masterclass.personMany");
   assert.equal(util.personsKey(21, "ru"), "masterclass.personOne");
 });
@@ -350,7 +354,7 @@ test("total text shows the tier TOTAL and the per-person price, formatted by mon
 test("new i18n keys exist in it/en/ru with the {n}/{total}/{per} placeholders where needed", () => {
   for (const l of ["it", "en", "ru"]) {
     const m = messages[l];
-    for (const k of ["seatsFree", "seatsFreeOne", "soldOut", "persons", "personOne", "personFew", "personMany", "total", "totalPer", "book"]) {
+    for (const k of ["seatsFree", "seatsFreeOne", "seatsAvailable", "soldOut", "persons", "personOne", "personFew", "personMany", "total", "totalPer", "book"]) {
       assert.ok(m.masterclass[k], `${l}.masterclass.${k}`);
     }
     for (const k of ["persons", "bookingAdjusted", "notEnoughSeats", "soldOut", "groupUnavailable"]) assert.ok(m.cart[k], `${l}.cart.${k}`);
@@ -360,6 +364,133 @@ test("new i18n keys exist in it/en/ru with the {n}/{total}/{per} placeholders wh
   }
   assert.equal(util.fillTemplate(messages.it.masterclass.seatsFree, { n: 6 }), "6 posti liberi");
   assert.equal(messages.it.masterclass.soldOut, "Completo");
+  assert.equal(messages.it.masterclass.seatsAvailable, "Posti disponibili");
+  assert.equal(messages.en.masterclass.seatsAvailable, "Seats available");
+  assert.equal(messages.ru.masterclass.seatsAvailable, "Места есть");
+});
+
+// ── gruppi fino a 20, posti illimitati (v3) ──
+// riga v3: price_1..price_20 e seats_total vuoto (illimitato) salvo diversa indicazione
+const row3 = (id, o) => {
+  const r = Object.assign({ id, name_it: "MC " + id, date: "01.01.2099", time: "10:00", level: "x", seats_total: "", seats_booked: "0", seats_free: "", img1: "" }, o);
+  for (let n = 1; n <= 20; n++) if (!(("price_" + n) in r)) r["price_" + n] = "";
+  return r;
+};
+const product3 = (r) => {
+  const b = util.bookingFromRow(r);
+  return { id: r.id, type: "digital", sold: b.sold, titles: { it: r.name_it }, priceCents: b.priceCents, tiersCents: b.tiersCents, maxQty: b.maxQty, seatsFree: b.seatsFree, seatsTotal: b.seatsTotal, img: "images/masterclass/x.jpg" };
+};
+const range = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
+
+test("rule A: only price_1 filled -> every size 1..20 is N x price_1 (1, 7, 20)", () => {
+  const b = util.bookingFromRow(row3("m", { price_1: "50" }));
+  assert.equal(b.tiersCents.length, 20);
+  assert.equal(b.tiersCents[0], 5000);
+  assert.equal(b.tiersCents[6], 35000);
+  assert.equal(b.tiersCents[19], 100000);
+  const p = product3(row3("m", { price_1: "50" }));
+  assert.deepEqual(cart.offeredPersons(p), range(1, 20));
+  for (const n of [1, 7, 20]) assert.equal(cart.mergeAdd([], p, n).cart[0].line_amount, 5000 * n);
+  // columns price_9..price_20 missing from the row entirely are blank too
+  const slim = { id: "m", price_1: "50", price_2: "", seats_total: "" };
+  assert.deepEqual(cart.offeredPersons(product3(slim)), range(1, 20));
+  // text, per-person price is identical
+  require("../masterclass.js");
+  assert.equal(globalThis.CD.masterclass.totalText(p, 20, "it"), "Totale 1000 € (50 € a persona)");
+  assert.equal(globalThis.CD.masterclass.totalText(p, 7, "en"), "Total €350 (€50 per person)");
+});
+
+test("explicit tiers 1..8 disable rule A: 9 is not offered", () => {
+  const p = product3(row3("m", TIERS));
+  assert.deepEqual(cart.offeredPersons(p), range(1, 8));
+  assert.equal(cart.tierCents(p, 9), null);
+  assert.equal(cart.mergeAdd([], p, 20).cart[0].quantity, 8);
+  // a single filled price_2 is enough to turn rule A off
+  assert.deepEqual(cart.offeredPersons(product3(row3("m", { price_1: "50", price_20: "900" }))), [1, 20]);
+});
+
+test("unlimited default (seats_total blank): no cap, never sold out, selector 1..20, no seats number", () => {
+  const b = util.bookingFromRow(row3("m", { price_1: "50", seats_booked: "7" }));
+  assert.equal(b.seatsTotal, null);
+  assert.equal(b.seatsFree, null);
+  assert.equal(b.maxQty, 20);
+  assert.equal(b.sold, false);
+  // a stray seats_free on an unlimited row is ignored
+  assert.equal(util.bookingFromRow(row3("m", { price_1: "50", seats_free: "3" })).maxQty, 20);
+  // absent seats_total column too
+  assert.equal(util.bookingFromRow({ id: "m", price_1: "50" }).seatsFree, null);
+  require("../masterclass.js");
+  const { html, modals } = renderRows([row3("mc1", { price_1: "50", seats_booked: "7" })], "en");
+  for (const out of [html, modals]) {
+    assert.match(out, /Seats available/);
+    assert.doesNotMatch(out, /seats left|Fully booked/);
+    assert.match(out, /<option value="20">20 people<\/option>/);
+    assert.doesNotMatch(out, /<option value="21"/);
+    assert.match(out, /data-add-to-cart="mc1"/);
+  }
+  assert.equal(globalThis.CD.shop.products.mc1.seatsFree, null);
+  assert.equal(globalThis.CD.shop.products.mc1.sold, false);
+});
+
+test("limited seats_total 30 with 5 booked -> 25 free, selector max 20; 3 free -> max 3; 0 free -> sold", () => {
+  const a = util.bookingFromRow(row3("m", { price_1: "50", seats_total: "30", seats_booked: "5" }));
+  assert.deepEqual([a.seatsTotal, a.seatsFree, a.maxQty], [30, 25, 20]);
+  const b = util.bookingFromRow(row3("m", { price_1: "50", seats_total: "30", seats_booked: "27" }));
+  assert.deepEqual([b.seatsFree, b.maxQty], [3, 3]);
+  assert.deepEqual(cart.offeredPersons(product3(row3("m", { price_1: "50", seats_total: "30", seats_booked: "27" }))), [1, 2, 3]);
+  // endpoint seats_free: the smaller wins
+  assert.equal(util.bookingFromRow(row3("m", { price_1: "50", seats_total: "30", seats_booked: "5", seats_free: "10" })).seatsFree, 10);
+  assert.equal(util.bookingFromRow(row3("m", { price_1: "50", seats_total: "30", seats_booked: "5", seats_free: "40" })).seatsFree, 25);
+  const z = util.bookingFromRow(row3("m", { price_1: "50", seats_total: "30", seats_booked: "30" }));
+  assert.deepEqual([z.seatsFree, z.maxQty, z.sold], [0, 0, true]);
+  assert.equal(util.bookingFromRow(row3("m", { price_1: "50", seats_total: "0" })).sold, true);
+  const { html } = renderRows([row3("mc1", { price_1: "50", seats_total: "30", seats_booked: "5" })], "en");
+  assert.match(html, /25 seats left/);
+});
+
+test("legacy rows keep the 20 cap and are never unlimited", () => {
+  const b = util.bookingFromRow({ id: "a", price: "100", spots: "Max 25" });
+  assert.equal(b.legacy, true);
+  assert.equal(b.seatsFree, 25);
+  assert.equal(b.maxQty, 20);
+  assert.equal(b.tiersCents.length, 20);
+  assert.equal(b.tiersCents[19], 200000);
+  const d = util.bookingFromRow({ id: "a", price: "100" });
+  assert.deepEqual([d.seatsTotal, d.seatsFree, d.maxQty], [6, 6, 6]);
+});
+
+test("reconcile: caps by 20, by free seats only when limited, drops only when not offered or sold out", () => {
+  const unl = product3(row3("m1", { price_1: "50" }));
+  const lim = (booked) => product3(row3("m1", { price_1: "50", seats_total: "30", seats_booked: String(booked) }));
+  const line = (p, q) => cart.mergeAdd([], p, q).cart[0];
+  // unlimited: 20 persons stay, never sold out
+  let r = cart.reconcile([line(unl, 20)], reg(unl));
+  assert.deepEqual([r.cart[0].quantity, r.removed, r.adjusted, r.changed], [20, 0, 0, false]);
+  // a stale line with more than 20 is capped by 20
+  r = cart.reconcile([Object.assign({}, line(unl, 20), { quantity: 30 })], reg(unl));
+  assert.equal(r.cart[0].quantity, 20);
+  assert.equal(r.adjusted, 1);
+  // limited: capped by the free seats, dropped at 0 free
+  r = cart.reconcile([line(unl, 20)], reg(lim(25)));       // 5 free
+  assert.deepEqual([r.cart[0].quantity, r.cart[0].line_amount, r.adjusted], [5, 25000, 1]);
+  r = cart.reconcile([line(unl, 4)], reg(lim(30)));
+  assert.deepEqual([r.cart.length, r.removed], [0, 1]);
+  // limited -> unlimited: nothing to cut
+  r = cart.reconcile([line(unl, 12)], reg(unl));
+  assert.equal(r.cart[0].quantity, 12);
+  // explicit tiers arrive: size 12 no longer offered, falls to the nearest offered below
+  const tiers = product3(row3("m1", { price_1: "50", price_5: "200", price_10: "380" }));
+  r = cart.reconcile([line(unl, 12)], reg(tiers));
+  assert.equal(r.cart[0].quantity, 10);
+  // a server "sold_out" override is the only way an unlimited one is sold: flag on the product
+  r = cart.reconcile([line(unl, 3)], reg(Object.assign({}, unl, { sold: true })));
+  assert.equal(r.removed, 1);
+});
+
+test("group_size_unavailable above 20 uses the existing translated message", () => {
+  assert.match(messages.it.cart.groupUnavailable, /dimensione di gruppo/);
+  assert.equal(cart.tierCents(product3(row3("m", { price_1: "50" })), 21), null);
+  assert.equal(cart.setPersons([cart.mergeAdd([], product3(row3("m", { price_1: "50" })), 1).cart[0]], product3(row3("m", { price_1: "50" })), "m", 21).status, "invalid");
 });
 
 test("server booking error codes map to translated messages and the line is dropped", () => {

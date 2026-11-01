@@ -229,9 +229,9 @@
   }
 
   // ─────────────────────────────────────────────
-  // Masterclass: prenotazione per numero di persone (1..8), prezzi a gruppo e posti
+  // Masterclass: prenotazione per numero di persone (1..20), prezzi a gruppo e posti
   // ─────────────────────────────────────────────
-  const MAX_PERSONS = 8;
+  const MAX_PERSONS = 20;
   const LEGACY_DEFAULT_SEATS = 6;
 
   function moneyLib() {
@@ -246,32 +246,50 @@
   }
 
   // Riga del foglio Masterclass -> offerta di prenotazione (stesso calcolo del server):
-  //   tiersCents [c1..c8, null dove quel gruppo non e' offerto], seatsTotal/Booked/Free,
-  //   maxQty = min(8, posti liberi, gruppo piu' grande offerto), priceCents (1 persona, o il piu'
-  //   economico offerto), sold (nessuna prenotazione possibile), legacy.
-  // Schema nuovo: colonne price_1..price_8, seats_total, seats_booked (e seats_free calcolata:
-  //   si usa il minore fra seats_free e totale - prenotati). seats_total vuoto/non valido = 8.
+  //   tiersCents [c1..c20, null dove quel gruppo non e' offerto], seatsTotal (null = illimitati) /
+  //   seatsBooked / seatsFree (null = illimitati), maxQty = min(20, posti liberi se limitati, gruppo
+  //   piu' grande offerto), priceCents (1 persona, o il piu' economico offerto), sold (nessuna
+  //   prenotazione possibile), legacy.
+  // Schema nuovo: colonne price_1..price_20 (totale per N persone), seats_total, seats_booked (e
+  //   seats_free calcolata dalla funzione, "" se illimitati).
+  //   Regola A: se price_2..price_20 sono TUTTE vuote/assenti, ogni gruppo 1..20 costa N x price_1
+  //   (stesso prezzo a persona); altrimenti sono offerti SOLO i gruppi con price_N compilato.
+  //   seats_total vuoto/assente = posti ILLIMITATI (mai "Completo", nessun numero di posti liberi);
+  //   compilato = limitato: liberi = totale - prenotati, e se seats_free non e' vuoto vale il minore.
+  //   Un seats_total non numerico e non vuoto e' trattato come 0 posti (mai vendere piu' del dovuto).
   // LEGACY (nessuna colonna price_N / seats_total: foglio non ancora migrato e ODS): prezzi lineari
-  //   N x price, posti = prima cifra di "spots" (default 6), nessun conteggio dei prenotati.
+  //   N x price, posti = prima cifra di "spots" (default 6), nessun conteggio dei prenotati; MAI illimitati.
   function bookingFromRow(row) {
     const r = row || {};
     const m = moneyLib();
     const has = (k) => Object.prototype.hasOwnProperty.call(r, k);
-    const modern = has("seats_total") || [1, 2, 3, 4, 5, 6, 7, 8].some((n) => has("price_" + n));
-    const tiers = [null, null, null, null, null, null, null, null];
+    const blank = (k) => !has(k) || (String(r[k] == null ? "" : r[k]).trim() === "" && typeof r[k + "__raw"] !== "number");
+    const nums = Array.from({ length: MAX_PERSONS }, (_, i) => i + 1);
+    const modern = has("seats_total") || nums.some((n) => has("price_" + n));
+    const tiers = nums.map(() => null);
     let seatsTotal, seatsBooked, seatsFree;
 
     if (modern) {
-      for (let n = 1; n <= MAX_PERSONS; n++) tiers[n - 1] = m.cellToCents(r, "price_" + n);
-      seatsTotal = nonNegInt(r.seats_total);
-      if (seatsTotal === null) seatsTotal = MAX_PERSONS;
+      const price1 = m.cellToCents(r, "price_1");
+      if (nums.slice(1).every((n) => blank("price_" + n))) {
+        if (price1) nums.forEach((n) => { tiers[n - 1] = price1 * n; });
+      } else {
+        nums.forEach((n) => { tiers[n - 1] = m.cellToCents(r, "price_" + n); });
+      }
+      const st = String(r.seats_total == null ? "" : r.seats_total).trim();
       seatsBooked = nonNegInt(r.seats_booked) || 0;
-      seatsFree = Math.max(0, seatsTotal - seatsBooked);
-      const sf = nonNegInt(r.seats_free);
-      if (sf !== null) seatsFree = Math.min(seatsFree, sf);
+      if (st === "") {
+        seatsTotal = null;
+        seatsFree = null;
+      } else {
+        seatsTotal = /^-?\d+$/.test(st) ? Math.max(0, parseInt(st, 10)) : 0;
+        seatsFree = Math.max(0, seatsTotal - seatsBooked);
+        const sf = nonNegInt(r.seats_free);
+        if (sf !== null) seatsFree = Math.min(seatsFree, sf);
+      }
     } else {
       const price = m.cellToCents(r, "price");
-      if (price) for (let n = 1; n <= MAX_PERSONS; n++) tiers[n - 1] = price * n;
+      if (price) nums.forEach((n) => { tiers[n - 1] = price * n; });
       const d = String(r.spots || "").match(/\d+/);
       seatsTotal = d && parseInt(d[0], 10) > 0 ? parseInt(d[0], 10) : LEGACY_DEFAULT_SEATS;
       seatsBooked = 0;
@@ -281,7 +299,7 @@
     let highest = 0;
     tiers.forEach((c, i) => { if (c) highest = i + 1; });
     const offered = tiers.filter((c) => c);
-    const maxQty = Math.min(MAX_PERSONS, seatsFree, highest);
+    const maxQty = Math.min(MAX_PERSONS, seatsFree === null ? MAX_PERSONS : seatsFree, highest);
     return {
       tiersCents: tiers,
       seatsTotal, seatsBooked, seatsFree, maxQty,

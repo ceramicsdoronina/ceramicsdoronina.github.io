@@ -32,7 +32,7 @@
     };
 
     // Registro (forma unica): masterclass = servizio digitale prenotato per PERSONE; i prezzi sono
-    // a gruppo (tiersCents, mai lineari per costruzione del sito), maxQty = max persone prenotabili.
+    // a gruppo (tiersCents, 1..20 persone), maxQty = max persone prenotabili.
     const b = CD.util.bookingFromRow(mc);
     const sold = CD.util.isSoldFlag(mc.venduto) || b.sold;
     if (!b.priceCents && !CD.util.isSoldFlag(mc.venduto)) {
@@ -95,6 +95,7 @@
       const spots = String(mc.spots || "").trim();
       return spots ? `<p>${esc(spots)}</p>` : "";
     }
+    if (p.seatsFree === null) return `<p class="mc-seats">${esc(tr("masterclass.seatsAvailable"))}</p>`;   // posti illimitati: nessun numero
     if (p.seatsFree === 0 || CD.util.isSoldOverride(p.id)) return `<p class="mc-seats mc-seats--full"><strong>${esc(tr("masterclass.soldOut"))}</strong></p>`;
     const key = p.seatsFree === 1 ? "masterclass.seatsFreeOne" : "masterclass.seatsFree";
     return `<p class="mc-seats">${esc(CD.util.fillTemplate(tr(key), { n: p.seatsFree }))}</p>`;
@@ -129,7 +130,7 @@
   // ─────────────────────────────────────────────
   // Lancia in caso di errore (nessun fallback silenzioso a lista vuota)
   async function loadRows() {
-    const data = await CD.util.loadOdsRows("catalogue/masterclass.ods", ["price", "price_1", "price_2", "price_3", "price_4", "price_5", "price_6", "price_7", "price_8"]);
+    const data = await CD.util.loadOdsRows("catalogue/masterclass.ods", ["price"].concat(Array.from({ length: 20 }, (_, i) => "price_" + (i + 1))));
     console.log("Dati caricati da masterclass.ods:", data.length, "righe");
     return data;
   }

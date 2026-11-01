@@ -28,7 +28,7 @@
   const TABS = {
     vasi:        { required: ["id", "name_it", "price_new", "venduto", "img1"], price: ["price_old", "price_new"] },
     masterclass: { required: ["id", "name_it", "date", "img1"], anyOf: [["price_1"], ["price"]],
-                   price: ["price", "price_1", "price_2", "price_3", "price_4", "price_5", "price_6", "price_7", "price_8"] },
+                   price: ["price"].concat(Array.from({ length: 20 }, (_, i) => "price_" + (i + 1))) },
     certificati: { required: ["id", "name_it", "amount_eur", "img1"],           price: ["amount_eur"] }
   };
   const MAX_ROWS = 1000;

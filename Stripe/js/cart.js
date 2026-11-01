@@ -4,8 +4,8 @@
 //
 // Carrello: array di righe {id, type, quantity, name, currency, unit_amount, image, kind?, line_amount?}.
 // Registro prodotti: products[id] = {id, type, titles, priceCents, img, maxQty?, sold?, tiersCents?}.
-// Masterclass (prodotto con tiersCents = [c1..c8, null dove quel gruppo non e' offerto]):
-//   quantity = PERSONE (1..8) e il prezzo della riga e' tiersCents[quantity-1] (UNA riga, mai
+// Masterclass (prodotto con tiersCents = [c1..c20, null dove quel gruppo non e' offerto]):
+//   quantity = PERSONE (1..20) e il prezzo della riga e' tiersCents[quantity-1] (UNA riga, mai
 //   prezzo unitario x quantita'): e' lo stesso calcolo del server. kind "masterclass" e line_amount
 //   (totale della riga) servono solo alla visualizzazione.
 // Marcatore "checkout in sospeso" (localStorage cd_checkout_pending): MAPPA
@@ -15,7 +15,7 @@
   const PENDING_KEY = "cd_checkout_pending";
   const DEFAULT_DIGITAL_MAX_QTY = 6;
   const MAX_LINE_QTY = 99;
-  const MAX_PERSONS = 8;
+  const MAX_PERSONS = 20;
   const PENDING_TTL_MS = 24 * 60 * 60 * 1000;
   const STRIPE_HOST = "checkout.stripe.com";
   const ID_RE = /^[A-Za-z0-9_-]+$/;
@@ -41,7 +41,7 @@
     return validPrice(c) ? c : null;
   }
 
-  // Numeri di persone prenotabili: gruppi offerti (prezzo valido) entro maxQty (posti liberi, max 8).
+  // Numeri di persone prenotabili: gruppi offerti (prezzo valido) entro maxQty (posti liberi se limitati, max 20).
   function offeredPersons(p) {
     if (!isBooking(p) || p.sold) return [];
     const cap = Math.min(MAX_PERSONS, Number.isInteger(p.maxQty) && p.maxQty > 0 ? p.maxQty : 0);
@@ -202,7 +202,8 @@
   // opts.nameFor(p, id) = titolo da mostrare. Ritorna {cart, removed, changed, adjusted}:
   // adjusted = prenotazioni masterclass con meno persone (posti liberi / gruppi offerti diminuiti).
   // Masterclass: persone limitate ai posti liberi e portate al gruppo offerto piu' vicino per difetto;
-  // riga tolta se esaurita o se nessun gruppo e' piu' offerto.
+  // riga tolta se esaurita (solo posti limitati a 0 liberi: gli illimitati non sono mai esauriti)
+  // o se nessun gruppo e' piu' offerto.
   function reconcile(cart, products, opts) {
     const o = opts || {};
     const reg = products || {};

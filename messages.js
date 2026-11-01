@@ -69,6 +69,7 @@ const messages = {
     masterclass: {
       seatsFree: "Свободных мест: {n}",
       seatsFreeOne: "Свободно 1 место",
+      seatsAvailable: "Места есть",
       soldOut: "Мест нет",
       persons: "Количество человек",
       personOne: "{n} человек",
@@ -223,6 +224,7 @@ const messages = {
     masterclass: {
       seatsFree: "{n} posti liberi",
       seatsFreeOne: "1 posto libero",
+      seatsAvailable: "Posti disponibili",
       soldOut: "Completo",
       persons: "Persone",
       personOne: "{n} persona",
@@ -378,6 +380,7 @@ const messages = {
     masterclass: {
       seatsFree: "{n} seats left",
       seatsFreeOne: "1 seat left",
+      seatsAvailable: "Seats available",
       soldOut: "Fully booked",
       persons: "People",
       personOne: "{n} person",
