@@ -1,7 +1,7 @@
 // Stripe/js/importerStripe.js
 // Avvio: i fetch degli ODS e dei partial partono subito (in parallelo) e NON aspettano SheetJS
 // (caricato in modo asincrono da index.html: loadOdsRows attende window.__xlsxReady solo per
-// XLSX.read). I partial si inseriscono appena arrivano; i dati ODS vengono resi quando pronti.
+// XLSX.read). I partial si inseriscono appena arrivano; i dati vengono resi quando pronti.
 
 const PARTIAL_IMPORTS = [
   ["import-navbar",     "Stripe/partials/navbar.html"],
@@ -24,7 +24,7 @@ async function importHTML(id, file) {
   container.innerHTML = await res.text();
 }
 
-// Dati ODS: [catalogo vasi, masterclass, carte regalo] come risultati allSettled.
+// Dati ODS (riserva per foglio): [catalogo vasi, masterclass, carte regalo] come risultati allSettled.
 // Sono letti da appInitStripe tramite window.__cdDataPromise.
 window.__cdDataPromise = Promise.allSettled([
   CD.catalogue.loadRows(),
@@ -32,11 +32,11 @@ window.__cdDataPromise = Promise.allSettled([
   CD.certificati ? CD.certificati.loadRows() : Promise.resolve([])
 ]);
 
-// Prezzi/venduto live (Google Sheet): in parallelo agli ODS, timeout 5 s, mai rifiuta
-// (in caso di errore Map vuota => restano i valori ODS). Applicato da appInitStripe.
+// Catalogo live (Google Sheet, versione 2 con righe dei fogli): in parallelo agli ODS, timeout 5 s,
+// mai rifiuta (in caso di errore => nessun foglio, restano gli ODS). Usato da appInitStripe.
 window.__cdLivePromise = (window.CD && CD.liveCatalogue && CD.config && CD.config.catalogueEndpoint)
-  ? CD.liveCatalogue.fetchLive(window.fetch.bind(window), CD.config.catalogueEndpoint)
-  : Promise.resolve(new Map());
+  ? CD.liveCatalogue.fetchCatalogue(window.fetch.bind(window), CD.config.catalogueEndpoint)
+  : Promise.resolve(null);
 
 function showPartialsBanner() {
   const msg = (window.CD && CD.i18n && CD.i18n.t && CD.i18n.t("partials.loadFailed"))

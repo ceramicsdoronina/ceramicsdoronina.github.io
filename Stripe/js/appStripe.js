@@ -1,5 +1,6 @@
 // Stripe/js/appStripe.js
-// Orchestrazione: lingua + UI subito (non dipendono dai dati), poi dati ODS e rendering per sezione.
+// Orchestrazione: lingua + UI subito (non dipendono dai dati), poi dati (fogli dall'endpoint, ODS di
+// riserva per foglio) e rendering per sezione.
 
 // Dati caricati: array di righe, oppure null se il caricamento e' fallito, undefined se non ancora noto.
 // Rendering di ogni sezione isolato: un errore mostra il messaggio "non disponibile" tradotto in
@@ -52,48 +53,68 @@ function reconcileCartWith(rendered) {
   }
 }
 
-// Sovrappone prezzo/venduto live alle righe ODS (una sola volta). Ritorna true se qualcosa e' cambiato.
-function applyLiveOverlay(map) {
-  if (window.__liveApplied || !map || !map.size) return false;
-  if (!Array.isArray(window.__catalogueData) || !CD.liveCatalogue) return false;
-  window.__catalogueData = CD.liveCatalogue.applyOverlay(window.__catalogueData, map);
-  window.__liveApplied = true;
-  return true;
+// Righe ODS dai risultati allSettled (null = caricamento fallito o non ancora noto)
+function odsValues(settled) {
+  const ok = (r) => r && r.status === "fulfilled" && Array.isArray(r.value);
+  const [catRes, mcRes, gcRes] = settled || [];
+  [["catalogo vasi", catRes], ["masterclass", mcRes], ["carte regalo", gcRes]].forEach(([label, r]) => {
+    if (r && !ok(r)) console.error(`[APP/STRIPE] ${label} non caricato:`, r.reason);
+  });
+  return {
+    vasi: ok(catRes) ? catRes.value : null,
+    masterclass: ok(mcRes) ? mcRes.value : null,
+    certificati: ok(gcRes) ? gcRes.value : null
+  };
+}
+
+// Fogli del Google Sheet (se presenti) al posto degli ODS, per foglio; overlay v1 solo sui vasi ODS.
+// Parte SEMPRE dalle righe ODS originali: nessuna doppia applicazione.
+function setData(live, ods) {
+  const chosen = CD.liveCatalogue.chooseData(live, ods);
+  window.__catalogueData = chosen.rows.vasi;
+  window.__masterclassData = chosen.rows.masterclass;
+  window.__certificatiData = chosen.rows.certificati;
+  window.__cdSources = chosen.sources;
+}
+
+function liveCoversAll(l) {
+  return !!(l && l.tabs && l.tabs.vasi && l.tabs.masterclass && l.tabs.certificati);
+}
+
+function liveHasData(l) {
+  return !!(l && ((l.items && l.items.size) || (l.tabs && (l.tabs.vasi || l.tabs.masterclass || l.tabs.certificati))));
 }
 
 async function appInitStripe() {
-  // lingua e UI non dipendono dai dati ODS: partono subito
+  // lingua e UI non dipendono dai dati: partono subito
   CD.i18n.initLanguage();
   CD.ui.initNavbarToggle();
   CD.ui.initNavbarAutoClose();
   CD.ui.initViewToggle();
   CD.ui.initCartOpenButton();
 
-  // dati ODS: gia' in download dall'avvio (vedi importerStripe.js)
-  const settled = await (window.__cdDataPromise || Promise.allSettled([
+  // dati: ODS e endpoint gia' in download dall'avvio (vedi importerStripe.js)
+  const odsP = window.__cdDataPromise || Promise.allSettled([
     CD.catalogue.loadRows(),
     CD.masterclass ? CD.masterclass.loadRows() : Promise.resolve([]),
     CD.certificati ? CD.certificati.loadRows() : Promise.resolve([])
-  ]));
-  const [catRes, mcRes, gcRes] = settled;
+  ]);
+  const livePromise = (window.__cdLivePromise || Promise.resolve(null))
+    .then((l) => l || CD.liveCatalogue.emptyLive(), () => CD.liveCatalogue.emptyLive());
+  let liveNow = null;
+  let odsSettled = null;
+  livePromise.then((l) => { liveNow = l; });
+  odsP.then((s) => { odsSettled = s; });
 
-  const ok = (r) => r && r.status === "fulfilled" && Array.isArray(r.value);
-  const value = (r) => (ok(r) ? r.value : null);   // null = caricamento fallito
-  [["catalogo vasi", catRes], ["masterclass", mcRes], ["carte regalo", gcRes]].forEach(([label, r]) => {
-    if (!ok(r)) console.error(`[APP/STRIPE] ${label} non caricato:`, r && r.reason);
-  });
+  // Primo render: appena gli ODS sono pronti, OPPURE appena l'endpoint copre tutti i fogli (allora
+  // non serve aspettare gli ODS ne' SheetJS). L'endpoint ha un timeout di 5 s, quindi se e' lui a
+  // fare da ostacolo l'attesa e' limitata; se non copre tutto si attendono gli ODS come prima.
+  await Promise.race([odsP, livePromise.then((l) => (liveCoversAll(l) ? l : new Promise(() => {})))]);
+  await Promise.resolve();   // lascia scattare i .then di sopra se l'altro lato e' arrivato insieme
 
-  window.__catalogueData = value(catRes);
-  window.__masterclassData = value(mcRes);
-  window.__certificatiData = value(gcRes);
-
-  // se il live e' gia' arrivato lo si applica prima del primo render; altrimenti si rende subito
-  // l'ODS e si ri-rende quando arriva (max 5 s, vedi sotto)
-  const livePromise = window.__cdLivePromise || Promise.resolve(new Map());
-  let liveMap = null;
-  livePromise.then((m) => { liveMap = m; });
-  await Promise.resolve();
-  applyLiveOverlay(liveMap);
+  const usedLive = liveNow;
+  const ods = odsValues(odsSettled);   // odsSettled null se ha vinto l'endpoint: non serve
+  setData(usedLive, ods);
 
   // lingua letta DOPO l'attesa dei dati: l'utente puo' averla cambiata nel frattempo
   const lang = CD.i18n.getCurrentLang();
@@ -105,17 +126,24 @@ async function appInitStripe() {
   CD.i18n.applyTranslations(lang);
   if (CD.shop && CD.shop.renderDrawer) CD.shop.renderDrawer();
 
-  // overlay live in ritardo: ri-rende con la lingua CORRENTE e riallinea il carrello
+  // endpoint arrivato dopo il primo render: ri-rende con la lingua CORRENTE e riallinea il carrello
   try {
     const late = await livePromise;
-    if (applyLiveOverlay(late)) {
+    if (late !== usedLive && liveHasData(late)) {
+      // il primo render e' avvenuto dagli ODS (odsSettled e' noto); id dei modali aperti da riaprire
+      const openIds = Array.from(document.querySelectorAll(".modal.open")).map((m) => m.id).filter(Boolean);
+      setData(late, ods);
       const lang2 = CD.i18n.getCurrentLang();
       reconcileCartWith(renderData(lang2));
       CD.i18n.applyTranslations(lang2);
       if (CD.shop && CD.shop.renderDrawer) CD.shop.renderDrawer();
+      openIds.forEach((id) => {
+        const m = document.getElementById(id);
+        if (m) CD.util.openModal(m);
+      });
     }
   } catch (err) {
-    console.warn("[APP/STRIPE] overlay live non applicato:", err);
+    console.warn("[APP/STRIPE] dati live non applicati:", err);
   }
 }
 
