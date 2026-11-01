@@ -15,12 +15,16 @@ L'endpoint è l'URL assoluto di Netlify, definito in un solo punto: `window.CD.c
 Modifica quel valore se cambi sito Netlify.
 Lo stesso blocco contiene `catalogueEndpoint` (`.../.netlify/functions/catalogue`, lettura pubblica): i due URL vanno tenuti allineati (stesso dominio) in `index.html` e qui.
 
-## Prezzi e "venduto" live (overlay)
-- Prezzi e flag venduto si modificano nel Google Sheet; la funzione `catalogue` li espone in JSON (CORS `*`, cache 60 s).
-- Il sito carica comunque l'ODS (`catalogue/vasi.ods`) e vi **sovrappone** prezzo e venduto per `id` (`Stripe/js/liveCatalogue.js`, collegato in `importerStripe.js` / `appStripe.js`). Se i dati live arrivano dopo il primo render, il catalogo viene ri-reso e il carrello riallineato (vasi diventati venduti rimossi, prezzi aggiornati).
-- Regola "venduto": se per un id esiste il dato live, **vale il live** (si può rimettere in vendita un pezzo segnato venduto nell'ODS); senza dato live vale l'ODS. Gli id sconosciuti all'ODS sono ignorati; id, immagini e testi non cambiano mai.
-- Fallback: errore di rete, HTTP non 200, timeout di 5 s o JSON non valido (versione diversa da 1, voci malformate scartate) => solo `console.warn`, il sito usa i valori ODS senza avvisi per il visitatore.
-- Descrizioni, dimensioni, finiture e immagini restano nell'ODS finché il foglio non avrà più colonne (oggi ne porta 9).
+## Catalogo dal Google Sheet (endpoint versione 2) e fallback ODS
+- Il catalogo vive nel Google Sheet (fogli `Vasi`, `Masterclass`, `Certificati`, stesse intestazioni degli ODS). La funzione `catalogue` risponde (CORS `*`, cache 60 s) con `version: 2`: `items` (id, prezzo in centesimi, venduto, come nella versione 1) e `tabs.vasi|masterclass|certificati` = `{headers, rows}` con le righe come stringhe del foglio (`venduto` dei vasi già con lo stato effettivo `si`/`no`), oppure `null` per il foglio che la funzione serve da snapshot.
+- Flusso dati (`importerStripe.js` / `appStripe.js` / `liveCatalogue.js`): gli ODS e l'endpoint partono in parallelo. Per ogni foglio: se l'endpoint porta le righe, il sito rende quelle; se il foglio è `null`, non valido o l'endpoint non risponde (timeout 5 s, HTTP non 200, JSON non valido: solo `console.warn`, nessun avviso al visitatore), si usa il corrispondente ODS in `catalogue/`. Scelta per foglio in `liveCatalogue.chooseData`.
+- Forma delle righe: una sola funzione di conversione (`util.normalizeRow`) serve sia `loadOdsRows` sia il percorso endpoint, quindi il rendering (`catalogueStripe.js`, `masterclass.js`, `certificati.js`) non sa da dove vengono le righe. Valori tagliati (trim), `-` e vuoti invariati (li interpreta il rendering), colonne non intestate scartate. Le righe del foglio non hanno `<col>__raw` (solo l'ODS conosce il tipo numerico della cella): i prezzi si leggono dal testo con `money.js`, stessi centesimi.
+- Dati non fidati: il testo del foglio passa dallo stesso `escapeHtml` dei dati ODS in tutti i template. Righe scartate: non oggetti, `id` mancante/non valido/duplicato; un foglio con righe ma nessuna valida, o senza le colonne minime, è considerato non valido (si usa l'ODS). I nomi immagine (`img1`...`img6`) sono semplici nomi file: con barre, `\` o `..` il valore diventa vuoto (segnaposto); il prefisso della cartella lo mette il sito.
+- Regola "venduto": valgono i valori letti dal rendering come per l'ODS (`si`, `sì`, `yes`, `sold`, `1`... = venduto; `no`, vuoto o altro = in vendita).
+- Overlay versione 1 (`applyOverlay`): serve solo quando i VASI vengono dall'ODS di riserva e l'endpoint porta `items`; mai sulle righe che arrivano dal foglio (niente doppia applicazione). Un payload versione 1 (senza `tabs`) funziona come prima: tutti i fogli da ODS + overlay prezzi/venduto.
+- Primo render: appena gli ODS sono pronti, oppure appena l'endpoint copre tutti e tre i fogli (allora non si aspetta né gli ODS né SheetJS). Se l'endpoint arriva dopo il primo render il sito ri-rende con la lingua corrente, riapre i modali aperti e riallinea il carrello.
+- **Gli ODS restano nel repo come fallback finché la titolare non conferma che il foglio è stabile; dopo la conferma si possono eliminare** (e con loro il caricamento di SheetJS in `index.html`, `loadOdsRows` e i `loadRows` dei moduli).
+- Test: `node --test test/*.test.js` (parità ODS/foglio con `test/fixtures/`; i valori attesi dell'ODS sono generati da `test/tools/ods_to_expected.py` perché SheetJS non è disponibile offline).
 - Il pagamento non cambia: il prezzo addebitato lo decide sempre il server.
 
 ## Variabili d'ambiente e stato "venduto" (README della funzione = fonte canonica)
@@ -46,10 +50,10 @@ Richiesta `POST` JSON:
 - La pagina di successo non ha più redirect automatico, mostra un riferimento d'ordine breve (ultimi 8 caratteri del `session_id`) e promette solo ciò che esiste: ricevuta di Stripe via email e contatto della titolare per la consegna. Per questo, in Stripe Dashboard > Settings > Emails va abilitato l'invio delle ricevute ai clienti (voce della checklist pre-lancio).
 
 ## Catalogo lato server (prezzi)
-I prezzi usati da Stripe vengono dal `catalogue.json` della funzione, **non** dal sito. Il sito mostra i prezzi letti dagli ODS solo per visualizzazione. Gli ODS sono la fonte canonica; `catalogue.json` è derivato.
+I prezzi usati da Stripe vengono dal `catalogue.json` della funzione, **non** dal sito. Il sito mostra i prezzi letti dal foglio (o dagli ODS di riserva) solo per visualizzazione. Con il passaggio al Google Sheet la fonte canonica è il foglio; finché gli ODS restano nel repo vanno tenuti allineati.
 Dopo ogni modifica agli ODS in `catalogue/` (`vasi.ods`, `masterclass.ods`, `certificati.ods`):
 1. Rigenera il catalogo con `tools/build-catalogue.py` nella repo `ceramicsdoronina.netifly` e verifica con `python3 -B -I tools/build-catalogue.py --check` (procedura completa nel README della funzione).
-2. `functions/sold.json` nella funzione è solo un override manuale d'emergenza: la visualizzazione del sito segue SOLO l'ODS, quindi se si usa `sold.json` va impostato anche `venduto` = `si` nell'ODS (altrimenti il sito continua a mostrare "Compra" e il cliente riceve un errore al checkout, che toglie la riga dal carrello).
+2. `functions/sold.json` nella funzione è solo un override manuale d'emergenza: la visualizzazione del sito segue SOLO il foglio (o l'ODS di riserva), quindi se si usa `sold.json` va impostato anche `venduto` = `si` lì (altrimenti il sito continua a mostrare "Compra" e il cliente riceve un errore al checkout, che toglie la riga dal carrello).
 3. Pubblica entrambe le repo.
 
 Mappatura: `price_new` (vasi) / `price` (masterclass) / `amount_eur` (carte regalo) → `priceCents` nel sito → prezzo server nel `catalogue.json`. `venduto` = `si` → articolo venduto (non acquistabile).
