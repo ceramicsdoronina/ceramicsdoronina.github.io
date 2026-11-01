@@ -2,8 +2,12 @@
 // Logica PURA del carrello (nessun DOM, nessun localStorage): testabile in Node
 // (test/cart.test.js). uiStripe.js e' lo strato DOM che la usa.
 //
-// Carrello: array di righe {id, type, quantity, name, currency, unit_amount, image}.
-// Registro prodotti: products[id] = {id, type, titles, priceCents, img, maxQty?, sold?}.
+// Carrello: array di righe {id, type, quantity, name, currency, unit_amount, image, kind?, line_amount?}.
+// Registro prodotti: products[id] = {id, type, titles, priceCents, img, maxQty?, sold?, tiersCents?}.
+// Masterclass (prodotto con tiersCents = [c1..c8, null dove quel gruppo non e' offerto]):
+//   quantity = PERSONE (1..8) e il prezzo della riga e' tiersCents[quantity-1] (UNA riga, mai
+//   prezzo unitario x quantita'): e' lo stesso calcolo del server. kind "masterclass" e line_amount
+//   (totale della riga) servono solo alla visualizzazione.
 // Marcatore "checkout in sospeso" (localStorage cd_checkout_pending): MAPPA
 //   { "<session_id>": { ids: [...], ts: <ms> } }   (voci piu' vecchie di 24 h potate in scrittura)
 (function (root) {
@@ -11,6 +15,7 @@
   const PENDING_KEY = "cd_checkout_pending";
   const DEFAULT_DIGITAL_MAX_QTY = 6;
   const MAX_LINE_QTY = 99;
+  const MAX_PERSONS = 8;
   const PENDING_TTL_MS = 24 * 60 * 60 * 1000;
   const STRIPE_HOST = "checkout.stripe.com";
   const ID_RE = /^[A-Za-z0-9_-]+$/;
@@ -27,10 +32,59 @@
     return Number.isInteger(c) && c > 0;
   }
 
-  // Vasi: sempre 1. Digitali: maxQty del registro (posti / default 6).
+  // ── masterclass: prenotazione per numero di persone ──
+  const isBooking = (p) => !!p && Array.isArray(p.tiersCents);
+
+  function tierCents(p, n) {
+    if (!isBooking(p) || !Number.isInteger(n) || n < 1 || n > MAX_PERSONS) return null;
+    const c = p.tiersCents[n - 1];
+    return validPrice(c) ? c : null;
+  }
+
+  // Numeri di persone prenotabili: gruppi offerti (prezzo valido) entro maxQty (posti liberi, max 8).
+  function offeredPersons(p) {
+    if (!isBooking(p) || p.sold) return [];
+    const cap = Math.min(MAX_PERSONS, Number.isInteger(p.maxQty) && p.maxQty > 0 ? p.maxQty : 0);
+    const out = [];
+    for (let n = 1; n <= cap; n++) if (tierCents(p, n) !== null) out.push(n);
+    return out;
+  }
+
+  // Massimo di persone prenotabili (0 = non prenotabile).
+  function personsCap(p) {
+    const o = offeredPersons(p);
+    return o.length ? o[o.length - 1] : 0;
+  }
+
+  // Il gruppo offerto piu' grande <= n (0 se non ce n'e').
+  function fitPersons(p, n) {
+    let best = 0;
+    for (const k of offeredPersons(p)) if (k <= n) best = k;
+    return best;
+  }
+
+  // Vasi: sempre 1. Masterclass: massimo di persone. Digitali: maxQty del registro (default 6).
   function maxQtyFor(p) {
     if (!p || p.type !== "digital") return 1;
+    if (isBooking(p)) return personsCap(p);
     return positiveInt(p.maxQty) || DEFAULT_DIGITAL_MAX_QTY;
+  }
+
+  // Totale della riga in centesimi, uguale a quello che calcola il server; null se non calcolabile.
+  // p = prodotto del registro (se assente si usano i valori salvati nella riga, solo visualizzazione).
+  function lineTotalCents(line, p) {
+    if (!line) return null;
+    if (isBooking(p)) return tierCents(p, line.quantity);
+    if (!p && line.kind === "masterclass") return validPrice(line.line_amount) ? line.line_amount : null;
+    const unit = p && validPrice(p.priceCents) ? p.priceCents : line.unit_amount;
+    return validPrice(unit) ? unit * line.quantity : null;
+  }
+
+  function cartTotalCents(cart, products) {
+    const reg = products || {};
+    let total = 0;
+    for (const line of Array.isArray(cart) ? cart : []) total += lineTotalCents(line, reg[line.id]) || 0;
+    return total;
   }
 
   // Riga grezza (da localStorage) -> riga valida, oppure null.
@@ -42,15 +96,21 @@
     if (!Number.isInteger(quantity) || quantity <= 0) return null;
     const unit = Number.isInteger(raw.unit_amount) && raw.unit_amount > 0 ? raw.unit_amount : 0;
     const image = typeof raw.image === "string" && /^images\/[^\s"'<>]+$/.test(raw.image) ? raw.image : "";
-    return {
+    const booking = raw.kind === "masterclass" && raw.type === "digital";
+    const out = {
       id,
       type: raw.type === "digital" ? "digital" : "physical",
-      quantity: Math.min(MAX_LINE_QTY, quantity),
+      quantity: Math.min(booking ? MAX_PERSONS : MAX_LINE_QTY, quantity),
       name: typeof raw.name === "string" && raw.name ? raw.name.slice(0, 200) : id,
       currency: "eur",
       unit_amount: unit,   // solo visualizzazione
       image
     };
+    if (booking) {
+      out.kind = "masterclass";
+      out.line_amount = Number.isInteger(raw.line_amount) && raw.line_amount > 0 ? raw.line_amount : 0;   // solo visualizzazione
+    }
+    return out;
   }
 
   // Array grezzo -> {cart, dropped}: righe non valide e id duplicati scartati.
@@ -72,6 +132,19 @@
     return titles.it || titles.en || titles.ru || id;
   }
 
+  // Campi della riga che dipendono dal numero di persone (prezzo = tier, mai lineare).
+  function bookingFields(p, n) {
+    return { kind: "masterclass", quantity: n, unit_amount: p.priceCents, line_amount: tierCents(p, n) };
+  }
+
+  // Cambia le persone di una riga masterclass. Ritorna {cart, status}: "ok" | "invalid"
+  // (riga assente, non una masterclass, o gruppo non offerto / oltre i posti liberi).
+  function setPersons(cart, p, id, n) {
+    const base = Array.isArray(cart) ? cart : [];
+    if (!isBooking(p) || !offeredPersons(p).includes(n) || !base.some((x) => x.id === id)) return { cart: base, status: "invalid" };
+    return { cart: base.map((x) => (x.id === id ? Object.assign({}, x, bookingFields(p, n)) : x)), status: "ok" };
+  }
+
   // Aggiunge un prodotto. Ritorna {cart, status}:
   //   "added" | "already" (vaso gia' nel carrello) | "max" (digitale al massimo) | "invalid"
   // opts.name = titolo da salvare (di default titles.it/en/ru).
@@ -84,6 +157,26 @@
     const addQty = positiveInt(qty) || 1;
     const out = base.map((x) => Object.assign({}, x));
     const line = out.find((x) => x.id === p.id);
+
+    // masterclass: le persone si SOMMANO entro i gruppi offerti / posti liberi
+    if (isBooking(p)) {
+      if (!maxQty) return { cart: base, status: "invalid" };
+      const target = fitPersons(p, Math.min(maxQty, (line ? line.quantity : 0) + addQty));
+      if (line) {
+        if (target <= line.quantity) return { cart: base, status: "max" };
+        Object.assign(line, bookingFields(p, target));
+        return { cart: out, status: "added" };
+      }
+      if (!target) return { cart: base, status: "invalid" };
+      out.push(Object.assign({
+        id: p.id,
+        type: "digital",
+        name: (opts && opts.name) || titleOf(p, p.id),
+        currency: "eur",
+        image: typeof p.img === "string" ? p.img : ""
+      }, bookingFields(p, target)));
+      return { cart: out, status: "added" };
+    }
 
     if (line) {
       if (type === "physical") return { cart: base, status: "already" };
@@ -106,7 +199,10 @@
 
   // Allinea il carrello al registro: scarta sconosciuti / venduti / tipo diverso / prezzo non valido,
   // limita la quantita'. opts.physicalKnown / opts.digitalKnown === false: quel tipo non si tocca.
-  // opts.nameFor(p, id) = titolo da mostrare. Ritorna {cart, removed, changed}.
+  // opts.nameFor(p, id) = titolo da mostrare. Ritorna {cart, removed, changed, adjusted}:
+  // adjusted = prenotazioni masterclass con meno persone (posti liberi / gruppi offerti diminuiti).
+  // Masterclass: persone limitate ai posti liberi e portate al gruppo offerto piu' vicino per difetto;
+  // riga tolta se esaurita o se nessun gruppo e' piu' offerto.
   function reconcile(cart, products, opts) {
     const o = opts || {};
     const reg = products || {};
@@ -114,6 +210,7 @@
     const out = [];
     let removed = 0;
     let changed = false;
+    let adjusted = 0;
 
     for (const line of Array.isArray(cart) ? cart : []) {
       const p = reg[line.id];
@@ -126,12 +223,23 @@
         continue;
       }
 
+      if (isBooking(p)) {
+        const persons = fitPersons(p, line.quantity);
+        if (!persons) { removed++; changed = true; continue; }
+        const nm = nameFor(p, line.id);
+        if (persons < line.quantity) adjusted++;
+        const next = Object.assign({}, line, { name: nm }, bookingFields(p, persons));
+        if (next.quantity !== line.quantity || next.name !== line.name || next.unit_amount !== line.unit_amount || next.line_amount !== line.line_amount) changed = true;
+        out.push(next);
+        continue;
+      }
+
       const quantity = Math.min(line.quantity, maxQtyFor(p));
       const name = nameFor(p, line.id);
       if (quantity !== line.quantity || name !== line.name || p.priceCents !== line.unit_amount) changed = true;
       out.push(Object.assign({}, line, { quantity, name, unit_amount: p.priceCents }));
     }
-    return { cart: out, removed, changed };
+    return { cart: out, removed, changed, adjusted };
   }
 
   function removeLine(cart, id) {
@@ -203,8 +311,9 @@
   }
 
   const api = {
-    CART_KEY, PENDING_KEY, PENDING_TTL_MS, MAX_LINE_QTY, DEFAULT_DIGITAL_MAX_QTY,
+    CART_KEY, PENDING_KEY, PENDING_TTL_MS, MAX_LINE_QTY, DEFAULT_DIGITAL_MAX_QTY, MAX_PERSONS,
     isValidId, positiveInt, validPrice, maxQtyFor,
+    isBooking, tierCents, offeredPersons, personsCap, fitPersons, lineTotalCents, cartTotalCents, setPersons,
     sanitizeLine, sanitizeCart, mergeAdd, reconcile, removeLine, removeIds,
     normalizePending, prunePending, addPending, pendingAfterSuccess, isStripeUrl
   };

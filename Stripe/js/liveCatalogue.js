@@ -22,10 +22,13 @@
     return require("./util.js");
   }
 
-  // Colonne minime perche' un foglio sia considerato valido, e colonne prezzo (per "<col>__raw")
+  // Colonne minime perche' un foglio sia considerato valido (required; anyOf = almeno uno dei gruppi
+  // di colonne, per i fogli masterclass nello schema nuovo price_1 o in quello legacy price), e colonne
+  // prezzo (per "<col>__raw")
   const TABS = {
     vasi:        { required: ["id", "name_it", "price_new", "venduto", "img1"], price: ["price_old", "price_new"] },
-    masterclass: { required: ["id", "name_it", "price", "date", "img1"],        price: ["price"] },
+    masterclass: { required: ["id", "name_it", "date", "img1"], anyOf: [["price_1"], ["price"]],
+                   price: ["price", "price_1", "price_2", "price_3", "price_4", "price_5", "price_6", "price_7", "price_8"] },
     certificati: { required: ["id", "name_it", "amount_eur", "img1"],           price: ["amount_eur"] }
   };
   const MAX_ROWS = 1000;
@@ -49,6 +52,7 @@
     const headers = tab.headers.filter((h) => typeof h === "string" && h && h !== "__proto__" && !/__raw$/.test(h));
     if (headers.length !== tab.headers.length || headers.length > MAX_COLS) return null;
     if (!spec.required.every((h) => headers.includes(h))) return null;
+    if (spec.anyOf && !spec.anyOf.some((g) => g.every((h) => headers.includes(h)))) return null;
     if (tab.rows.length > MAX_ROWS) return null;
 
     const u = util();

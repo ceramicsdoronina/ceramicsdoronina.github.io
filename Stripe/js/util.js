@@ -217,11 +217,100 @@
   // ─────────────────────────────────────────────
   function pickLangField(obj, base, lang, fallback) {
     const fb = fallback || "it";
+    const ok = (v) => v && v !== "-";
     const v1 = obj[`${base}_${lang}`];
-    if (v1 && v1 !== "-") return v1;
+    if (ok(v1)) return v1;
     const v2 = obj[`${base}_${fb}`];
-    if (v2 && v2 !== "-") return v2;
-    return obj[`${base}_en`] || obj[`${base}_ru`] || "";
+    if (ok(v2)) return v2;
+    const v3 = obj[`${base}_en`];
+    if (ok(v3)) return v3;
+    const v4 = obj[`${base}_ru`];
+    return ok(v4) ? v4 : "";
+  }
+
+  // ─────────────────────────────────────────────
+  // Masterclass: prenotazione per numero di persone (1..8), prezzi a gruppo e posti
+  // ─────────────────────────────────────────────
+  const MAX_PERSONS = 8;
+  const LEGACY_DEFAULT_SEATS = 6;
+
+  function moneyLib() {
+    if (root.CD && root.CD.money) return root.CD.money;
+    return require("./money.js");
+  }
+
+  // Intero >= 0 da una cella di testo, altrimenti null.
+  function nonNegInt(v) {
+    const s = String(v == null ? "" : v).trim();
+    return /^\d+$/.test(s) ? parseInt(s, 10) : null;
+  }
+
+  // Riga del foglio Masterclass -> offerta di prenotazione (stesso calcolo del server):
+  //   tiersCents [c1..c8, null dove quel gruppo non e' offerto], seatsTotal/Booked/Free,
+  //   maxQty = min(8, posti liberi, gruppo piu' grande offerto), priceCents (1 persona, o il piu'
+  //   economico offerto), sold (nessuna prenotazione possibile), legacy.
+  // Schema nuovo: colonne price_1..price_8, seats_total, seats_booked (e seats_free calcolata:
+  //   si usa il minore fra seats_free e totale - prenotati). seats_total vuoto/non valido = 8.
+  // LEGACY (nessuna colonna price_N / seats_total: foglio non ancora migrato e ODS): prezzi lineari
+  //   N x price, posti = prima cifra di "spots" (default 6), nessun conteggio dei prenotati.
+  function bookingFromRow(row) {
+    const r = row || {};
+    const m = moneyLib();
+    const has = (k) => Object.prototype.hasOwnProperty.call(r, k);
+    const modern = has("seats_total") || [1, 2, 3, 4, 5, 6, 7, 8].some((n) => has("price_" + n));
+    const tiers = [null, null, null, null, null, null, null, null];
+    let seatsTotal, seatsBooked, seatsFree;
+
+    if (modern) {
+      for (let n = 1; n <= MAX_PERSONS; n++) tiers[n - 1] = m.cellToCents(r, "price_" + n);
+      seatsTotal = nonNegInt(r.seats_total);
+      if (seatsTotal === null) seatsTotal = MAX_PERSONS;
+      seatsBooked = nonNegInt(r.seats_booked) || 0;
+      seatsFree = Math.max(0, seatsTotal - seatsBooked);
+      const sf = nonNegInt(r.seats_free);
+      if (sf !== null) seatsFree = Math.min(seatsFree, sf);
+    } else {
+      const price = m.cellToCents(r, "price");
+      if (price) for (let n = 1; n <= MAX_PERSONS; n++) tiers[n - 1] = price * n;
+      const d = String(r.spots || "").match(/\d+/);
+      seatsTotal = d && parseInt(d[0], 10) > 0 ? parseInt(d[0], 10) : LEGACY_DEFAULT_SEATS;
+      seatsBooked = 0;
+      seatsFree = seatsTotal;
+    }
+
+    let highest = 0;
+    tiers.forEach((c, i) => { if (c) highest = i + 1; });
+    const offered = tiers.filter((c) => c);
+    const maxQty = Math.min(MAX_PERSONS, seatsFree, highest);
+    return {
+      tiersCents: tiers,
+      seatsTotal, seatsBooked, seatsFree, maxQty,
+      priceCents: tiers[0] || (offered.length ? Math.min.apply(null, offered) : null),
+      sold: maxQty === 0,
+      legacy: !modern
+    };
+  }
+
+  // "Totale {total} ({per} a persona)": segnaposto {nome} sostituiti dai valori (testo grezzo,
+  // da passare a esc() al momento dell'inserimento nell'HTML).
+  function fillTemplate(tpl, vars) {
+    return String(tpl == null ? "" : tpl).replace(/\{(\w+)\}/g, (all, k) => (vars && vars[k] != null ? String(vars[k]) : all));
+  }
+
+  // Chiave messaggio per "N persone": it/en singolare/plurale; ru 1 / 2-4 / 5+ (con 11-14 plurale).
+  function personsKey(n, lang) {
+    if (lang === "ru") {
+      const d = n % 10, dd = n % 100;
+      if (d === 1 && dd !== 11) return "masterclass.personOne";
+      if (d >= 2 && d <= 4 && (dd < 12 || dd > 14)) return "masterclass.personFew";
+      return "masterclass.personMany";
+    }
+    return n === 1 ? "masterclass.personOne" : "masterclass.personMany";
+  }
+
+  // "2 persone" / "2 people" / "2 человека". t(key, lang) = CD.i18n.t.
+  function personsLabel(n, lang, t) {
+    return fillTemplate(t(personsKey(n, lang), lang), { n });
   }
 
   // ─────────────────────────────────────────────
@@ -341,7 +430,11 @@
       }
 
       try {
-        const ok = await CD.shop.addProduct(pid, 1);
+        // masterclass: il selettore "persone" della stessa scheda/modale da' la quantita'
+        const scope = btn.closest(".card, .modal");
+        const sel = scope && scope.querySelector("select[data-persons]");
+        const persons = sel ? parseInt(sel.value, 10) : 1;
+        const ok = await CD.shop.addProduct(pid, persons > 0 ? persons : 1);
         if (!ok) {
           console.warn("[CART] Non aggiunto:", pid);
           notifyFail();
@@ -359,6 +452,7 @@
     loadOdsRows, normalizeRow, safeFileName, openModal, renderUnavailable,
     registerProduct, clearProducts, markSold, isSoldOverride,
     warnBadPrice, pickLangField,
+    bookingFromRow, fillTemplate, personsKey, personsLabel,
     loadLazyImgs, loadNeighbours, activateSlide,
     bindModalDelegate, bindAddToCart,
     ID_RE
