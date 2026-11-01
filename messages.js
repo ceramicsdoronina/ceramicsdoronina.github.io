@@ -66,6 +66,18 @@ const messages = {
       cta: "Записаться",
       noEvents: "Сейчас дат в расписании нет — напишите мне, и мы договоримся о занятии."
     },
+    masterclass: {
+      seatsFree: "Свободных мест: {n}",
+      seatsFreeOne: "Свободно 1 место",
+      soldOut: "Мест нет",
+      persons: "Количество человек",
+      personOne: "{n} человек",
+      personFew: "{n} человека",
+      personMany: "{n} человек",
+      total: "Итого {total}",
+      totalPer: "Итого {total} ({per} с человека)",
+      book: "Забронировать"
+    },
     giftcards: {
       title: "ПОДАРОЧНЫЕ СЕРТИФИКАТЫ",
       lead: "Подарите эмоцию прикосновения к глине или выбор керамического объекта для дома.",
@@ -109,7 +121,12 @@ const messages = {
       maxQty: "Достигнуто максимальное количество для этого товара.",
       processing: "Переход к оплате…",
       removedUnavailable: "Некоторые товары в корзине больше недоступны и были удалены.",
-      changed: "Корзина была изменена в другой вкладке. Проверьте её и попробуйте снова."
+      changed: "Корзина была изменена в другой вкладке. Проверьте её и попробуйте снова.",
+      persons: "Человек",
+      bookingAdjusted: "Количество человек в бронировании уменьшено по числу свободных мест.",
+      notEnoughSeats: "Свободных мест для этого бронирования недостаточно. Выберите меньше человек.",
+      soldOut: "Для этого мастер-класса мест больше нет.",
+      groupUnavailable: "Такого размера группы для этого мастер-класса нет. Выберите другое количество человек."
     },
     checkoutStatus: {
       success: "Оплата получена. Stripe пришлёт вам чек по электронной почте. Я свяжусь с вами по поводу доставки.",
@@ -203,6 +220,18 @@ const messages = {
       cta: "Scrivimi",
       noEvents: "Al momento non ci sono date in programma: scrivimi per organizzarne una."
     },
+    masterclass: {
+      seatsFree: "{n} posti liberi",
+      seatsFreeOne: "1 posto libero",
+      soldOut: "Completo",
+      persons: "Persone",
+      personOne: "{n} persona",
+      personFew: "{n} persone",
+      personMany: "{n} persone",
+      total: "Totale {total}",
+      totalPer: "Totale {total} ({per} a persona)",
+      book: "Prenota"
+    },
     giftcards: {
       title: "CARTE REGALO",
       lead:
@@ -247,7 +276,12 @@ const messages = {
       maxQty: "Hai raggiunto la quantità massima per questo articolo.",
       processing: "Reindirizzamento al pagamento…",
       removedUnavailable: "Alcuni articoli del carrello non sono più disponibili e sono stati rimossi.",
-      changed: "Il carrello è stato modificato in un’altra scheda. Controllalo e riprova."
+      changed: "Il carrello è stato modificato in un’altra scheda. Controllalo e riprova.",
+      persons: "Persone",
+      bookingAdjusted: "Il numero di persone di una prenotazione è stato ridotto in base ai posti liberi.",
+      notEnoughSeats: "Non ci sono abbastanza posti liberi per questa prenotazione. Scegli meno persone.",
+      soldOut: "Questa masterclass è al completo.",
+      groupUnavailable: "Questa dimensione di gruppo non è disponibile per la masterclass. Scegli un altro numero di persone."
     },
     checkoutStatus: {
       success: "Pagamento ricevuto. Stripe ti invierà la ricevuta via email. Ti contatterò per la consegna.",
@@ -341,6 +375,18 @@ const messages = {
       cta: "Write me to join",
       noEvents: "No dates scheduled right now, write to me to arrange one."
     },
+    masterclass: {
+      seatsFree: "{n} seats left",
+      seatsFreeOne: "1 seat left",
+      soldOut: "Fully booked",
+      persons: "People",
+      personOne: "{n} person",
+      personFew: "{n} people",
+      personMany: "{n} people",
+      total: "Total {total}",
+      totalPer: "Total {total} ({per} per person)",
+      book: "Book"
+    },
     giftcards: {
       title: "GIFT CARDS",
       lead: "Offer the emotion of working with clay or choosing a ceramic object for the home.",
@@ -384,7 +430,12 @@ const messages = {
       maxQty: "You have reached the maximum quantity for this item.",
       processing: "Redirecting to payment…",
       removedUnavailable: "Some items in your cart are no longer available and were removed.",
-      changed: "Your cart was changed in another tab. Please review it and try again."
+      changed: "Your cart was changed in another tab. Please review it and try again.",
+      persons: "People",
+      bookingAdjusted: "The number of people in a booking was reduced to match the free seats.",
+      notEnoughSeats: "There are not enough free seats for this booking. Please choose fewer people.",
+      soldOut: "This masterclass is fully booked.",
+      groupUnavailable: "This group size is not available for the masterclass. Please choose another number of people."
     },
     checkoutStatus: {
       success: "Payment received. Stripe will email you the receipt. I will contact you about delivery.",
