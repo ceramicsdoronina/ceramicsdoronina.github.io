@@ -233,6 +233,14 @@
   // ─────────────────────────────────────────────
   const MAX_PERSONS = 20;
   const LEGACY_DEFAULT_SEATS = 6;
+  // Tetto tecnico del prezzo lineare (stesso del server): persone <= 999 e totale <= 99.999.999 centesimi.
+  const MAX_LINEAR_PERSONS = 999;
+  const MAX_AMOUNT_CENTS = 99999999;
+
+  // Persone massime per N x price_1 (centesimi): min(999, floor(99999999 / price_1)); 0 se price_1 non valido.
+  function linearMaxPersons(cents) {
+    return Number.isInteger(cents) && cents > 0 ? Math.min(MAX_LINEAR_PERSONS, Math.floor(MAX_AMOUNT_CENTS / cents)) : 0;
+  }
 
   function moneyLib() {
     if (root.CD && root.CD.money) return root.CD.money;
@@ -249,11 +257,14 @@
   //   tiersCents [c1..c20, null dove quel gruppo non e' offerto], seatsTotal (null = illimitati) /
   //   seatsBooked / seatsFree (null = illimitati), maxQty = min(20, posti liberi se limitati, gruppo
   //   piu' grande offerto), priceCents (1 persona, o il piu' economico offerto), sold (nessuna
-  //   prenotazione possibile), legacy.
+  //   prenotazione possibile), legacy; pricing "linear" (regola A) | "table" | "legacy", linearCents
+  //   (price_1, solo linear) e maxPersons (tetto tecnico, solo linear).
   // Schema nuovo: colonne price_1..price_20 (totale per N persone), seats_total, seats_booked (e
   //   seats_free calcolata dalla funzione, "" se illimitati).
-  //   Regola A: se price_2..price_20 sono TUTTE vuote/assenti, ogni gruppo 1..20 costa N x price_1
-  //   (stesso prezzo a persona); altrimenti sono offerti SOLO i gruppi con price_N compilato.
+  //   Regola A (pricing "linear"): se price_2..price_20 sono TUTTE vuote/assenti, ogni gruppo costa
+  //   N x price_1 (stesso prezzo a persona), con QUALSIASI N fino a maxPersons = min(999, floor(99999999 /
+  //   price_1 in centesimi)) e, se i posti sono limitati, fino ai posti liberi (tiersCents resta 1..20 per
+  //   compatibilita'); altrimenti (pricing "table") sono offerti SOLO i gruppi con price_N compilato.
   //   seats_total vuoto/assente = posti ILLIMITATI (mai "Completo", nessun numero di posti liberi);
   //   compilato = limitato: liberi = totale - prenotati, e se seats_free non e' vuoto vale il minore.
   //   Un seats_total non numerico e non vuoto e' trattato come 0 posti (mai vendere piu' del dovuto).
@@ -268,12 +279,19 @@
     const modern = has("seats_total") || nums.some((n) => has("price_" + n));
     const tiers = nums.map(() => null);
     let seatsTotal, seatsBooked, seatsFree;
+    let pricing = "legacy", linearCents = null, maxPersons = 0;
 
     if (modern) {
       const price1 = m.cellToCents(r, "price_1");
       if (nums.slice(1).every((n) => blank("price_" + n))) {
-        if (price1) nums.forEach((n) => { tiers[n - 1] = price1 * n; });
+        pricing = "linear";
+        if (price1) {
+          linearCents = price1;
+          maxPersons = linearMaxPersons(price1);
+          nums.forEach((n) => { if (n <= maxPersons) tiers[n - 1] = price1 * n; });
+        }
       } else {
+        pricing = "table";
         nums.forEach((n) => { tiers[n - 1] = m.cellToCents(r, "price_" + n); });
       }
       const st = String(r.seats_total == null ? "" : r.seats_total).trim();
@@ -299,9 +317,12 @@
     let highest = 0;
     tiers.forEach((c, i) => { if (c) highest = i + 1; });
     const offered = tiers.filter((c) => c);
-    const maxQty = Math.min(MAX_PERSONS, seatsFree === null ? MAX_PERSONS : seatsFree, highest);
+    const maxQty = pricing === "linear"
+      ? (linearCents ? Math.min(maxPersons, seatsFree === null ? maxPersons : seatsFree) : 0)
+      : Math.min(MAX_PERSONS, seatsFree === null ? MAX_PERSONS : seatsFree, highest);
     return {
       tiersCents: tiers,
+      pricing, linearCents, maxPersons,
       seatsTotal, seatsBooked, seatsFree, maxQty,
       priceCents: tiers[0] || (offered.length ? Math.min.apply(null, offered) : null),
       sold: maxQty === 0,
@@ -315,7 +336,8 @@
     return String(tpl == null ? "" : tpl).replace(/\{(\w+)\}/g, (all, k) => (vars && vars[k] != null ? String(vars[k]) : all));
   }
 
-  // Chiave messaggio per "N persone": it/en singolare/plurale; ru 1 / 2-4 / 5+ (con 11-14 plurale).
+  // Chiave messaggio per "N persone": it/en singolare/plurale; ru 1 / 2-4 / 5+ (con 11-14 plurale);
+  // vale per qualsiasi n intero (anche fino a 999: 21 e 101 -> uno, 22 -> poche, 111 -> molte).
   function personsKey(n, lang) {
     if (lang === "ru") {
       const d = n % 10, dd = n % 100;
@@ -329,6 +351,11 @@
   // "2 persone" / "2 people" / "2 человека". t(key, lang) = CD.i18n.t.
   function personsLabel(n, lang, t) {
     return fillTemplate(t(personsKey(n, lang), lang), { n });
+  }
+
+  // "Massimo N persone" / "Maximum N people" / "Максимум N человек" (n = massimo, qualsiasi intero).
+  function personsMaxHint(n, lang, t) {
+    return fillTemplate(t("masterclass.personsMax", lang), { n, label: personsLabel(n, lang, t) });
   }
 
   // ─────────────────────────────────────────────
@@ -448,9 +475,10 @@
       }
 
       try {
-        // masterclass: il selettore "persone" della stessa scheda/modale da' la quantita'
+        // masterclass: il selettore (o campo numerico) "persone" della stessa scheda/modale da' la quantita'
+        // (vuoto / non numerico -> 1; sopra il massimo lo riduce mergeAdd)
         const scope = btn.closest(".card, .modal");
-        const sel = scope && scope.querySelector("select[data-persons]");
+        const sel = scope && scope.querySelector("select[data-persons], input[data-persons]");
         const persons = sel ? parseInt(sel.value, 10) : 1;
         const ok = await CD.shop.addProduct(pid, persons > 0 ? persons : 1);
         if (!ok) {
@@ -470,7 +498,7 @@
     loadOdsRows, normalizeRow, safeFileName, openModal, renderUnavailable,
     registerProduct, clearProducts, markSold, isSoldOverride,
     warnBadPrice, pickLangField,
-    bookingFromRow, fillTemplate, personsKey, personsLabel,
+    bookingFromRow, linearMaxPersons, fillTemplate, personsKey, personsLabel, personsMaxHint,
     loadLazyImgs, loadNeighbours, activateSlide,
     bindModalDelegate, bindAddToCart,
     ID_RE

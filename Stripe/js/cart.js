@@ -5,8 +5,10 @@
 // Carrello: array di righe {id, type, quantity, name, currency, unit_amount, image, kind?, line_amount?}.
 // Registro prodotti: products[id] = {id, type, titles, priceCents, img, maxQty?, sold?, tiersCents?}.
 // Masterclass (prodotto con tiersCents = [c1..c20, null dove quel gruppo non e' offerto]):
-//   quantity = PERSONE (1..20) e il prezzo della riga e' tiersCents[quantity-1] (UNA riga, mai
-//   prezzo unitario x quantita'): e' lo stesso calcolo del server. kind "masterclass" e line_amount
+//   quantity = PERSONE (1..20; fino a 999 per il prezzo lineare, vedi sotto) e il prezzo della riga e'
+//   tiersCents[quantity-1] (UNA riga, mai prezzo unitario x quantita'): e' lo stesso calcolo del server.
+//   Prezzo lineare (pricing "linear" + linearCents = price_1, regola A): N x linearCents per qualsiasi N
+//   fino a maxPersons = min(999, floor(99999999 / linearCents)) e, se limitati, ai posti liberi. kind "masterclass" e line_amount
 //   (totale della riga) servono solo alla visualizzazione.
 // Marcatore "checkout in sospeso" (localStorage cd_checkout_pending): MAPPA
 //   { "<session_id>": { ids: [...], ts: <ms> } }   (voci piu' vecchie di 24 h potate in scrittura)
@@ -15,7 +17,9 @@
   const PENDING_KEY = "cd_checkout_pending";
   const DEFAULT_DIGITAL_MAX_QTY = 6;
   const MAX_LINE_QTY = 99;
-  const MAX_PERSONS = 20;
+  const MAX_PERSONS = 20;            // tabelle e legacy: gruppi 1..20
+  const MAX_LINEAR_PERSONS = 999;    // tetto tecnico del prezzo lineare
+  const MAX_AMOUNT_CENTS = 99999999;
   const PENDING_TTL_MS = 24 * 60 * 60 * 1000;
   const STRIPE_HOST = "checkout.stripe.com";
   const ID_RE = /^[A-Za-z0-9_-]+$/;
@@ -35,32 +39,58 @@
   // ── masterclass: prenotazione per numero di persone ──
   const isBooking = (p) => !!p && Array.isArray(p.tiersCents);
 
+  // Prezzo lineare (regola A): price_1 valido e pricing "linear".
+  const isLinear = (p) => isBooking(p) && p.pricing === "linear" && validPrice(p.linearCents);
+
+  // Tetto tecnico del lineare: min(999, floor(99999999 / price_1)); 0 se non lineare.
+  function linearMax(p) {
+    return isLinear(p) ? Math.min(MAX_LINEAR_PERSONS, Math.floor(MAX_AMOUNT_CENTS / p.linearCents)) : 0;
+  }
+
+  // Totale del gruppo di n persone (senza guardare i posti), null se n non e' prezzabile.
   function tierCents(p, n) {
-    if (!isBooking(p) || !Number.isInteger(n) || n < 1 || n > MAX_PERSONS) return null;
+    if (!isBooking(p) || !Number.isInteger(n) || n < 1) return null;
+    if (isLinear(p)) return n <= linearMax(p) ? p.linearCents * n : null;
+    if (n > MAX_PERSONS) return null;
     const c = p.tiersCents[n - 1];
     return validPrice(c) ? c : null;
   }
 
-  // Numeri di persone prenotabili: gruppi offerti (prezzo valido) entro maxQty (posti liberi se limitati, max 20).
+  // Massimo di persone prenotabili (0 = non prenotabile): tabella/legacy = gruppo offerto piu' grande
+  // entro maxQty (posti liberi se limitati, max 20); lineare = min(tetto tecnico, maxQty).
+  function personsCap(p) {
+    if (!isBooking(p) || p.sold) return 0;
+    const q = Number.isInteger(p.maxQty) && p.maxQty > 0 ? p.maxQty : 0;
+    if (isLinear(p)) return Math.min(linearMax(p), q);
+    let best = 0;
+    for (let n = 1; n <= Math.min(MAX_PERSONS, q); n++) if (tierCents(p, n) !== null) best = n;
+    return best;
+  }
+
+  // Numeri di persone prenotabili: gruppi offerti (prezzo valido) entro il massimo.
   function offeredPersons(p) {
-    if (!isBooking(p) || p.sold) return [];
-    const cap = Math.min(MAX_PERSONS, Number.isInteger(p.maxQty) && p.maxQty > 0 ? p.maxQty : 0);
+    const cap = personsCap(p);
     const out = [];
     for (let n = 1; n <= cap; n++) if (tierCents(p, n) !== null) out.push(n);
     return out;
   }
 
-  // Massimo di persone prenotabili (0 = non prenotabile).
-  function personsCap(p) {
-    const o = offeredPersons(p);
-    return o.length ? o[o.length - 1] : 0;
-  }
-
   // Il gruppo offerto piu' grande <= n (0 se non ce n'e').
   function fitPersons(p, n) {
+    if (!Number.isInteger(n) || n < 1) return 0;
+    if (isLinear(p)) return Math.min(n, personsCap(p));
     let best = 0;
     for (const k of offeredPersons(p)) if (k <= n) best = k;
     return best;
+  }
+
+  // Scelta del controllo persone: "select" (insieme discreto <= 20 valori: tabella, legacy, lineare
+  // limitato con massimo <= 20), "number" (campo numerico: lineare illimitato o massimo > 20), "" (non prenotabile).
+  function personsInput(p) {
+    const cap = personsCap(p);
+    if (!cap) return "";
+    if (isLinear(p) && (p.seatsFree === null || cap > MAX_PERSONS)) return "number";
+    return "select";
   }
 
   // Vasi: sempre 1. Masterclass: massimo di persone. Digitali: maxQty del registro (default 6).
@@ -100,7 +130,7 @@
     const out = {
       id,
       type: raw.type === "digital" ? "digital" : "physical",
-      quantity: Math.min(booking ? MAX_PERSONS : MAX_LINE_QTY, quantity),
+      quantity: Math.min(booking ? MAX_LINEAR_PERSONS : MAX_LINE_QTY, quantity),
       name: typeof raw.name === "string" && raw.name ? raw.name.slice(0, 200) : id,
       currency: "eur",
       unit_amount: unit,   // solo visualizzazione
@@ -132,7 +162,7 @@
     return titles.it || titles.en || titles.ru || id;
   }
 
-  // Campi della riga che dipendono dal numero di persone (prezzo = tier, mai lineare).
+  // Campi della riga che dipendono dal numero di persone (prezzo = tier, o N x price_1 se lineare).
   function bookingFields(p, n) {
     return { kind: "masterclass", quantity: n, unit_amount: p.priceCents, line_amount: tierCents(p, n) };
   }
@@ -141,7 +171,7 @@
   // (riga assente, non una masterclass, o gruppo non offerto / oltre i posti liberi).
   function setPersons(cart, p, id, n) {
     const base = Array.isArray(cart) ? cart : [];
-    if (!isBooking(p) || !offeredPersons(p).includes(n) || !base.some((x) => x.id === id)) return { cart: base, status: "invalid" };
+    if (!isBooking(p) || !(n >= 1) || fitPersons(p, n) !== n || !base.some((x) => x.id === id)) return { cart: base, status: "invalid" };
     return { cart: base.map((x) => (x.id === id ? Object.assign({}, x, bookingFields(p, n)) : x)), status: "ok" };
   }
 
@@ -201,7 +231,8 @@
   // limita la quantita'. opts.physicalKnown / opts.digitalKnown === false: quel tipo non si tocca.
   // opts.nameFor(p, id) = titolo da mostrare. Ritorna {cart, removed, changed, adjusted}:
   // adjusted = prenotazioni masterclass con meno persone (posti liberi / gruppi offerti diminuiti).
-  // Masterclass: persone limitate ai posti liberi e portate al gruppo offerto piu' vicino per difetto;
+  // Masterclass: persone limitate al massimo (posti liberi, 20 per tabelle/legacy, tetto tecnico per il
+  // lineare) e portate al gruppo offerto piu' vicino per difetto;
   // riga tolta se esaurita (solo posti limitati a 0 liberi: gli illimitati non sono mai esauriti)
   // o se nessun gruppo e' piu' offerto.
   function reconcile(cart, products, opts) {
@@ -312,9 +343,9 @@
   }
 
   const api = {
-    CART_KEY, PENDING_KEY, PENDING_TTL_MS, MAX_LINE_QTY, DEFAULT_DIGITAL_MAX_QTY, MAX_PERSONS,
+    CART_KEY, PENDING_KEY, PENDING_TTL_MS, MAX_LINE_QTY, DEFAULT_DIGITAL_MAX_QTY, MAX_PERSONS, MAX_LINEAR_PERSONS,
     isValidId, positiveInt, validPrice, maxQtyFor,
-    isBooking, tierCents, offeredPersons, personsCap, fitPersons, lineTotalCents, cartTotalCents, setPersons,
+    isBooking, isLinear, linearMax, personsInput, tierCents, offeredPersons, personsCap, fitPersons, lineTotalCents, cartTotalCents, setPersons,
     sanitizeLine, sanitizeCart, mergeAdd, reconcile, removeLine, removeIds,
     normalizePending, prunePending, addPending, pendingAfterSuccess, isStripeUrl
   };

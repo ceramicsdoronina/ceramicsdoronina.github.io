@@ -75,6 +75,7 @@ const messages = {
       personOne: "{n} человек",
       personFew: "{n} человека",
       personMany: "{n} человек",
+      personsMax: "Максимум {label}",
       total: "Итого {total}",
       totalPer: "Итого {total} ({per} с человека)",
       book: "Забронировать"
@@ -230,6 +231,7 @@ const messages = {
       personOne: "{n} persona",
       personFew: "{n} persone",
       personMany: "{n} persone",
+      personsMax: "Massimo {label}",
       total: "Totale {total}",
       totalPer: "Totale {total} ({per} a persona)",
       book: "Prenota"
@@ -386,6 +388,7 @@ const messages = {
       personOne: "{n} person",
       personFew: "{n} people",
       personMany: "{n} people",
+      personsMax: "Maximum {label}",
       total: "Total {total}",
       totalPer: "Total {total} ({per} per person)",
       book: "Book"

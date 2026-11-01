@@ -31,8 +31,8 @@ test("it / en / ru have exactly the same keys, all non-empty strings", () => {
   }
 });
 
-test("key count is the same in every language (112 with the masterclass booking keys)", () => {
-  for (const l of ["it", "en", "ru"]) assert.equal(flat(messages[l]).length, 112, l);
+test("key count is the same in every language (113 with the masterclass booking keys)", () => {
+  for (const l of ["it", "en", "ru"]) assert.equal(flat(messages[l]).length, 113, l);
 });
 
 test("delivery copy states the real shipping area (EU + NO + CH), not 'worldwide'", () => {
