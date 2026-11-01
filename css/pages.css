@@ -11,7 +11,7 @@
 }
 
 .hero-landing{
-  background:url('../images/banner-anna.jpg') center/cover no-repeat;
+  background:#1c1917; /* neutro scuro: niente vecchia immagine mentre il video carica */
 }
 
 .hero::before{

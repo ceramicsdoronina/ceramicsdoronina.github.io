@@ -100,7 +100,7 @@ const messages = {
     contact: {
       title: "Контакты",
       addressLabel: "Адрес",
-      addressValue: "Via San Lorenzo 7/5 Sc. Dx, 16123 Генуя",
+      addressValue: "Via San Donato 17R, 16123 Генуя",
       countrySuffix: ", Италия",
       phoneLabel: "Телефонный номер",
       emailLabel: "Почта",
@@ -257,7 +257,7 @@ const messages = {
     contact: {
       title: "Contatti",
       addressLabel: "Indirizzo",
-      addressValue: "Via San Lorenzo 7/5 Sc. Dx, 16123 Genova",
+      addressValue: "Via San Donato 17R, 16123 Genova",
       countrySuffix: " (Italia)",
       phoneLabel: "Numero di telefono",
       emailLabel: "Email",
@@ -413,7 +413,7 @@ const messages = {
     contact: {
       title: "Contact",
       addressLabel: "Address",
-      addressValue: "Via San Lorenzo 7/5 Sc. Dx, 16123 Genoa",
+      addressValue: "Via San Donato 17R, 16123 Genoa",
       countrySuffix: ", Italy",
       phoneLabel: "Phone number",
       emailLabel: "Email",
