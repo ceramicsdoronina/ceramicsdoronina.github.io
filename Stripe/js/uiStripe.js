@@ -245,11 +245,18 @@
     return data;
   }
 
-  // 400 con item_id: toglie quella riga dal carrello e, se il server dice "item_sold", segna
-  // l'articolo venduto per questa sessione (ri-render: niente piu' pulsante Compra).
+  // Messaggi per i 400 delle masterclass (codici del server)
+  const BOOKING_ERROR_KEYS = {
+    not_enough_seats: "cart.notEnoughSeats",
+    sold_out: "cart.soldOut",
+    group_size_unavailable: "cart.groupUnavailable"
+  };
+
+  // 400 con item_id: toglie quella riga dal carrello e, se il server dice "item_sold" o "sold_out",
+  // segna l'articolo venduto per questa sessione (ri-render: niente piu' pulsante Compra).
   async function dropUnavailableItem(itemId, serverError) {
     writeCart(cartLib.removeLine(readCart(), itemId));
-    if (serverError === "item_sold") {
+    if (serverError === "item_sold" || serverError === "sold_out") {
       util().markSold(itemId);
       try {
         if (window.CD?.app?.renderData) window.CD.app.renderData(getLang());
@@ -258,7 +265,8 @@
       }
     }
     await shop.renderDrawer();
-    showNotice(t("cart.removedUnavailable") || "Some items are no longer available and were removed.");
+    const bookingKey = BOOKING_ERROR_KEYS[serverError];
+    showNotice((bookingKey && t(bookingKey)) || t("cart.removedUnavailable") || "Some items are no longer available and were removed.");
   }
 
   async function startCheckout() {
@@ -378,7 +386,18 @@
       if (res.changed || droppedOnRead > 0) writeCart(res.cart);
       shop.renderDrawer();
       if (removed > 0) showNotice(t("cart.removedUnavailable") || "Some items are no longer available.");
+      else if (res.adjusted > 0) showNotice(t("cart.bookingAdjusted") || "A booking was reduced to match the free seats.");
       return removed;
+    },
+
+    // Cambia le persone di una prenotazione masterclass nel carrello (prezzo = tier di quel N).
+    async setPersons(productId, persons) {
+      const id = normalizeId(productId);
+      const res = cartLib.setPersons(readCart(), shop.products[id], id, persons);
+      if (res.status !== "ok") { await shop.renderDrawer(); return false; }
+      writeCart(res.cart);
+      await shop.renderDrawer();
+      return true;
     },
 
     async removeLineItem(productId) {
@@ -409,16 +428,22 @@
       const rows = cart.map((ci) => {
         const p = shop.products[ci.id];
         const title = p ? productTitle(p, ci.id) : ci.name;
-        const unit = p && cartLib.validPrice(p.priceCents) ? p.priceCents : ci.unit_amount;
-        const lineCents = unit * ci.quantity;
+        // masterclass: prezzo del gruppo (tier) per N persone, mai unitario x quantita'
+        const lineCents = cartLib.lineTotalCents(ci, p) || 0;
         totalCents += lineCents;
+        const booking = cartLib.isBooking(p);
+        const qtyHtml = booking
+          ? `<label>${esc(t("cart.persons") || "People")}: <select class="cart-item__persons" data-line-id="${esc(ci.id)}" aria-label="${esc(t("cart.persons") || "People")}">${
+              cartLib.offeredPersons(p).map((k) => `<option value="${k}"${k === ci.quantity ? " selected" : ""}>${esc(util().personsLabel(k, getLang(), (key, l) => window.CD.i18n.t(key, l)))}</option>`).join("")
+            }</select></label>`
+          : `${esc(t("cart.qty") || "Qty")}: ${ci.quantity}`;
 
         return `
           <div class="cart-item">
             ${ci.image ? `<img class="cart-item__img" src="${esc(ci.image)}" alt="">` : ""}
             <div class="cart-item__meta">
               <div class="cart-item__title">${esc(title)}</div>
-              <div class="cart-item__sub">${esc(t("cart.qty") || "Qty")}: ${ci.quantity} · <span class="nowrap">${esc(formatMoney(lineCents))}</span></div>
+              <div class="cart-item__sub">${qtyHtml} · <span class="nowrap">${esc(formatMoney(lineCents))}</span></div>
               <button type="button" class="cart-item__remove" data-line-id="${esc(ci.id)}">
                 ${esc(t("cart.remove") || "Remove")}
               </button>
@@ -501,6 +526,13 @@
         if (lineId) shop.removeLineItem(lineId);
       }
     }, false);
+
+    // persone di una prenotazione masterclass nel drawer
+    document.addEventListener("change", (e) => {
+      const sel = e.target && e.target.closest ? e.target.closest(".cart-item__persons") : null;
+      if (!sel || !sel.dataset.lineId) return;
+      shop.setPersons(sel.dataset.lineId, parseInt(sel.value, 10));
+    });
 
     document.addEventListener("keydown", (e) => {
       if (e.key !== "Escape") return;
