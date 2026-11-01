@@ -101,6 +101,41 @@
     return Promise.reject(new Error("SheetJS (XLSX) non caricato"));
   }
 
+  // Nome file immagine "semplice": niente percorsi (barre / e rovesciate), niente "..", niente caratteri di controllo.
+  // Il prefisso della cartella lo mette sempre il sito. Ritorna il nome oppure "" se non valido.
+  function safeFileName(v) {
+    const fn = String(v == null ? "" : v).trim();
+    if (!fn || fn === "-") return fn;
+    if (/[\\/\u0000-\u001f\u007f]/.test(fn) || fn.includes("..")) return "";
+    return fn;
+  }
+
+  // Conversione UNICA riga -> forma usata dal rendering, condivisa dal percorso ODS (loadOdsRows)
+  // e dal percorso endpoint (liveCatalogue.js), cosi' lo stesso contenuto del foglio da' righe identiche.
+  //   fmt:  oggetto intestazione -> valore come visualizzato (stringa; null/oggetti => "")
+  //   raw:  (opzionale) intestazione -> valore grezzo; per le colonne in priceKeys, se e' un numero
+  //         si aggiunge "<col>__raw" (solo l'ODS conosce il tipo numerico della cella)
+  // Valori tagliati (trim); "-" e vuoti restano com'e' (li interpreta il rendering). Colonne immagine
+  // (img, img1..): se il nome non e' un semplice nome file diventa "" (=> segnaposto).
+  function normalizeRow(fmt, raw, priceKeys) {
+    const out = {};
+    Object.keys(fmt || {}).forEach((k) => {
+      if (k === "__proto__" || /__raw$/.test(k)) return;
+      const v = fmt[k];
+      let str = typeof v === "string" ? v : (typeof v === "number" && Number.isFinite(v) ? String(v) : "");
+      str = str.trim();
+      if (/^img\d*$/.test(k) && safeFileName(str) !== str) {
+        console.warn("[CATALOGO] nome immagine non valido ignorato:", k, JSON.stringify(str));
+        str = "";
+      }
+      out[k] = str;
+    });
+    (priceKeys || []).forEach((k) => {
+      if (raw && Object.prototype.hasOwnProperty.call(out, k) && typeof raw[k] === "number") out[k + "__raw"] = raw[k];
+    });
+    return out;
+  }
+
   // Lancia in caso di errore (nessun fallback silenzioso).
   // priceKeys: colonne prezzo per cui conservare il valore numerico grezzo in "<col>__raw".
   async function loadOdsRows(url, priceKeys) {
@@ -114,16 +149,11 @@
     const ws = workbook.Sheets[workbook.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(ws, { raw: false, defval: "" });
     const raws = XLSX.utils.sheet_to_json(ws, { raw: true, defval: "" });
-    if (rows.length === raws.length) {
-      rows.forEach((row, i) => {
-        (priceKeys || []).forEach((k) => {
-          if (typeof raws[i][k] === "number") row[k + "__raw"] = raws[i][k];
-        });
-      });
-    } else {
+    const aligned = rows.length === raws.length;
+    if (!aligned) {
       console.warn(`[ODS] ${url}: righe formattate (${rows.length}) e grezze (${raws.length}) non coincidono, valori numerici grezzi ignorati`);
     }
-    return rows;
+    return rows.map((row, i) => normalizeRow(row, aligned ? raws[i] : null, priceKeys));
   }
 
   // ─────────────────────────────────────────────
@@ -326,7 +356,7 @@
   const api = {
     escapeHtml, isValidId, isSoldFlag,
     parseEventDate, parseEventDateParts, romeToday, isPastEvent,
-    loadOdsRows, renderUnavailable,
+    loadOdsRows, normalizeRow, safeFileName, openModal, renderUnavailable,
     registerProduct, clearProducts, markSold, isSoldOverride,
     warnBadPrice, pickLangField,
     loadLazyImgs, loadNeighbours, activateSlide,
