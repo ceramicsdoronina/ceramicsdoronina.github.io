@@ -432,11 +432,18 @@
         const lineCents = cartLib.lineTotalCents(ci, p) || 0;
         totalCents += lineCents;
         const booking = cartLib.isBooking(p);
-        const qtyHtml = booking
-          ? `<label>${esc(t("cart.persons") || "People")}: <select class="cart-item__persons" data-line-id="${esc(ci.id)}" aria-label="${esc(t("cart.persons") || "People")}">${
-              cartLib.offeredPersons(p).map((k) => `<option value="${k}"${k === ci.quantity ? " selected" : ""}>${esc(util().personsLabel(k, getLang(), (key, l) => window.CD.i18n.t(key, l)))}</option>`).join("")
-            }</select></label>`
-          : `${esc(t("cart.qty") || "Qty")}: ${ci.quantity}`;
+        const personsLbl = esc(t("cart.persons") || "People");
+        let qtyHtml;
+        if (booking && cartLib.personsInput(p) === "number") {
+          // lineare illimitato / massimo > 20: campo numerico
+          qtyHtml = `<label>${personsLbl}: <input type="number" class="cart-item__persons" data-line-id="${esc(ci.id)}" min="1" max="${cartLib.personsCap(p)}" step="1" inputmode="numeric" autocomplete="off" value="${ci.quantity}" aria-label="${personsLbl}"></label>`;
+        } else if (booking) {
+          qtyHtml = `<label>${personsLbl}: <select class="cart-item__persons" data-line-id="${esc(ci.id)}" aria-label="${personsLbl}">${
+            cartLib.offeredPersons(p).map((k) => `<option value="${k}"${k === ci.quantity ? " selected" : ""}>${esc(util().personsLabel(k, getLang(), (key, l) => window.CD.i18n.t(key, l)))}</option>`).join("")
+          }</select></label>`;
+        } else {
+          qtyHtml = `${esc(t("cart.qty") || "Qty")}: ${ci.quantity}`;
+        }
 
         return `
           <div class="cart-item">
@@ -531,7 +538,13 @@
     document.addEventListener("change", (e) => {
       const sel = e.target && e.target.closest ? e.target.closest(".cart-item__persons") : null;
       if (!sel || !sel.dataset.lineId) return;
-      shop.setPersons(sel.dataset.lineId, parseInt(sel.value, 10));
+      let n = parseInt(sel.value, 10);
+      if (sel.tagName === "INPUT") {
+        // campo numerico: vuoto / non numerico -> 1, sopra il massimo -> massimo
+        const p = shop.products[normalizeId(sel.dataset.lineId)];
+        n = cartLib.fitPersons(p, Number.isInteger(n) && n > 0 ? n : 1) || 1;
+      }
+      shop.setPersons(sel.dataset.lineId, n);
     });
 
     document.addEventListener("keydown", (e) => {

@@ -32,7 +32,8 @@
     };
 
     // Registro (forma unica): masterclass = servizio digitale prenotato per PERSONE; i prezzi sono
-    // a gruppo (tiersCents, 1..20 persone), maxQty = max persone prenotabili.
+    // a gruppo (tiersCents, 1..20 persone) o lineari (pricing "linear": N x linearCents, N fino a maxQty,
+    // anche oltre 20), maxQty = max persone prenotabili.
     const b = CD.util.bookingFromRow(mc);
     const sold = CD.util.isSoldFlag(mc.venduto) || b.sold;
     if (!b.priceCents && !CD.util.isSoldFlag(mc.venduto)) {
@@ -45,6 +46,8 @@
       titles,
       priceCents: b.priceCents,
       tiersCents: b.tiersCents,
+      pricing: b.pricing,
+      linearCents: b.linearCents,
       seatsFree: b.seatsFree,
       seatsTotal: b.seatsTotal,
       legacy: b.legacy,
@@ -65,25 +68,50 @@
     return CD.util.fillTemplate(tr("masterclass.totalPer"), { total: fmt(total), per: fmt(Math.round(total / n)) });
   }
 
+  // Persone (intero) da un valore grezzo del campo: non numerico/vuoto/< 1 -> 1, sopra il massimo -> massimo.
+  function clampPersons(p, raw) {
+    const v = Math.floor(Number(String(raw == null ? "" : raw).trim()));
+    const n = Number.isFinite(v) && v >= 1 ? v : 1;
+    const cap = CD.cart.personsCap(p);
+    return cap > 0 ? Math.min(n, cap) : n;
+  }
+
   function initialPersons(p) {
+    if (CD.cart.personsInput(p) === "number") return clampPersons(p, selectedPersons[p.id]);
     const offered = CD.cart.offeredPersons(p);
     if (!offered.length) return 0;
     return offered.includes(selectedPersons[p.id]) ? selectedPersons[p.id] : offered[0];
   }
 
-  function bookingHtml(p, lang, esc) {
+  // scope = "c" (scheda) | "m" (modale): rende unici gli id del suggerimento (lo stesso HTML sta in entrambi).
+  function bookingHtml(p, lang, esc, scope) {
     const tr = (key) => (window.CD?.i18n?.t?.(key, lang)) || "";
-    const offered = CD.cart.offeredPersons(p);
-    if (p.sold || !offered.length) return "";
+    const mode = CD.cart.personsInput(p);
+    if (p.sold || !mode) return "";
     const n = initialPersons(p);
     const pid = esc(p.id);
-    const options = offered.map((k) =>
-      `<option value="${k}"${k === n ? " selected" : ""}>${esc(CD.util.personsLabel(k, lang, (key, l) => window.CD.i18n.t(key, l)))}</option>`
-    ).join("");
-    return `<div class="mc-booking">
-      <label class="mc-persons">${esc(tr("masterclass.persons"))}
+    let control;
+    if (mode === "number") {
+      // campo numerico libero (lineare illimitato o massimo > 20); il suggerimento del massimo solo se i posti sono limitati
+      const cap = CD.cart.personsCap(p);
+      const limited = p.seatsFree !== null;
+      const hintId = esc(`mc-hint-${p.id}-${scope || "c"}`);
+      const hint = limited
+        ? `<span class="mc-hint" id="${hintId}">${esc(CD.util.personsMaxHint(cap, lang, (key, l) => window.CD.i18n.t(key, l)))}</span>`
+        : "";
+      control = `<label class="mc-persons">${esc(tr("masterclass.persons"))}
+        <input type="number" class="mc-persons-input" data-persons="${pid}" min="1" max="${cap}" step="1" inputmode="numeric" autocomplete="off" value="${n}"${limited ? ` aria-describedby="${hintId}"` : ""}>
+      </label>${hint}`;
+    } else {
+      const options = CD.cart.offeredPersons(p).map((k) =>
+        `<option value="${k}"${k === n ? " selected" : ""}>${esc(CD.util.personsLabel(k, lang, (key, l) => window.CD.i18n.t(key, l)))}</option>`
+      ).join("");
+      control = `<label class="mc-persons">${esc(tr("masterclass.persons"))}
         <select data-persons="${pid}" aria-label="${esc(tr("masterclass.persons"))}">${options}</select>
-      </label>
+      </label>`;
+    }
+    return `<div class="mc-booking">
+      ${control}
       <p class="mc-price" data-persons-total="${pid}" aria-live="polite"><strong>${esc(totalText(p, n, lang))}</strong></p>
     </div>`;
   }
@@ -101,18 +129,31 @@
     return `<p class="mc-seats">${esc(CD.util.fillTemplate(tr(key), { n: p.seatsFree }))}</p>`;
   }
 
-  // Cambio persone: aggiorna totale e selettori gemelli (scheda e modale) di quell'id
+  // Cambio persone (select: change; campo numerico: input / change / focusout): aggiorna totale e
+  // controlli gemelli (scheda e modale) di quell'id. Il campo numerico e' sempre riportato a un intero
+  // in [1, massimo]; mentre si digita il campo sorgente non viene riscritto (salvo valore sopra il massimo).
   function onPersonsChange(e) {
-    const sel = e.target && e.target.closest ? e.target.closest("select[data-persons]") : null;
+    const sel = e.target && e.target.closest ? e.target.closest("select[data-persons], input[data-persons]") : null;
     if (!sel) return;
     const id = sel.getAttribute("data-persons");
     const p = window.CD?.shop?.products?.[id];
-    const n = parseInt(sel.value, 10);
-    if (!p || !CD.cart.offeredPersons(p).includes(n)) return;
+    if (!p) return;
+    const isNum = CD.cart.personsInput(p) === "number";
+    let n;
+    if (isNum) {
+      n = clampPersons(p, sel.value);
+    } else {
+      if (e.type === "input" || e.type === "focusout") return;
+      n = parseInt(sel.value, 10);
+      if (!CD.cart.offeredPersons(p).includes(n)) return;
+    }
     selectedPersons[id] = n;
+    const typing = e.type === "input" && Number(sel.value) <= CD.cart.personsCap(p);
     const lang = CD.i18n.getCurrentLang();
-    document.querySelectorAll("select[data-persons]").forEach((el) => {
-      if (el.getAttribute("data-persons") === id) el.value = String(n);
+    document.querySelectorAll("[data-persons]").forEach((el) => {
+      if (el.getAttribute("data-persons") !== id) return;
+      if (el === sel && typing) return;
+      el.value = String(n);
     });
     document.querySelectorAll("[data-persons-total]").forEach((el) => {
       if (el.getAttribute("data-persons-total") === id) el.innerHTML = `<strong>${CD.util.escapeHtml(totalText(p, n, lang))}</strong>`;
@@ -123,6 +164,8 @@
     if (!el || !el.addEventListener || (el.dataset && el.dataset.personsBound === "1")) return;
     if (el.dataset) el.dataset.personsBound = "1";
     el.addEventListener("change", onPersonsChange);
+    el.addEventListener("input", onPersonsChange);
+    el.addEventListener("focusout", onPersonsChange);
   }
 
   // ─────────────────────────────────────────────
@@ -188,9 +231,10 @@
       if (date || time) metaHtml += `<p><strong>${esc(date)}</strong>${time ? " · " + esc(time) : ""}</p>`;
       if (level) metaHtml += `<p>${esc(level)}</p>`;
       metaHtml += seatsHtml(mc, p, lang, esc);
-      const bookHtml = bookingHtml(p, lang, esc);
+      const bookHtmlCard = bookingHtml(p, lang, esc, "c");
+      const bookHtmlModal = bookingHtml(p, lang, esc, "m");
 
-      const canBuy = !!(window.CD?.shop?.addProduct && !p.sold && CD.cart.offeredPersons(p).length);
+      const canBuy = !!(window.CD?.shop?.addProduct && !p.sold && CD.cart.personsCap(p));
       const pidAttr = esc(productId);
 
       // CARD
@@ -209,7 +253,7 @@
           <h4>${esc(name)}</h4>
           <p>${esc(shortText)}</p>
           ${metaHtml}
-          ${bookHtml}
+          ${bookHtmlCard}
           <div class="card-actions">
             ${
               canBuy
@@ -242,7 +286,7 @@
               <div class="vase-detail-panel">
                 <h3 class="vase-subtitle">${esc(shortText)}</h3>
                 ${metaHtml}
-                ${bookHtml}
+                ${bookHtmlModal}
                 <div class="vase-actions">
                   ${
                     canBuy
