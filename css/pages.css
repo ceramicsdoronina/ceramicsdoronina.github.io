@@ -359,3 +359,23 @@
 }
 
 Удалить
+
+/* workshop e gift card: testo un po' più in basso rispetto alla foto (desktop) */
+@media (min-width: 769px){
+  .giftcards-text, .workshops-text{ padding-top:56px; }
+}
+
+/* contatti: sempre due colonne uguali, blocco centrato nella pagina, mappa centrata in verticale rispetto al testo */
+@media (min-width: 769px){
+  .contact-grid-2{
+    grid-template-columns: 1fr 1fr;
+    max-width:960px;
+    margin-left:auto;
+    margin-right:auto;
+    gap:48px;
+    align-items:center;
+  }
+  .contact-left{ justify-self:end; }
+  .contact-right{ width:100%; }
+  .contact-map{ margin:0 auto; width:100%; }
+}
