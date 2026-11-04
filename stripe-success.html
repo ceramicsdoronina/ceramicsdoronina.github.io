@@ -10,6 +10,10 @@
     .box{max-width:720px; margin:0 auto; border:1px solid #e5e5e5; padding:18px 20px;}
     .muted{color:#666;}
   </style>
+  <script>
+    // Arrivo dalla pagina di conferma su Netlify (?from=confirm): questa pagina fa solo pulizia del carrello e torna al sito, senza mostrare una seconda conferma.
+    if (/[?&]from=confirm(&|$)/.test(window.location.search)) document.documentElement.style.visibility = "hidden";
+  </script>
   <script src="messages.js"></script>
   <script src="Stripe/js/cart.js"></script>
 </head>
@@ -79,7 +83,11 @@
       } catch (err) {
         console.warn("[success] aggiornamento carrello fallito:", err);
       }
-      // nessun redirect automatico: la pagina resta finche' l'utente non usa il link
+      // Da pagina Netlify (?from=confirm): carrello pulito, si torna al sito senza seconda conferma.
+      // In tutti gli altri casi (arrivo diretto da Stripe) la pagina resta e mostra la conferma.
+      if (new URLSearchParams(window.location.search).get("from") === "confirm") {
+        window.location.replace("/");
+      }
     })();
   </script>
 </body>

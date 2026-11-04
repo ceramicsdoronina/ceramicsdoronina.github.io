@@ -131,7 +131,7 @@ const messages = {
       groupUnavailable: "Такого размера группы для этого мастер-класса нет. Выберите другое количество человек."
     },
     checkoutStatus: {
-      success: "Оплата получена. Stripe пришлёт вам чек по электронной почте. Я свяжусь с вами по поводу доставки.",
+      success: "Оплата получена. Stripe пришлёт вам чек по электронной почте. Я свяжусь с вами по поводу дальнейших шагов.",
       orderRef: "Номер заказа",
       error: "Не удалось начать оплату. Попробуйте ещё раз или свяжитесь со мной.",
       itemUnavailable: "Один из товаров больше недоступен. Обновите страницу и проверьте корзину.",
@@ -300,7 +300,7 @@ const messages = {
       groupUnavailable: "Questa dimensione di gruppo non è disponibile per la masterclass. Scegli un altro numero di persone."
     },
     checkoutStatus: {
-      success: "Pagamento ricevuto. Stripe ti invierà la ricevuta via email. Ti contatterò per la consegna.",
+      success: "Pagamento ricevuto. Stripe ti invierà la ricevuta via email. Ti contatterò per i passi successivi.",
       orderRef: "Riferimento ordine",
       error: "Impossibile avviare il pagamento. Riprova o contattami.",
       itemUnavailable: "Uno degli articoli non è più disponibile. Aggiorna la pagina e controlla il carrello.",
@@ -468,7 +468,7 @@ const messages = {
       groupUnavailable: "This group size is not available for the masterclass. Please choose another number of people."
     },
     checkoutStatus: {
-      success: "Payment received. Stripe will email you the receipt. I will contact you about delivery.",
+      success: "Payment received. Stripe will email you the receipt. I will contact you about the next steps.",
       orderRef: "Order reference",
       error: "Could not start payment. Please try again or contact me.",
       itemUnavailable: "One of the items is no longer available. Please refresh the page and check your cart.",

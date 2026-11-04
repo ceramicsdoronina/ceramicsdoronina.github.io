@@ -37,7 +37,8 @@ test("index.html loads scripts in dependency order and every file exists", () =>
 
 test("success page loads cart.js and the cancel page never touches the pending marker", () => {
   assert.match(read("stripe-success.html"), /<script src="Stripe\/js\/cart\.js">/);
-  assert.doesNotMatch(read("stripe-success.html"), /setTimeout|location\.replace/);
+  assert.doesNotMatch(read("stripe-success.html"), /setTimeout/);
+  assert.match(read("stripe-success.html"), /from.*confirm[\s\S]*location\.replace\("\/"\)/);
   const cancel = read("stripe-cancel.html");
   assert.doesNotMatch(cancel, /cd_checkout_pending|PENDING_KEY|removeItem/);
 });
