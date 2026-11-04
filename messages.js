@@ -154,8 +154,18 @@ const messages = {
     modal: {
       close: "Закрыть"
     },
+    consent: {
+      privacyUrl: "privacy-policy.ru.html",
+      privacyPre: "Я прочитал(а) ",
+      privacyLink: "политику конфиденциальности",
+      privacyPost: " и соглашаюсь на обработку моих персональных данных для оформления заказа в соответствии с Регламентом ЕС 2016/679 (GDPR) и законодательным декретом Италии № 196/2003.",
+      marketingOptOut: "НЕ разрешаю ceramicsdoronina хранить данные моих заказов для последующих маркетинговых рассылок.",
+      privacyRequired: "Чтобы продолжить, необходимо принять политику конфиденциальности."
+    },
     footer: {
-      made: "Сайт на GitHub Pages"
+      made: "Сайт на GitHub Pages",
+      privacy: "Конфиденциальность",
+      privacyUrl: "privacy-policy.ru.html"
     }
   },
 
@@ -311,8 +321,18 @@ const messages = {
     modal: {
       close: "Chiudi"
     },
+    consent: {
+      privacyUrl: "privacy-policy.html",
+      privacyPre: "Ho letto l'",
+      privacyLink: "informativa sulla privacy",
+      privacyPost: " e acconsento al trattamento dei miei dati personali per l'elaborazione dell'ordine, ai sensi del Regolamento UE 2016/679 (GDPR) e del D.Lgs. 196/2003.",
+      marketingOptOut: "NON autorizzo ceramicsdoronina a conservare i miei dati d'ordine per successive comunicazioni di marketing.",
+      privacyRequired: "Per procedere devi accettare l'informativa sulla privacy."
+    },
     footer: {
-      made: "Realizzato con GitHub Pages"
+      made: "Realizzato con GitHub Pages",
+      privacy: "Privacy",
+      privacyUrl: "privacy-policy.html"
     }
   },
 
@@ -467,8 +487,18 @@ const messages = {
     modal: {
       close: "Close"
     },
+    consent: {
+      privacyUrl: "privacy-policy.en.html",
+      privacyPre: "I have read the ",
+      privacyLink: "privacy notice",
+      privacyPost: " and I consent to the processing of my personal data to handle my order, pursuant to EU Regulation 2016/679 (GDPR) and Italian Legislative Decree 196/2003.",
+      marketingOptOut: "I do NOT authorise ceramicsdoronina to keep my order data for later marketing communications.",
+      privacyRequired: "To continue you must accept the privacy notice."
+    },
     footer: {
-      made: "Made with GitHub Pages"
+      made: "Made with GitHub Pages",
+      privacy: "Privacy",
+      privacyUrl: "privacy-policy.en.html"
     }
   }
 };

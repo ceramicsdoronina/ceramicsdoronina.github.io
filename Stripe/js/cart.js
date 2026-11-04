@@ -342,12 +342,19 @@
     return u.protocol === "https:" && u.hostname === STRIPE_HOST && !u.username && !u.password && !u.port;
   }
 
+  // Consensi inviati a create-checkout: {privacy:true, marketing_optout:boolean}.
+  // null se l'informativa privacy non e' stata accettata (il checkout non parte).
+  function buildConsents(privacyChecked, marketingOptoutChecked) {
+    if (privacyChecked !== true) return null;
+    return { privacy: true, marketing_optout: marketingOptoutChecked === true };
+  }
+
   const api = {
     CART_KEY, PENDING_KEY, PENDING_TTL_MS, MAX_LINE_QTY, DEFAULT_DIGITAL_MAX_QTY, MAX_PERSONS, MAX_LINEAR_PERSONS,
     isValidId, positiveInt, validPrice, maxQtyFor,
     isBooking, isLinear, linearMax, personsInput, tierCents, offeredPersons, personsCap, fitPersons, lineTotalCents, cartTotalCents, setPersons,
     sanitizeLine, sanitizeCart, mergeAdd, reconcile, removeLine, removeIds,
-    normalizePending, prunePending, addPending, pendingAfterSuccess, isStripeUrl
+    normalizePending, prunePending, addPending, pendingAfterSuccess, isStripeUrl, buildConsents
   };
   root.CD = root.CD || {};
   root.CD.cart = api;

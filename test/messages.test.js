@@ -31,8 +31,8 @@ test("it / en / ru have exactly the same keys, all non-empty strings", () => {
   }
 });
 
-test("key count is the same in every language (113 with the masterclass booking keys)", () => {
-  for (const l of ["it", "en", "ru"]) assert.equal(flat(messages[l]).length, 113, l);
+test("key count is the same in every language (121 with the masterclass booking and consent keys)", () => {
+  for (const l of ["it", "en", "ru"]) assert.equal(flat(messages[l]).length, 121, l);
 });
 
 test("delivery copy states the real shipping area (EU + NO + CH), not 'worldwide'", () => {
@@ -56,7 +56,7 @@ test("every data-i18n / data-i18n-aria-label key used by the live partials and p
   const dict = new Set(flat(messages.it));
   for (const f of files) {
     const src = read(f);
-    for (const m of src.matchAll(/data-i18n(?:-aria-label)?="([A-Za-z0-9_.]+)"/g)) {
+    for (const m of src.matchAll(/data-i18n(?:-aria-label|-href)?="([A-Za-z0-9_.]+)"/g)) {
       assert.ok(dict.has(m[1]), `${f}: unknown key ${m[1]}`);
     }
   }

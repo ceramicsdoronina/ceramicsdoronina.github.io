@@ -183,3 +183,10 @@ test("isStripeUrl: only https://checkout.stripe.com, lookalike hosts rejected", 
   ];
   for (const u of bad) assert.equal(cart.isStripeUrl(u), false, String(u));
 });
+
+test("buildConsents: privacy required, marketing_optout boolean", () => {
+  assert.equal(cart.buildConsents(false, false), null);
+  assert.equal(cart.buildConsents(undefined, true), null);
+  assert.deepEqual(cart.buildConsents(true, false), { privacy: true, marketing_optout: false });
+  assert.deepEqual(cart.buildConsents(true, true), { privacy: true, marketing_optout: true });
+});

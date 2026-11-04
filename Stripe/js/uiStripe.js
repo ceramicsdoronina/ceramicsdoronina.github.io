@@ -190,14 +190,48 @@
     if (!btn) return;
     const empty = readCart().length === 0;
     const disabled = empty || checkoutBusy;
+    // senza informativa accettata il pulsante e' "disabilitato" per gli assistivi e attenuato, ma resta
+    // cliccabile: il click mostra l'errore accanto alla casella (niente alert del browser)
+    const needsConsent = !disabled && !privacyChecked();
     btn.textContent = checkoutBusy
       ? (t("cart.processing") || "…")
       : (t("cart.checkout") || "Checkout");
     btn.setAttribute("href", "#");
     btn.dataset.disabled = disabled ? "1" : "0";
-    btn.setAttribute("aria-disabled", disabled ? "true" : "false");
+    btn.setAttribute("aria-disabled", disabled || needsConsent ? "true" : "false");
+    btn.dataset.needsConsent = needsConsent ? "1" : "0";
     btn.style.pointerEvents = disabled ? "none" : "";
-    btn.style.opacity = disabled ? "0.6" : "";
+    btn.style.opacity = disabled || needsConsent ? "0.6" : "";
+  }
+
+  // ── consensi (mai salvati: le caselle partono sempre vuote) ──
+  function privacyChecked() {
+    const el = document.getElementById("cart-consent-privacy");
+    return !!(el && el.checked);
+  }
+  function optoutChecked() {
+    const el = document.getElementById("cart-consent-optout");
+    return !!(el && el.checked);
+  }
+  function showConsentError(show) {
+    const el = document.getElementById("cart-consent-error");
+    if (el) el.hidden = !show;
+    const box = document.getElementById("cart-consent-privacy");
+    if (box) box.setAttribute("aria-invalid", show ? "true" : "false");
+    if (show && box) box.focus();
+  }
+  function showConsentErrorSilently() {
+    const el = document.getElementById("cart-consent-error");
+    if (el) el.hidden = true;
+    const box = document.getElementById("cart-consent-privacy");
+    if (box) box.setAttribute("aria-invalid", "false");
+  }
+  function resetConsents() {
+    const a = document.getElementById("cart-consent-privacy");
+    const b = document.getElementById("cart-consent-optout");
+    if (a) a.checked = false;
+    if (b) b.checked = false;
+    showConsentError(false);
   }
 
   function readPendingMap() {
@@ -220,14 +254,14 @@
     }
   }
 
-  async function createCheckoutSession(items, signal) {
+  async function createCheckoutSession(items, consents, signal) {
     const endpoint = window.CD?.config?.checkoutEndpoint;
     if (!endpoint) throw new Error("CD.config.checkoutEndpoint mancante");
 
     const res = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items, locale: getLang() }),
+      body: JSON.stringify({ items, locale: getLang(), consents }),
       signal
     });
 
@@ -282,6 +316,13 @@
       return;
     }
 
+    const consents = cartLib.buildConsents(privacyChecked(), optoutChecked());
+    if (!consents) {
+      showConsentError(true);
+      applyCheckoutButtonState();
+      return;
+    }
+
     checkoutBusy = true;
     applyCheckoutButtonState();
 
@@ -290,7 +331,7 @@
 
     try {
       const items = cart.map((ci) => ({ id: ci.id, quantity: ci.quantity }));
-      const out = await createCheckoutSession(items, ctrl.signal);
+      const out = await createCheckoutSession(items, consents, ctrl.signal);
 
       const url = out && typeof out.url === "string" ? out.url : "";
       if (!cartLib.isStripeUrl(url) || typeof out.session_id !== "string") {
@@ -310,7 +351,10 @@
       }, REDIRECT_FALLBACK_MS);
     } catch (err) {
       console.error("[CHECKOUT] errore:", err && err.message, err && err.requestId ? `request_id=${err.requestId}` : "");
-      if (err && err.status === 400 && isValidId(err.itemId)) {
+      if (err && err.status === 400 && err.serverError === "privacy_required") {
+        showConsentError(true);
+        showNotice(t("consent.privacyRequired") || "You must accept the privacy notice to continue.");
+      } else if (err && err.status === 400 && isValidId(err.itemId)) {
         await dropUnavailableItem(err.itemId, err.serverError);
       } else {
         const key = err && err.status === 400 ? "checkoutStatus.itemUnavailable" : "checkoutStatus.error";
@@ -534,6 +578,13 @@
       }
     }, false);
 
+    // casella privacy: aggiorna il pulsante e nasconde l'errore
+    document.addEventListener("change", (e) => {
+      if (!e.target || e.target.id !== "cart-consent-privacy") return;
+      if (privacyChecked()) showConsentErrorSilently();
+      applyCheckoutButtonState();
+    });
+
     // persone di una prenotazione masterclass nel drawer
     document.addEventListener("change", (e) => {
       const sel = e.target && e.target.closest ? e.target.closest(".cart-item__persons") : null;
@@ -563,6 +614,7 @@
       clearTimeout(redirectTimer);
       redirecting = false;
       checkoutBusy = false;
+      resetConsents(); // dopo il Back da Stripe le caselle ripartono vuote
       shop.renderDrawer();
     });
   }

@@ -91,3 +91,16 @@ Paesi: UE + NO + CH – elenco da confermare con la titolare. **Il testo "spedia
 - Sito: `node --test test/*.test.js` (Node 20+; con Node 22+ non passare la cartella `test/` da sola). Copre parser euro, formattatore, date evento, logica del carrello (`cart.js`), parità delle chiavi it/en/ru e controlli statici sull'ordine degli script. CI: `.github/workflows/test.yml`.
 - Casi prezzo condivisi con la funzione: `test/fixtures/price-cases.json` (usato anche dal test python di `cents()` nella repo della funzione).
 - Funzione (checkout, webhook, catalogo): vedi i test e il README nella repo `ceramicsdoronina.netifly`.
+
+
+## Consensi e privacy (2026-11)
+
+- Nel drawer del carrello, sopra il pulsante di checkout, ci sono due caselle sempre vuote all'apertura (mai salvate):
+  1. **Informativa privacy** (obbligatoria): senza spunta il pulsante e' attenuato/`aria-disabled`; il click mostra l'errore accanto alla casella.
+  2. **Opposizione al marketing** (facoltativa): spuntata = `marketing_optout: true`; non spuntata = il negozio puo' contattare il cliente.
+- Il body di `create-checkout` diventa `{ items:[{id,quantity}], locale, consents:{ privacy:true, marketing_optout:boolean } }` (helper puro `CD.cart.buildConsents`). Il server risponde `400 privacy_required` se `privacy` non e' `true`; il drawer mostra l'errore tradotto.
+- Informativa in tre lingue: `privacy-policy.html` (it, predefinita), `privacy-policy.en.html`, `privacy-policy.ru.html`, tutte con `<meta name="privacy-version" content="2026-11">`, riga "ultimo aggiornamento", link "torna alla home" e selettore lingua in alto.
+- I link seguono la lingua corrente: casella nel drawer e voce "Privacy" del footer usano `data-i18n-href` (chiavi `consent.privacyUrl`, `footer.privacyUrl`; `i18n.js` le riapplica a ogni cambio lingua). Predefinito: italiano.
+- **Le tre pagine vanno aggiornate insieme** (stesse sezioni e stessi fatti) e la stringa di versione (`privacy-version`) va alzata insieme a `PRIVACY_POLICY_VERSION` nella funzione Netlify; i test controllano che le tre pagine esistano con la stessa versione e lo stesso numero di sezioni.
+- La traduzione in inglese e in russo va fatta controllare da un madrelingua / legale.
+- **Il testo dell'informativa e delle caselle va fatto rivedere da un legale**: in particolare l'opposizione al marketing con casella "NON autorizzo" regge solo come "soft spam" (art. 130 c.4 Codice Privacy: solo e-mail, prodotti/servizi analoghi, clienti esistenti), non come consenso GDPR.

@@ -14,3 +14,13 @@
 
 /* Prezzi: il simbolo dell'euro non va a capo da solo */
 .nowrap,.price-old,.price-current,.price-discount,.vase-price,.vase-old-price,.vase-discount{white-space:nowrap;}
+
+/* Consensi nel drawer del carrello (privacy obbligatoria + opposizione marketing) */
+.cart-consent{margin:0 0 12px;font-size:13px;line-height:1.4;color:var(--text);}
+.cart-consent__row{display:flex;align-items:flex-start;gap:8px;margin:0 0 8px;}
+.cart-consent__row input[type="checkbox"]{flex:0 0 auto;width:18px;height:18px;margin:1px 0 0;accent-color:var(--btn-primary);cursor:pointer;}
+.cart-consent__row label{cursor:pointer;}
+.cart-consent__row a{color:var(--btn-primary);text-decoration:underline;}
+.cart-consent__error{margin:0 0 8px 26px;color:#b42318;font-size:13px;}
+.cart-consent__error[hidden]{display:none;}
+#cart-checkout-btn[data-needs-consent="1"]{cursor:pointer;}

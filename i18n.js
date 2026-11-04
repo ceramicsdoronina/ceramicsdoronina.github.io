@@ -57,6 +57,12 @@
       if (val !== null) el.setAttribute("aria-label", val);
     });
 
+    // link che seguono la lingua: data-i18n-href="chiave" (il valore e' un percorso relativo)
+    document.querySelectorAll("[data-i18n-href]").forEach(el => {
+      const val = lookup(dict, el.getAttribute("data-i18n-href"));
+      if (val !== null) el.setAttribute("href", val);
+    });
+
     const langSelect = document.getElementById("language-selector");
     if (langSelect) langSelect.value = lang;
   }

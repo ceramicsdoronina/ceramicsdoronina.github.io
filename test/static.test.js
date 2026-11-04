@@ -77,3 +77,48 @@ test("live scripts parse (syntax)", () => {
   const vm = require("node:vm");
   for (const f of LIVE_JS) assert.doesNotThrow(() => new vm.Script(read(f), { filename: f }), f);
 });
+
+test("privacy page, consent checkboxes and footer link are wired", () => {
+  const page = read("privacy-policy.html");
+  assert.match(page, /<meta name="privacy-version" content="2026-11">/);
+  assert.match(page, /Ultimo aggiornamento: 4 novembre 2026/);
+  const html = read("index.html");
+  assert.match(html, /id="cart-consent-privacy"[^>]*required/);
+  assert.doesNotMatch(html, /id="cart-consent-(privacy|optout)"[^>]*\schecked/);
+  assert.match(html, /href="privacy-policy\.html" target="_blank" rel="noopener"/);
+  assert.match(read("Stripe/partials/footer.html"), /href="privacy-policy\.html"/);
+  assert.match(read("Stripe/js/uiStripe.js"), /consents/);
+});
+
+test("privacy policy exists in it/en/ru with the same version, matching lang, a valid switcher and per-language links", () => {
+  const pages = { it: "privacy-policy.html", en: "privacy-policy.en.html", ru: "privacy-policy.ru.html" };
+  const updated = { it: /Ultimo aggiornamento: 4 novembre 2026/, en: /Last updated: 4 November 2026/, ru: /Последнее обновление: 4 ноября 2026/ };
+  const sections = {};
+  for (const [lang, file] of Object.entries(pages)) {
+    const html = read(file);
+    assert.match(html, new RegExp(`<html lang="${lang}">`), file);
+    assert.match(html, /<meta name="privacy-version" content="2026-11">/, file);
+    assert.match(html, updated[lang], file);
+    sections[lang] = (html.match(/<h2>/g) || []).length;
+    // language switcher: the other two pages are linked, files exist, own page is not a link
+    for (const [other, ofile] of Object.entries(pages)) {
+      if (other === lang) assert.doesNotMatch(html, new RegExp(`<a href="${ofile.replace(/\./g, "\\.")}"`), `${file} links to itself`);
+      else assert.match(html, new RegExp(`<a href="${ofile.replace(/\./g, "\\.")}" hreflang="${other}"`), `${file} -> ${ofile}`);
+      assert.ok(fs.existsSync(path.join(ROOT, ofile)), ofile);
+    }
+    assert.match(html, /href="index\.html"/, file);
+  }
+  assert.deepEqual([sections.en, sections.ru], [sections.it, sections.it], "same number of sections");
+  // drawer + footer links follow the language
+  assert.match(read("index.html"), /data-i18n-href="consent\.privacyUrl"/);
+  assert.match(read("Stripe/partials/footer.html"), /data-i18n-href="footer\.privacyUrl"/);
+  globalThis.window = {};
+  delete require.cache[require.resolve("../messages.js")];
+  require("../messages.js");
+  const msgs = globalThis.window.messages;
+  delete globalThis.window;
+  for (const lang of ["it", "en", "ru"]) {
+    assert.equal(msgs[lang].consent.privacyUrl, pages[lang]);
+    assert.equal(msgs[lang].footer.privacyUrl, pages[lang]);
+  }
+});
