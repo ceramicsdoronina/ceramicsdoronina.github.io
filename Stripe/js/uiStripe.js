@@ -204,14 +204,22 @@
     btn.style.opacity = disabled || needsConsent ? "0.6" : "";
   }
 
-  // ── consensi (mai salvati: le caselle partono sempre vuote) ──
-  function privacyChecked() {
-    const el = document.getElementById("cart-consent-privacy");
+  // ── consensi (mai salvati: ad ogni apertura/pageshow tornano ai valori predefiniti) ──
+  const CONSENT_BOXES = {
+    privacy: "cart-consent-privacy",
+    email_marketing: "cart-consent-email",
+    other_channels: "cart-consent-channels",
+    third_party: "cart-consent-third"
+  };
+  function consentChecked(key) {
+    const el = document.getElementById(CONSENT_BOXES[key]);
     return !!(el && el.checked);
   }
-  function optoutChecked() {
-    const el = document.getElementById("cart-consent-optout");
-    return !!(el && el.checked);
+  function privacyChecked() { return consentChecked("privacy"); }
+  function readConsentState() {
+    const st = {};
+    for (const k of Object.keys(CONSENT_BOXES)) st[k] = consentChecked(k);
+    return st;
   }
   function showConsentError(show) {
     const el = document.getElementById("cart-consent-error");
@@ -227,11 +235,13 @@
     if (box) box.setAttribute("aria-invalid", "false");
   }
   function resetConsents() {
-    const a = document.getElementById("cart-consent-privacy");
-    const b = document.getElementById("cart-consent-optout");
-    if (a) a.checked = false;
-    if (b) b.checked = false;
-    showConsentError(false);
+    // valori predefiniti: privacy e e-mail selezionate, altri canali e terzi no
+    for (const k of Object.keys(CONSENT_BOXES)) {
+      const el = document.getElementById(CONSENT_BOXES[k]);
+      if (el) el.checked = cartLib.CONSENT_DEFAULTS[k] === true;
+    }
+    showConsentErrorSilently();
+    applyCheckoutButtonState();
   }
 
   function readPendingMap() {
@@ -316,7 +326,7 @@
       return;
     }
 
-    const consents = cartLib.buildConsents(privacyChecked(), optoutChecked());
+    const consents = cartLib.buildConsents(readConsentState());
     if (!consents) {
       showConsentError(true);
       applyCheckoutButtonState();

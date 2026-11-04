@@ -193,13 +193,21 @@
         </div>
         <div class="cart-consent">
           <div class="cart-consent__row">
-            <input type="checkbox" id="cart-consent-privacy" autocomplete="off" required aria-describedby="cart-consent-error">
-            <label for="cart-consent-privacy"><span data-i18n="consent.privacyPre">Ho letto l'</span><a href="privacy-policy.html" target="_blank" rel="noopener" data-i18n-href="consent.privacyUrl" data-i18n="consent.privacyLink">informativa sulla privacy</a><span data-i18n="consent.privacyPost"> e acconsento al trattamento dei miei dati personali per l'elaborazione dell'ordine, ai sensi del Regolamento UE 2016/679 (GDPR) e del D.Lgs. 196/2003.</span></label>
+            <input type="checkbox" id="cart-consent-privacy" autocomplete="off" required checked aria-describedby="cart-consent-error">
+            <label for="cart-consent-privacy"><span data-i18n="consent.privacyPre">Ho letto l'</span><a href="privacy-policy.html" target="_blank" rel="noopener" data-i18n-href="consent.privacyUrl" data-i18n="consent.privacyLink">informativa sulla privacy</a><span data-i18n="consent.privacyPost"> e acconsento al trattamento dei miei dati personali per l'elaborazione dell'ordine (obbligatorio per completare l'ordine), ai sensi del Regolamento UE 2016/679 (GDPR) e del D.Lgs. 196/2003.</span></label>
           </div>
           <div id="cart-consent-error" class="cart-consent__error" role="alert" data-i18n="consent.privacyRequired" hidden>Per procedere devi accettare l'informativa sulla privacy.</div>
           <div class="cart-consent__row">
-            <input type="checkbox" id="cart-consent-optout" autocomplete="off">
-            <label for="cart-consent-optout" data-i18n="consent.marketingOptOut">NON autorizzo ceramicsdoronina a conservare i miei dati d'ordine per successive comunicazioni di marketing.</label>
+            <input type="checkbox" id="cart-consent-email" autocomplete="off" checked>
+            <label for="cart-consent-email" data-i18n="consent.emailMarketing">Acconsento a conservare i dati del mio ordine e a usarli per inviarmi in futuro informazioni via e-mail. Se deseleziono questa casella, ceramicsdoronina non ha il diritto di usare i miei dati per contattarmi in futuro.</label>
+          </div>
+          <div class="cart-consent__row">
+            <input type="checkbox" id="cart-consent-channels" autocomplete="off">
+            <label for="cart-consent-channels" data-i18n="consent.otherChannels">Acconsento a essere contattato/a in futuro anche su altri canali (telefono, app di messaggistica, social network).</label>
+          </div>
+          <div class="cart-consent__row">
+            <input type="checkbox" id="cart-consent-third" autocomplete="off">
+            <label for="cart-consent-third" data-i18n="consent.thirdParty">Acconsento alla comunicazione dei miei dati a terzi per indagini e ricerche di mercato.</label>
           </div>
         </div>
         <a id="cart-checkout-btn" class="cart-drawer__checkout" href="#" rel="noopener">

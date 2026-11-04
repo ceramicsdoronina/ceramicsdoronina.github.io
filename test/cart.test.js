@@ -184,9 +184,17 @@ test("isStripeUrl: only https://checkout.stripe.com, lookalike hosts rejected", 
   for (const u of bad) assert.equal(cart.isStripeUrl(u), false, String(u));
 });
 
-test("buildConsents: privacy required, marketing_optout boolean", () => {
-  assert.equal(cart.buildConsents(false, false), null);
-  assert.equal(cart.buildConsents(undefined, true), null);
-  assert.deepEqual(cart.buildConsents(true, false), { privacy: true, marketing_optout: false });
-  assert.deepEqual(cart.buildConsents(true, true), { privacy: true, marketing_optout: true });
+test("buildConsents: defaults, mandatory order-processing box, payload shape", () => {
+  assert.deepEqual(cart.CONSENT_DEFAULTS, { privacy: true, email_marketing: true, other_channels: false, third_party: false });
+  // defaults produce the payload the server expects
+  assert.deepEqual(cart.buildConsents(cart.CONSENT_DEFAULTS), { privacy: true, email_marketing: true, other_channels: false, third_party: false });
+  // privacy unticked (or missing / not exactly true) => no request at all
+  for (const bad of [null, undefined, {}, { privacy: false, email_marketing: true }, { privacy: "true" }, { privacy: 1 }]) {
+    assert.equal(cart.buildConsents(bad), null);
+  }
+  // each box maps to its own boolean; only === true counts
+  assert.deepEqual(cart.buildConsents({ privacy: true, email_marketing: false, other_channels: true, third_party: true }),
+    { privacy: true, email_marketing: false, other_channels: true, third_party: true });
+  assert.deepEqual(cart.buildConsents({ privacy: true }), { privacy: true, email_marketing: false, other_channels: false, third_party: false });
+  assert.deepEqual(Object.keys(cart.buildConsents({ privacy: true })), ["privacy", "email_marketing", "other_channels", "third_party"]);
 });

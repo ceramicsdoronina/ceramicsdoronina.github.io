@@ -342,11 +342,14 @@
     return u.protocol === "https:" && u.hostname === STRIPE_HOST && !u.username && !u.password && !u.port;
   }
 
-  // Consensi inviati a create-checkout: {privacy:true, marketing_optout:boolean}.
-  // null se l'informativa privacy non e' stata accettata (il checkout non parte).
-  function buildConsents(privacyChecked, marketingOptoutChecked) {
-    if (privacyChecked !== true) return null;
-    return { privacy: true, marketing_optout: marketingOptoutChecked === true };
+  // Consensi inviati a create-checkout: {privacy, email_marketing, other_channels, third_party} (booleani).
+  // Predefiniti: privacy e email_marketing selezionati, altri canali e terzi no. null se la privacy
+  // (elaborazione dell'ordine, obbligatoria) non e' selezionata: il checkout non parte.
+  const CONSENT_DEFAULTS = Object.freeze({ privacy: true, email_marketing: true, other_channels: false, third_party: false });
+  function buildConsents(state) {
+    const s = state && typeof state === "object" ? state : {};
+    if (s.privacy !== true) return null;
+    return { privacy: true, email_marketing: s.email_marketing === true, other_channels: s.other_channels === true, third_party: s.third_party === true };
   }
 
   const api = {
@@ -354,7 +357,7 @@
     isValidId, positiveInt, validPrice, maxQtyFor,
     isBooking, isLinear, linearMax, personsInput, tierCents, offeredPersons, personsCap, fitPersons, lineTotalCents, cartTotalCents, setPersons,
     sanitizeLine, sanitizeCart, mergeAdd, reconcile, removeLine, removeIds,
-    normalizePending, prunePending, addPending, pendingAfterSuccess, isStripeUrl, buildConsents
+    normalizePending, prunePending, addPending, pendingAfterSuccess, isStripeUrl, buildConsents, CONSENT_DEFAULTS
   };
   root.CD = root.CD || {};
   root.CD.cart = api;

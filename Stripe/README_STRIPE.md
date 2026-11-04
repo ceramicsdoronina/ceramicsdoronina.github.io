@@ -93,14 +93,21 @@ Paesi: UE + NO + CH – elenco da confermare con la titolare. **Il testo "spedia
 - Funzione (checkout, webhook, catalogo): vedi i test e il README nella repo `ceramicsdoronina.netifly`.
 
 
-## Consensi e privacy (2026-11)
+## Consensi e privacy (versione 2026-11-04)
 
-- Nel drawer del carrello, sopra il pulsante di checkout, ci sono due caselle sempre vuote all'apertura (mai salvate):
-  1. **Informativa privacy** (obbligatoria): senza spunta il pulsante e' attenuato/`aria-disabled`; il click mostra l'errore accanto alla casella.
-  2. **Opposizione al marketing** (facoltativa): spuntata = `marketing_optout: true`; non spuntata = il negozio puo' contattare il cliente.
-- Il body di `create-checkout` diventa `{ items:[{id,quantity}], locale, consents:{ privacy:true, marketing_optout:boolean } }` (helper puro `CD.cart.buildConsents`). Il server risponde `400 privacy_required` se `privacy` non e' `true`; il drawer mostra l'errore tradotto.
-- Informativa in tre lingue: `privacy-policy.html` (it, predefinita), `privacy-policy.en.html`, `privacy-policy.ru.html`, tutte con `<meta name="privacy-version" content="2026-11">`, riga "ultimo aggiornamento", link "torna alla home" e selettore lingua in alto.
+- Nel drawer del carrello, sopra il pulsante di checkout, ci sono **quattro caselle** (mai salvate: all'apertura e al `pageshow`/Back tornano ai valori predefiniti, `CD.cart.CONSENT_DEFAULTS`):
+  1. **Elaborazione dell'ordine** (`privacy`): selezionata, **obbligatoria**. Se la si deseleziona il pulsante e' `aria-disabled`/attenuato ma cliccabile: il click mostra l'errore `role="alert"` accanto alla casella e **non invia nulla**. Contiene il link all'informativa.
+  2. **Informazioni via e-mail** (`email_marketing`): selezionata. Deselezionata = il negozio non ha il diritto di usare i dati per contatti futuri (scritto nell'etichetta).
+  3. **Altri canali** (`other_channels`: telefono, messaggistica, social): NON selezionata.
+  4. **Comunicazione a terzi** per indagini/ricerche di mercato (`third_party`): NON selezionata.
+- Body di `create-checkout`: `{ items:[{id,quantity}], locale, consents:{ privacy, email_marketing, other_channels, third_party } }` (booleani; helper puro `CD.cart.buildConsents(state)`, ritorna `null` se `privacy` non e' `true`). Il server risponde `400 privacy_required` se `privacy` non e' `true`; il drawer mostra l'errore tradotto. La vecchia casella `marketing_optout` e le sue chiavi sono state rimosse.
+- Informativa in tre lingue: `privacy-policy.html` (it, predefinita), `privacy-policy.en.html`, `privacy-policy.ru.html`, tutte con `<meta name="privacy-version" content="2026-11-04">`, riga "ultimo aggiornamento", link "torna alla home" e selettore lingua in alto. Le sezioni sul consenso descrivono esattamente le quattro scelte.
 - I link seguono la lingua corrente: casella nel drawer e voce "Privacy" del footer usano `data-i18n-href` (chiavi `consent.privacyUrl`, `footer.privacyUrl`; `i18n.js` le riapplica a ogni cambio lingua). Predefinito: italiano.
 - **Le tre pagine vanno aggiornate insieme** (stesse sezioni e stessi fatti) e la stringa di versione (`privacy-version`) va alzata insieme a `PRIVACY_POLICY_VERSION` nella funzione Netlify; i test controllano che le tre pagine esistano con la stessa versione e lo stesso numero di sezioni.
-- La traduzione in inglese e in russo va fatta controllare da un madrelingua / legale.
-- **Il testo dell'informativa e delle caselle va fatto rivedere da un legale**: in particolare l'opposizione al marketing con casella "NON autorizzo" regge solo come "soft spam" (art. 130 c.4 Codice Privacy: solo e-mail, prodotti/servizi analoghi, clienti esistenti), non come consenso GDPR.
+- **Da far rivedere a un legale / madrelingua** (en, ru): testi delle caselle e delle pagine. In particolare la casella e-mail preselezionata: un consenso preselezionato in genere non e' un consenso valido per il GDPR (considerando 32).
+
+## Ritorno dal pagamento e marcatore `cd_checkout_pending`
+
+- Alla creazione della sessione, `uiStripe.js` salva in `localStorage` (`cd_checkout_pending`, mappa `session_id -> {ids, ts}`; voci > 24 h potate) gli id dell'ordine. **Il marcatore e il carrello stanno nell'origine in cui parte il checkout** (oggi `https://ceramicsdoronina.it`, vedi `CNAME`).
+- Ritorno con `stripe-success.html?session_id=cs_...` (anche tramite la pagina Netlify `order-confirmed.html` che rimanda qui): la pagina toglie dal carrello SOLO gli id di quella sessione e SOLO quella voce del marcatore (`pendingAfterSuccess`); un `session_id` sconosciuto non cambia nulla. Testato (`test/static.test.js`). Perche' funzioni, **il link di ritorno deve puntare alla stessa origine** del checkout (`https://ceramicsdoronina.it/stripe-success.html?session_id=...`, non a `*.github.io`): `localStorage` e' per origine.
+- Altri ritorni: Back dal checkout Stripe (`pageshow`) sblocca il pulsante e azzera le caselle di consenso, il carrello resta; `stripe-cancel.html` non tocca ne' carrello ne' marcatore; riaprire il sito direttamente lascia carrello e marcatore invariati. Quindi chi paga ma non torna alla pagina di conferma si ritrova gli articoli ancora nel carrello (la voce del marcatore scade dopo 24 h, il carrello no): comportamento invariato, non e' un errore.

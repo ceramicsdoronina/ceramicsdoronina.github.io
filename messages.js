@@ -158,8 +158,10 @@ const messages = {
       privacyUrl: "privacy-policy.ru.html",
       privacyPre: "Я прочитал(а) ",
       privacyLink: "политику конфиденциальности",
-      privacyPost: " и соглашаюсь на обработку моих персональных данных для оформления заказа в соответствии с Регламентом ЕС 2016/679 (GDPR) и законодательным декретом Италии № 196/2003.",
-      marketingOptOut: "НЕ разрешаю ceramicsdoronina хранить данные моих заказов для последующих маркетинговых рассылок.",
+      privacyPost: " и соглашаюсь на обработку моих персональных данных для оформления заказа (обязательно для завершения заказа) в соответствии с Регламентом ЕС 2016/679 (GDPR) и законодательным декретом Италии № 196/2003.",
+      emailMarketing: "Соглашаюсь на хранение данных моего заказа и их использование для отправки мне информации по электронной почте в будущем. Если я сниму эту галочку, ceramicsdoronina не вправе использовать мои данные, чтобы связываться со мной в будущем.",
+      otherChannels: "Соглашаюсь также на то, чтобы со мной связывались в будущем по другим каналам (телефон, мессенджеры, социальные сети).",
+      thirdParty: "Соглашаюсь на передачу моих данных третьим лицам для опросов и маркетинговых исследований.",
       privacyRequired: "Чтобы продолжить, необходимо принять политику конфиденциальности."
     },
     footer: {
@@ -325,8 +327,10 @@ const messages = {
       privacyUrl: "privacy-policy.html",
       privacyPre: "Ho letto l'",
       privacyLink: "informativa sulla privacy",
-      privacyPost: " e acconsento al trattamento dei miei dati personali per l'elaborazione dell'ordine, ai sensi del Regolamento UE 2016/679 (GDPR) e del D.Lgs. 196/2003.",
-      marketingOptOut: "NON autorizzo ceramicsdoronina a conservare i miei dati d'ordine per successive comunicazioni di marketing.",
+      privacyPost: " e acconsento al trattamento dei miei dati personali per l'elaborazione dell'ordine (obbligatorio per completare l'ordine), ai sensi del Regolamento UE 2016/679 (GDPR) e del D.Lgs. 196/2003.",
+      emailMarketing: "Acconsento a conservare i dati del mio ordine e a usarli per inviarmi in futuro informazioni via e-mail. Se deseleziono questa casella, ceramicsdoronina non ha il diritto di usare i miei dati per contattarmi in futuro.",
+      otherChannels: "Acconsento a essere contattato/a in futuro anche su altri canali (telefono, app di messaggistica, social network).",
+      thirdParty: "Acconsento alla comunicazione dei miei dati a terzi per indagini e ricerche di mercato.",
       privacyRequired: "Per procedere devi accettare l'informativa sulla privacy."
     },
     footer: {
@@ -491,8 +495,10 @@ const messages = {
       privacyUrl: "privacy-policy.en.html",
       privacyPre: "I have read the ",
       privacyLink: "privacy notice",
-      privacyPost: " and I consent to the processing of my personal data to handle my order, pursuant to EU Regulation 2016/679 (GDPR) and Italian Legislative Decree 196/2003.",
-      marketingOptOut: "I do NOT authorise ceramicsdoronina to keep my order data for later marketing communications.",
+      privacyPost: " and I consent to the processing of my personal data to handle my order (mandatory to complete the order), pursuant to EU Regulation 2016/679 (GDPR) and Italian Legislative Decree 196/2003.",
+      emailMarketing: "I consent to ceramicsdoronina keeping my order data and using it to send me information by e-mail in the future. If I untick this box, ceramicsdoronina has no right to use my data to contact me in the future.",
+      otherChannels: "I also consent to being contacted in the future through other channels (phone, messaging apps, social networks).",
+      thirdParty: "I consent to my data being shared with third parties for surveys and market research.",
       privacyRequired: "To continue you must accept the privacy notice."
     },
     footer: {
