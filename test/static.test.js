@@ -166,3 +166,22 @@ test("stripe-success.html reached with ?session_id=cs_... clears only that order
   vm.runInNewContext(script, ctx);
   assert.equal(JSON.stringify(store), before);
 });
+
+test("auto-clear after payment: config endpoint, wiring on load/pageshow/visibilitychange, throttle and poll window", () => {
+  const html = read("index.html");
+  assert.match(html, /sessionStatusEndpoint:\s*"https:\/\/ceramicsdoronina\.netlify\.app\/\.netlify\/functions\/session-status"/);
+  const ui = read("Stripe/js/uiStripe.js");
+  assert.match(ui, /cartLib\.pendingToCheck\(/);
+  assert.match(ui, /cartLib\.resolvePending\(/);
+  assert.match(ui, /cartLib\.sessionStatusUrl\(window\.CD\?\.config\?\.sessionStatusEndpoint/);
+  assert.match(ui, /addEventListener\("visibilitychange"/);
+  assert.match(ui, /addEventListener\("pageshow"[\s\S]*startPendingWatch\(\)/);
+  assert.match(ui, /STATUS_GAP_EVENT_MS = 10000/);
+  assert.match(ui, /POLL_INTERVAL_MS = 5000/);
+  assert.match(ui, /POLL_WINDOW_MS = 2 \* 60 \* 1000/);
+  assert.match(ui, /credentials: "omit"/);
+  assert.match(ui, /statusInflight/);
+  // a paid:false answer must never reach the cart: only resolvePending decides, and it only clears on paid === true
+  assert.doesNotMatch(ui, /writeCart\(\[\]\)/);
+  assert.match(read("Stripe/js/cart.js"), /a\.paid === true/);
+});

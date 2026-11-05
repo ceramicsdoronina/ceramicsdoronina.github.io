@@ -117,7 +117,7 @@ test("reconcile: physicalKnown / digitalKnown false leaves that type alone", () 
   assert.equal(noneKnown.changed, false);
 });
 
-test("pending map: normalise, add with 24 h pruning", () => {
+test("pending map: normalise, add without age expiry, capped", () => {
   const now = 1_700_000_000_000;
   assert.deepEqual(cart.normalizePending(null), {});
   assert.deepEqual(cart.normalizePending([]), {});
@@ -127,9 +127,14 @@ test("pending map: normalise, add with 24 h pruning", () => {
   // voci malformate scartate
   assert.deepEqual(cart.normalizePending({ a: { ids: ["v1"], ts: 1 }, b: 7, c: { ids: "no" } }), { a: { ids: ["v1"], ts: 0 + 1 } });
 
-  const old = { cs_old: { ids: ["v1"], ts: now - cart.PENDING_TTL_MS - 1 }, cs_recent: { ids: ["v2"], ts: now - 1000 } };
+  const old = { cs_old: { ids: ["v1"], ts: now - 400 * 24 * 3600 * 1000 }, cs_recent: { ids: ["v2"], ts: now - 1000 } };
   const m = cart.addPending(old, "cs_new", ["v3", "v4"], now);
-  assert.deepEqual(Object.keys(m).sort(), ["cs_new", "cs_recent"]);
+  assert.deepEqual(Object.keys(m).sort(), ["cs_new", "cs_old", "cs_recent"], "no age expiry");
+  const big = {};
+  for (let i = 0; i < cart.PENDING_MAX_ENTRIES + 5; i++) big["cs_" + i] = { ids: ["v"], ts: i };
+  const capped = cart.addPending(big, "cs_x", ["v1"], now);
+  assert.equal(Object.keys(capped).length, cart.PENDING_MAX_ENTRIES);
+  assert.ok(capped.cs_x && !capped.cs_0, "oldest dropped");
   assert.deepEqual(m.cs_new, { ids: ["v3", "v4"], ts: now });
   assert.ok(old.cs_old, "input not mutated");
 });
@@ -197,4 +202,84 @@ test("buildConsents: defaults, mandatory order-processing box, payload shape", (
     { privacy: true, email_marketing: false, other_channels: true, third_party: true });
   assert.deepEqual(cart.buildConsents({ privacy: true }), { privacy: true, email_marketing: false, other_channels: false, third_party: false });
   assert.deepEqual(Object.keys(cart.buildConsents({ privacy: true })), ["privacy", "email_marketing", "other_channels", "third_party"]);
+});
+
+// ── pagamento completato senza pagina di ritorno: pendingToCheck / sessionStatusUrl / resolvePending ──
+const SID_A = "cs_test_AAAAAAAA1111";
+const SID_B = "cs_live_BBBBBBBB2222";
+
+test("pendingToCheck: valid ids only, no age limit, throttled per id", () => {
+  const now = 1_000_000_000_000;
+  const map = {
+    [SID_A]: { ids: ["v1"], ts: now - 1000 },
+    [SID_B]: { ids: ["v2"], ts: now - 400 * 24 * 3600 * 1000 },   // molto vecchia: va comunque verificata
+    "not-a-session": { ids: ["v3"], ts: now },
+    "cs_test_short": { ids: ["v4"], ts: now }
+  };
+  assert.deepEqual(cart.pendingToCheck(map, {}, now, 10000).sort(), [SID_A, SID_B].sort());
+  assert.deepEqual(cart.pendingToCheck(map, { [SID_A]: now - 9000, [SID_B]: now - 9000 }, now, 10000), [], "asked 9 s ago: not yet");
+  assert.deepEqual(cart.pendingToCheck(map, { [SID_A]: now - 10000, [SID_B]: now - 1 }, now, 10000), [SID_A], "10 s later: again");
+  assert.deepEqual(cart.pendingToCheck(map, { [SID_A]: now - 5000, [SID_B]: now - 1 }, now, 4500), [SID_A], "poll gap is shorter");
+  assert.deepEqual(cart.pendingToCheck(null, null, now, 10000), []);
+});
+
+test("sessionStatusUrl: endpoint + encoded valid id, otherwise null", () => {
+  const ep = "https://x.example/.netlify/functions/session-status";
+  assert.equal(cart.sessionStatusUrl(ep, SID_A), ep + "?session_id=" + SID_A);
+  assert.equal(cart.sessionStatusUrl(ep + "?a=1", SID_A), ep + "?a=1&session_id=" + SID_A);
+  assert.equal(cart.sessionStatusUrl("", SID_A), null);
+  assert.equal(cart.sessionStatusUrl(undefined, SID_A), null);
+  assert.equal(cart.sessionStatusUrl(ep, "cs_test_a/../b"), null);
+  assert.equal(cart.sessionStatusUrl(ep, "nope"), null);
+});
+
+test("resolvePending: paid:true clears exactly that order's lines and that entry; others untouched", () => {
+  const map = { [SID_A]: { ids: ["v1", "mc1"], ts: 1 }, [SID_B]: { ids: ["v2"], ts: 2 } };
+  const c = [line("v1"), line("v2"), line("mc1", { type: "digital" }), line("v9")];
+  const r = cart.resolvePending(map, c, { [SID_A]: { paid: true, status: "complete" } });
+  assert.deepEqual(r.cart.map((x) => x.id), ["v2", "v9"]);
+  assert.deepEqual(Object.keys(r.map), [SID_B]);
+  assert.deepEqual(r.cleared, [SID_A]);
+  assert.deepEqual(r.dropped, []);
+  assert.deepEqual(Object.keys(map), [SID_A, SID_B], "input map untouched");
+  assert.equal(c.length, 4, "input cart untouched");
+});
+
+test("resolvePending: paid:false never clears anything (open, unknown, complete-unpaid)", () => {
+  const map = { [SID_A]: { ids: ["v1"], ts: 1 } };
+  const c = [line("v1")];
+  for (const a of [{ paid: false, status: "open" }, { paid: false, status: "unknown" }, { paid: false, status: "complete" }, { paid: false, status: "" }]) {
+    const r = cart.resolvePending(map, c, { [SID_A]: a });
+    assert.equal(r.cart, c);
+    assert.equal(r.map, map);
+    assert.deepEqual([r.cleared, r.dropped], [[], []]);
+  }
+});
+
+test("resolvePending: expired drops only the marker entry, the cart stays", () => {
+  const map = { [SID_A]: { ids: ["v1"], ts: 1 }, [SID_B]: { ids: ["v2"], ts: 2 } };
+  const c = [line("v1"), line("v2")];
+  const r = cart.resolvePending(map, c, { [SID_A]: { paid: false, status: "expired" } });
+  assert.equal(r.cart, c);
+  assert.deepEqual(Object.keys(r.map), [SID_B]);
+  assert.deepEqual([r.cleared, r.dropped], [[], [SID_A]]);
+});
+
+test("resolvePending: answers for sessions that are not in the marker (or garbage) change nothing", () => {
+  const map = { [SID_A]: { ids: ["v1"], ts: 1 } };
+  const c = [line("v1")];
+  const r = cart.resolvePending(map, c, { [SID_B]: { paid: true, status: "complete" }, [SID_A]: null, toString: { paid: true } });
+  assert.equal(r.cart, c);
+  assert.equal(r.map, map);
+  const r2 = cart.resolvePending(map, c, { [SID_A]: { paid: "yes", status: "complete" } });
+  assert.equal(r2.cart, c, "paid must be the boolean true");
+  assert.deepEqual(cart.resolvePending(undefined, undefined, undefined), { map: {}, cart: undefined, cleared: [], dropped: [] });
+});
+
+test("resolvePending: two paid sessions in one round clear both orders", () => {
+  const map = { [SID_A]: { ids: ["v1"], ts: 1 }, [SID_B]: { ids: ["v2"], ts: 2 } };
+  const r = cart.resolvePending(map, [line("v1"), line("v2"), line("v3")], { [SID_A]: { paid: true, status: "complete" }, [SID_B]: { paid: true, status: "complete" } });
+  assert.deepEqual(r.cart.map((x) => x.id), ["v3"]);
+  assert.deepEqual(r.map, {});
+  assert.deepEqual(r.cleared.sort(), [SID_A, SID_B].sort());
 });

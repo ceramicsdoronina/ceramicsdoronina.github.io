@@ -11,7 +11,7 @@
 //   fino a maxPersons = min(999, floor(99999999 / linearCents)) e, se limitati, ai posti liberi. kind "masterclass" e line_amount
 //   (totale della riga) servono solo alla visualizzazione.
 // Marcatore "checkout in sospeso" (localStorage cd_checkout_pending): MAPPA
-//   { "<session_id>": { ids: [...], ts: <ms> } }   (voci piu' vecchie di 24 h potate in scrittura)
+//   { "<session_id>": { ids: [...], ts: <ms> } }   (nessuna scadenza per eta'; tetto di voci)
 (function (root) {
   const CART_KEY = "cd_stripe_cart_v1";
   const PENDING_KEY = "cd_checkout_pending";
@@ -20,7 +20,7 @@
   const MAX_PERSONS = 20;            // tabelle e legacy: gruppi 1..20
   const MAX_LINEAR_PERSONS = 999;    // tetto tecnico del prezzo lineare
   const MAX_AMOUNT_CENTS = 99999999;
-  const PENDING_TTL_MS = 24 * 60 * 60 * 1000;
+  const PENDING_MAX_ENTRIES = 50; // nessuna scadenza temporale: una voce sparisce solo quando Stripe dice pagato/scaduto; il tetto evita solo che la mappa cresca senza fine
   const STRIPE_HOST = "checkout.stripe.com";
   const ID_RE = /^[A-Za-z0-9_-]+$/;
 
@@ -305,19 +305,18 @@
 
   function prunePending(map, now) {
     const t = Number.isFinite(now) ? now : Date.now();
+    const sids = Object.keys(map || {}).sort((a, b) => map[b].ts - map[a].ts).slice(0, PENDING_MAX_ENTRIES);
     const out = {};
-    for (const sid of Object.keys(map || {})) {
-      if (t - map[sid].ts <= PENDING_TTL_MS) out[sid] = map[sid];
-    }
+    for (const sid of sids) out[sid] = map[sid];
     return out;
   }
 
-  // Aggiunge/sovrascrive la voce della sessione e pota le voci > 24 h. Ritorna una NUOVA mappa.
+  // Aggiunge/sovrascrive la voce della sessione (senza scadenza per eta'; tetto di voci). Ritorna una NUOVA mappa.
   function addPending(map, sessionId, ids, now) {
     const t = Number.isFinite(now) ? now : Date.now();
-    const out = prunePending(map, t);
+    const out = Object.assign({}, map || {});
     out[sessionId] = { ids: (ids || []).map(String), ts: t };
-    return out;
+    return prunePending(out, t);
   }
 
   // Pagina di successo: se sessionId corrisponde a una voce, rimuove dal carrello SOLO i suoi id
@@ -332,6 +331,52 @@
     const entry = nextMap[sessionId];
     delete nextMap[sessionId];
     return { map: nextMap, cart: removeIds(cart, entry.ids), matched: true };
+  }
+
+  // ── pagamento completato senza passare dalla pagina di ritorno ──
+  // Il sito chiede alla funzione session-status (solo {paid, status}) lo stato delle sessioni "in sospeso" di questo
+  // browser. Parti pure (testabili in Node): quali sessioni interrogare e cosa fare con le risposte.
+  const SESSION_ID_RE = /^cs_(test|live)_[A-Za-z0-9]{8,}$/;
+
+  // Id delle sessioni da interrogare ora: id valido, non interrogato da meno di minGapMs.
+  // lastChecked = {"<session_id>": <ms dell'ultima richiesta>}.
+  function pendingToCheck(map, lastChecked, now, minGapMs) {
+    const t = Number.isFinite(now) ? now : Date.now();
+    const gap = Number.isFinite(minGapMs) ? minGapMs : 10000;
+    const last = lastChecked || {};
+    const live = prunePending(map || {}, t);
+    return Object.keys(live).filter((sid) => SESSION_ID_RE.test(sid) && !(Number.isFinite(last[sid]) && t - last[sid] < gap));
+  }
+
+  // URL della funzione session-status per una sessione (null se endpoint mancante o id non valido).
+  function sessionStatusUrl(endpoint, sessionId) {
+    if (typeof endpoint !== "string" || !endpoint || !SESSION_ID_RE.test(String(sessionId))) return null;
+    return endpoint + (endpoint.includes("?") ? "&" : "?") + "session_id=" + encodeURIComponent(sessionId);
+  }
+
+  // answers = {"<session_id>": {paid, status}} (solo risposte valide).
+  //   paid === true            -> come la pagina di successo: toglie dal carrello SOLO le righe di quell'ordine e SOLO quella voce.
+  //   paid false e "expired"   -> toglie SOLO la voce del marcatore (il carrello resta).
+  //   ogni altra risposta      -> nessuna modifica (mai svuotare per paid:false).
+  // Ritorna {map, cart, cleared:[sid], dropped:[sid]}; gli input non vengono modificati.
+  function resolvePending(map, cart, answers) {
+    let m = map || {};
+    let c = cart;
+    const cleared = [];
+    const dropped = [];
+    for (const sid of Object.keys(answers || {})) {
+      const a = answers[sid];
+      if (!a || typeof a !== "object" || !Object.prototype.hasOwnProperty.call(m, sid)) continue;
+      if (a.paid === true) {
+        const r = pendingAfterSuccess(m, sid, c);
+        if (r.matched) { m = r.map; c = r.cart; cleared.push(sid); }
+      } else if (a.paid === false && a.status === "expired") {
+        m = Object.assign({}, m);
+        delete m[sid];
+        dropped.push(sid);
+      }
+    }
+    return { map: m, cart: c, cleared, dropped };
   }
 
   // Redirect consentito solo verso https://checkout.stripe.com/... (host esatto, niente credenziali).
@@ -353,11 +398,11 @@
   }
 
   const api = {
-    CART_KEY, PENDING_KEY, PENDING_TTL_MS, MAX_LINE_QTY, DEFAULT_DIGITAL_MAX_QTY, MAX_PERSONS, MAX_LINEAR_PERSONS,
+    CART_KEY, PENDING_KEY, PENDING_MAX_ENTRIES, MAX_LINE_QTY, DEFAULT_DIGITAL_MAX_QTY, MAX_PERSONS, MAX_LINEAR_PERSONS,
     isValidId, positiveInt, validPrice, maxQtyFor,
     isBooking, isLinear, linearMax, personsInput, tierCents, offeredPersons, personsCap, fitPersons, lineTotalCents, cartTotalCents, setPersons,
     sanitizeLine, sanitizeCart, mergeAdd, reconcile, removeLine, removeIds,
-    normalizePending, prunePending, addPending, pendingAfterSuccess, isStripeUrl, buildConsents, CONSENT_DEFAULTS
+    normalizePending, prunePending, addPending, pendingAfterSuccess, pendingToCheck, sessionStatusUrl, resolvePending, SESSION_ID_RE, isStripeUrl, buildConsents, CONSENT_DEFAULTS
   };
   root.CD = root.CD || {};
   root.CD.cart = api;

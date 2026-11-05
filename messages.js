@@ -128,7 +128,8 @@ const messages = {
       bookingAdjusted: "Количество человек в бронировании уменьшено по числу свободных мест.",
       notEnoughSeats: "Свободных мест для этого бронирования недостаточно. Выберите меньше человек.",
       soldOut: "Для этого мастер-класса мест больше нет.",
-      groupUnavailable: "Такого размера группы для этого мастер-класса нет. Выберите другое количество человек."
+      groupUnavailable: "Такого размера группы для этого мастер-класса нет. Выберите другое количество человек.",
+      itemHeld: "Кто-то сейчас оформляет покупку этого изделия. Попробуйте ещё раз примерно через 30 минут: если оплата не пройдёт, изделие снова станет доступным."
     },
     checkoutStatus: {
       success: "Оплата получена. Stripe пришлёт вам чек по электронной почте. Я свяжусь с вами по поводу дальнейших шагов.",
@@ -297,7 +298,8 @@ const messages = {
       bookingAdjusted: "Il numero di persone di una prenotazione è stato ridotto in base ai posti liberi.",
       notEnoughSeats: "Non ci sono abbastanza posti liberi per questa prenotazione. Scegli meno persone.",
       soldOut: "Questa masterclass è al completo.",
-      groupUnavailable: "Questa dimensione di gruppo non è disponibile per la masterclass. Scegli un altro numero di persone."
+      groupUnavailable: "Questa dimensione di gruppo non è disponibile per la masterclass. Scegli un altro numero di persone.",
+      itemHeld: "Qualcuno sta completando l'acquisto di questo pezzo. Riprova tra circa 30 minuti: se il pagamento non va a buon fine tornerà disponibile."
     },
     checkoutStatus: {
       success: "Pagamento ricevuto. Stripe ti invierà la ricevuta via email. Ti contatterò per i passi successivi.",
@@ -465,7 +467,8 @@ const messages = {
       bookingAdjusted: "The number of people in a booking was reduced to match the free seats.",
       notEnoughSeats: "There are not enough free seats for this booking. Please choose fewer people.",
       soldOut: "This masterclass is fully booked.",
-      groupUnavailable: "This group size is not available for the masterclass. Please choose another number of people."
+      groupUnavailable: "This group size is not available for the masterclass. Please choose another number of people.",
+      itemHeld: "Someone else is completing the purchase of this piece. Please try again in about 30 minutes: if their payment does not go through, it becomes available again."
     },
     checkoutStatus: {
       success: "Payment received. Stripe will email you the receipt. I will contact you about the next steps.",

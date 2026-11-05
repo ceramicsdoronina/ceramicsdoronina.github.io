@@ -357,7 +357,7 @@ test("new i18n keys exist in it/en/ru with the {n}/{total}/{per} placeholders wh
     for (const k of ["seatsFree", "seatsFreeOne", "seatsAvailable", "soldOut", "persons", "personOne", "personFew", "personMany", "total", "totalPer", "book"]) {
       assert.ok(m.masterclass[k], `${l}.masterclass.${k}`);
     }
-    for (const k of ["persons", "bookingAdjusted", "notEnoughSeats", "soldOut", "groupUnavailable"]) assert.ok(m.cart[k], `${l}.cart.${k}`);
+    for (const k of ["persons", "bookingAdjusted", "notEnoughSeats", "soldOut", "groupUnavailable", "itemHeld"]) assert.ok(m.cart[k], `${l}.cart.${k}`);
     assert.match(m.masterclass.seatsFree, /\{n\}/);
     assert.match(m.masterclass.totalPer, /\{total\}.*\{per\}/);
     assert.match(m.masterclass.personMany, /\{n\}/);
@@ -664,6 +664,22 @@ test("server booking error codes map to translated messages and the line is drop
     assert.match(src, new RegExp(code + ': "' + key.replace(".", "\\.") + '"'));
   }
   assert.match(src, /serverError === "item_sold" \|\| serverError === "sold_out"/);
+});
+
+test("item_held: a unique piece held by another customer keeps its line in the cart and shows the translated notice (no drop, not marked sold)", () => {
+  const src = fs.readFileSync(path.join(__dirname, "..", "Stripe/js/uiStripe.js"), "utf8");
+  const branch = src.slice(src.indexOf('err.serverError === "item_held"'), src.indexOf("await dropUnavailableItem"));
+  assert.match(branch, /showNotice\(t\("cart\.itemHeld"\)/);
+  assert.doesNotMatch(branch, /dropUnavailableItem|markSold|removeLine/);
+  assert.ok(src.indexOf('err.serverError === "item_held"') < src.indexOf("await dropUnavailableItem"), "checked before the generic 400-with-item branch");
+  for (const l of ["it", "en", "ru"]) assert.ok(messages[l].cart.itemHeld.length > 20, l);
+  assert.match(messages.it.cart.itemHeld, /30 minuti/);
+});
+
+test("pending marker has no age TTL", () => {
+  const c = require("../Stripe/js/cart.js");
+  assert.equal(c.PENDING_TTL_MS, undefined);
+  assert.ok(c.PENDING_MAX_ENTRIES >= 20);
 });
 
 // ── rendering (DOM finto) ──

@@ -254,7 +254,7 @@
     }
   }
 
-  // Aggiunge la voce di QUESTA sessione alla mappa (le altre restano; voci > 24 h potate).
+  // Aggiunge la voce di QUESTA sessione alla mappa (le altre restano; nessuna scadenza per eta').
   function storePending(sessionId, ids) {
     try {
       const map = cartLib.addPending(readPendingMap(), sessionId, ids, Date.now());
@@ -262,6 +262,89 @@
     } catch (err) {
       console.warn("[CHECKOUT] cd_checkout_pending non salvato:", err);
     }
+  }
+
+  // ── pagamento completato: svuota il carrello da solo ──
+  // Per ogni sessione "in sospeso" di questo browser chiede alla funzione session-status {paid, status}. Se paid:true toglie dal
+  // carrello SOLO le righe di quell'ordine (come stripe-success.html); se la sessione e' scaduta toglie solo il marcatore.
+  // Errori di rete/HTTP: silenziosi, si riprova al prossimo evento. Mai nulla per paid:false.
+  const STATUS_GAP_EVENT_MS = 10000;   // al massimo una richiesta ogni 10 s per sessione (load/pageshow/visibilitychange)
+  const STATUS_GAP_POLL_MS = 4500;     // il polling gira ogni 5 s
+  const POLL_INTERVAL_MS = 5000;
+  const POLL_WINDOW_MS = 2 * 60 * 1000;
+  const STATUS_TIMEOUT_MS = 8000;
+  const statusLastChecked = {};
+  const statusInflight = new Set();
+  let pollTimer = null;
+  let pollUntil = 0;
+
+  function writePendingMap(map) {
+    try {
+      if (Object.keys(map).length) localStorage.setItem(PENDING_KEY, JSON.stringify(map));
+      else localStorage.removeItem(PENDING_KEY);
+    } catch (err) {
+      console.warn("[CHECKOUT] cd_checkout_pending non salvato:", err);
+    }
+  }
+
+  async function fetchSessionStatus(sid) {
+    const url = cartLib.sessionStatusUrl(window.CD?.config?.sessionStatusEndpoint, sid);
+    if (!url) return null;
+    const ctrl = typeof AbortController === "function" ? new AbortController() : null;
+    const timer = ctrl ? setTimeout(() => ctrl.abort(), STATUS_TIMEOUT_MS) : null;
+    try {
+      const res = await fetch(url, { method: "GET", credentials: "omit", cache: "no-store", signal: ctrl ? ctrl.signal : undefined });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data && typeof data.paid === "boolean" ? { paid: data.paid, status: String(data.status || "") } : null;
+    } catch (_) {
+      return null; // silenzioso: si riprova
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  }
+
+  async function checkPendingSessions(minGapMs) {
+    const now = Date.now();
+    const due = cartLib.pendingToCheck(readPendingMap(), statusLastChecked, now, minGapMs).filter((sid) => !statusInflight.has(sid));
+    if (!due.length) return;
+    const answers = {};
+    await Promise.all(due.map(async (sid) => {
+      statusInflight.add(sid);
+      statusLastChecked[sid] = now;
+      try {
+        const a = await fetchSessionStatus(sid);
+        if (a) answers[sid] = a;
+      } finally {
+        statusInflight.delete(sid);
+      }
+    }));
+    if (!Object.keys(answers).length) return;
+    // stato FRESCO dopo le richieste (un'altra scheda puo' aver cambiato carrello o marcatore nel frattempo)
+    const res = cartLib.resolvePending(readPendingMap(), readCart(), answers);
+    if (!res.cleared.length && !res.dropped.length) return;
+    if (res.cleared.length) writeCart(res.cart);
+    writePendingMap(res.map);
+    await shop.renderDrawer();
+  }
+
+  function stopPendingPoll() {
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+  }
+
+  function pollTick() {
+    if (document.hidden) return; // pagina non visibile: niente richieste
+    if (Date.now() > pollUntil || !Object.keys(readPendingMap()).length) { stopPendingPoll(); return; }
+    checkPendingSessions(STATUS_GAP_POLL_MS);
+  }
+
+  // Da chiamare a caricamento, pageshow e quando la pagina torna visibile: controllo subito + polling leggero per ~2 minuti.
+  function startPendingWatch() {
+    if (!window.CD?.config?.sessionStatusEndpoint) return;
+    if (!Object.keys(readPendingMap()).length) return;
+    checkPendingSessions(STATUS_GAP_EVENT_MS);
+    pollUntil = Date.now() + POLL_WINDOW_MS;
+    if (!pollTimer) pollTimer = setInterval(pollTick, POLL_INTERVAL_MS);
   }
 
   async function createCheckoutSession(items, consents, signal) {
@@ -364,6 +447,9 @@
       if (err && err.status === 400 && err.serverError === "privacy_required") {
         showConsentError(true);
         showNotice(t("consent.privacyRequired") || "You must accept the privacy notice to continue.");
+      } else if (err && err.status === 400 && err.serverError === "item_held") {
+        // pezzo unico in questo momento nel checkout di un altro cliente: resta nel carrello (tornera' disponibile se quel pagamento non va a buon fine)
+        showNotice(t("cart.itemHeld") || "Someone else is completing the purchase of this piece. Please try again in about 30 minutes.");
       } else if (err && err.status === 400 && isValidId(err.itemId)) {
         await dropUnavailableItem(err.itemId, err.serverError);
       } else {
@@ -626,7 +712,16 @@
       checkoutBusy = false;
       resetConsents(); // dopo il Back da Stripe le caselle ripartono vuote
       shop.renderDrawer();
+      startPendingWatch();
     });
+
+    // pagina di nuovo visibile (cambio scheda, ritorno dall'app dei pagamenti): ricontrolla le sessioni in sospeso
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) startPendingWatch();
+    });
+
+    // al caricamento: un ordine pagato in un'altra scheda/pagina svuota subito il carrello
+    startPendingWatch();
   }
 
   // ─────────────────────────────────────────────
