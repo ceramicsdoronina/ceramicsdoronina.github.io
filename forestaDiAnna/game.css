@@ -7,10 +7,9 @@ html,body{margin:0;height:100%;background:#1c1410;color:var(--cream);font-family
 .game{position:fixed;inset:0;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none}
 
 /* mondo: altezza = viewport, larghezza dall'immagine (impostata da game.js) */
-.world{position:absolute;left:0;top:0;height:100%;will-change:transform;
-  background:#6b4a30 url("img/studio-bg.png") left top/100% 100% no-repeat;image-rendering:pixelated}
+.world{position:absolute;left:0;top:0;height:100%;will-change:transform;background:#6b4a30}
+.seg{position:absolute;top:0;height:100%;background-repeat:no-repeat;background-size:100% 100%;image-rendering:pixelated}
 .shelves{position:absolute;inset:0}
-.room{position:absolute;top:0;height:100%;background:url("img/showroom-bg.png") left top/100% 100% no-repeat;image-rendering:pixelated}
 
 /* Anna */
 .anna{position:absolute;background:url("img/anna-walk.png") 0 0/400% 100% no-repeat;image-rendering:pixelated;

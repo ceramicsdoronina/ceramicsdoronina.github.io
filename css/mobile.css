@@ -28,10 +28,11 @@ h1,h2,h3,h4{
   hyphens:none;
 }
 
-/* Hamburger nascosto di default */
+/* Hamburger nascosto di default (colore del testo, non l'azzurro di sistema) */
 .nav-toggle-btn,
 #nav-toggle{
   display:none;
+  color:var(--text);
 }
 
 /* ─────────────────────────────────────────────

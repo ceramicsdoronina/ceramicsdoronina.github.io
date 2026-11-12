@@ -185,3 +185,10 @@ test("auto-clear after payment: config endpoint, wiring on load/pageshow/visibil
   assert.doesNotMatch(ui, /writeCart\(\[\]\)/);
   assert.match(read("Stripe/js/cart.js"), /a\.paid === true/);
 });
+
+test("buttons never fall back to the system blue (menu, modal close, cart close)", () => {
+  assert.match(read("css/base.css"), /button\{color:inherit;/);
+  assert.match(read("css/catalogue.css"), /\.modal-header button\{[^}]*color:var\(--text\)/);
+  assert.match(read("css/components.css"), /\.cart-drawer__close\{[^}]*color:var\(--text\)/);
+  assert.match(read("css/mobile.css"), /#nav-toggle\{[^}]*color:var\(--text\)/);
+});

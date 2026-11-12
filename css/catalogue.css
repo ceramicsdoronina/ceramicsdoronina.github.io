@@ -172,6 +172,7 @@
   border:none;
   font-size:24px;
   cursor:pointer;
+  color:var(--text);
 }
 
 .modal-body{

@@ -12,15 +12,16 @@
     CELL_W: 543, CELL_H: 613,         // cella della sprite sheet di Anna
     ANNA_H: 0.46,                     // altezza di Anna (frazione dell'altezza del mondo)
     FLOOR: 0.93,                      // y dei piedi di Anna
-    SPEED: 0.36,                      // altezze del mondo al secondo
+    SPEED: 0.6,                       // altezze del mondo al secondo
     STEP_MS: 150,                     // durata di un fotogramma di camminata
     IDLE_FRAME: 1,
     NEAR: 0.09,                       // "vicino" = entro questa frazione dell'altezza
     FALLBACK_FRAME: 0.09,             // lato del quadretto se manca lo sprite del vaso
-    BG1: "img/studio-bg.png", BG2: "img/showroom-bg.png", BG_ASPECT: 3,
+    // scene affiancate da sinistra a destra: ingresso con gli attrezzi, salotto, forno e mensola principale
+    SEGMENTS: [{ id: "start", src: "img/start-bg.png" }, { id: "room", src: "img/showroom-bg.png" }, { id: "studio", src: "img/studio-right.png" }],
     VASE_DIR: "img/vases/", GIFT_SPRITE: "img/gift.png",
     // altezza dello sprite = base + cm * per_cm (frazione dell'altezza del mondo); i vasi piu' alti risultano piu' alti
-    VASE_BASE: 0.05, VASE_PER_CM: 0.0023, GIFT_H: 0.075,
+    VASE_BASE: 0.045, VASE_PER_CM: 0.0019, GIFT_H: 0.075,
     VASE_SLOTS: [], CARD_SLOTS: []    // vedi scene.js
   };
   Object.assign(CFG, window.__ANNA_SCENE || {});
@@ -47,13 +48,14 @@
   };
 
   const $ = (id) => document.getElementById(id);
-  const world = $("world"), shelvesEl = $("shelves"), annaEl = $("anna"), game = $("game"), roomEl = $("room");
+  const world = $("world"), shelvesEl = $("shelves"), annaEl = $("anna"), game = $("game");
   const popup = $("popup");
 
   let lang = "it";
   let items = [];            // { kind, id, row, p, priceCents, imgs[], x, y, el }
   let dataState = "loading"; // loading | ok | error
-  let W = 0, H = 0, VW = 0, W1 = 0, W2 = 0, aspect1 = CFG.BG_ASPECT, aspect2 = 0;
+  let W = 0, H = 0, VW = 0;
+  let segs = [];             // { id, src, aspect, left, w, el } (solo le immagini caricate)
   let x = 0, target = null, pendingOpen = null, facing = 1;
   const keys = { left: false, right: false };
   let padDir = 0, dragging = false;
@@ -153,13 +155,20 @@
   }
 
   // ── geometria ──
-  function slotPx(s) { return { x: s.bg === "room" ? W1 + s.x * W2 : s.x * W1, y: s.y * H }; }
+  function slotPx(s) {
+    const g = segs.find((q) => q.id === s.bg);
+    return g ? { x: g.left + s.x * g.w, y: s.y * H } : null;
+  }
 
   function layout() {
     VW = window.innerWidth; H = window.innerHeight;
-    W1 = Math.round(H * aspect1); W2 = aspect2 ? Math.round(H * aspect2) : 0; W = W1 + W2;
-    world.style.width = W + "px"; world.style.backgroundSize = W1 + "px 100%";
-    roomEl.hidden = !W2; roomEl.style.left = W1 + "px"; roomEl.style.width = W2 + "px";
+    let left = 0;
+    segs.forEach((g) => {
+      g.left = left; g.w = Math.round(H * g.aspect); left += g.w;
+      g.el.style.left = g.left + "px"; g.el.style.width = g.w + "px";
+    });
+    W = left;
+    world.style.width = W + "px";
     const ah = CFG.ANNA_H * H, aw = ah * CFG.CELL_W / CFG.CELL_H;
     annaEl.style.width = aw + "px"; annaEl.style.height = ah + "px"; annaEl.style.top = (CFG.FLOOR * H - ah) + "px";
     placeItems();
@@ -174,8 +183,8 @@
     let vi = 0, ci = 0;
     items.forEach((it) => {
       const s = it.kind === "card" ? CFG.CARD_SLOTS[ci++] : CFG.VASE_SLOTS[vi++];
-      if (!s || (s.bg === "room" && !W2)) { it.x = null; if (it.el) it.el.hidden = true; return; }
-      const p = slotPx(s);
+      const p = s && slotPx(s);
+      if (!p) { it.x = null; if (it.el) it.el.hidden = true; return; }
       it.x = p.x; it.y = p.y;
       if (it.el) {
         const h = it.fallback ? CFG.FALLBACK_FRAME * H : spriteHeight(it);
@@ -431,13 +440,24 @@
     im.src = src;
   });
 
+  // Crea i segmenti di sfondo solo per le immagini che esistono (aspect reale dall'immagine)
+  async function buildSegments() {
+    const aspects = await Promise.all(CFG.SEGMENTS.map((g) => loadAspect(g.src)));
+    segs = [];
+    CFG.SEGMENTS.forEach((g, i) => {
+      if (!aspects[i]) { console.warn("[GIOCO] sfondo mancante:", g.src); return; }
+      const el = document.createElement("div");
+      el.className = "seg"; el.style.backgroundImage = 'url("' + g.src + '")';
+      world.insertBefore(el, shelvesEl);
+      segs.push({ id: g.id, src: g.src, aspect: aspects[i], left: 0, w: 0, el });
+    });
+  }
+
   async function init() {
     lang = pickLang();
     applyStatic(); updateCartCount(); setStatus();
-    const [a1, a2] = await Promise.all([loadAspect(CFG.BG1), loadAspect(CFG.BG2)]);
-    if (a1) aspect1 = a1;
-    aspect2 = a2;
-    layout(); x = 0.08 * W;
+    await buildSegments();
+    layout(); x = 0.3 * H;   // parte davanti alla porta
     bind();
     requestAnimationFrame(tick);
     try {

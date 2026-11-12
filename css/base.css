@@ -33,6 +33,8 @@ body{
 
 img{max-width:100%;display:block;}
 a{text-decoration:none;color:inherit;}
+/* i pulsanti non devono prendere l'azzurro di sistema (iOS): stesso colore del testo del sito */
+button{color:inherit;-webkit-tap-highlight-color:transparent;}
 
 /* Gestione testi */
 p, li, a {

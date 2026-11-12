@@ -12,7 +12,7 @@ test("forestaDiAnna: noindex, and every referenced local file exists", () => {
   const refs = [...html.matchAll(/(?:src|href)="([^"#]+)"/g)].map((m) => m[1]).filter((s) => !/^https?:/.test(s) && s !== "../");
   assert.ok(refs.length >= 6);
   refs.forEach((r) => assert.ok(fs.existsSync(path.join(root, "forestaDiAnna", r)), r));
-  ["img/anna-walk.png", "img/studio-bg.png", "img/showroom-bg.png", "img/gift.png", "img/vases/v1.png", "img/vases/v11.png"].forEach((f) => assert.ok(fs.existsSync(path.join(root, "forestaDiAnna", f)), f));
+  ["img/anna-walk.png", "img/start-bg.png", "img/studio-right.png", "img/showroom-bg.png", "img/gift.png", "img/vases/v1.png", "img/vases/v11.png"].forEach((f) => assert.ok(fs.existsSync(path.join(root, "forestaDiAnna", f)), f));
 });
 
 test("forestaDiAnna: not linked from any other page or partial", () => {

@@ -205,6 +205,7 @@ footer{
 .cart-drawer__close{
   border:none; background:transparent;
   font-size:26px; cursor:pointer;
+  color:var(--text);
 }
 
 .cart-drawer__items{

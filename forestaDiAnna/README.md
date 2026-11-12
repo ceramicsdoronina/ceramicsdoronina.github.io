@@ -3,7 +3,7 @@
 Pagina nascosta (non linkata, `noindex`): Anna cammina nello studio di ceramica e i vasi in vendita sono quadretti pixelati sulle mensole.
 Indirizzo: `/forestaDiAnna/`. Usa gli stessi moduli, dati (foglio live, ODS di riserva) e carrello (`cd_stripe_cart_v1`) del sito; il pagamento resta nel sito principale.
 
-- Scena: due sfondi affiancati, studio (`img/studio-bg.png`) e salotto (`img/showroom-bg.png`). `scene.js` contiene le posizioni (frazioni dell'immagine) di ogni oggetto sulle superfici: mensole, divano, tavolini, poltrona, sedie, sgabello (vasi) e credenza (carte regalo).
+- Scena: tre sfondi affiancati da sinistra a destra: ingresso con gli attrezzi da ceramista (`img/start-bg.png`: porta, tornio, pannello di attrezzi, sacchi di argilla, scaffale di essiccazione, poltrona, sedie, tavolini), salotto (`img/showroom-bg.png`) e forno con mensola principale (`img/studio-right.png`). `scene.js` contiene le posizioni (frazioni di ciascuna immagine) di ogni oggetto sulle superfici. I vasi partono dall'ingresso, cosi' si trovano subito; Anna cammina a 0.6 altezze/s.
 - Vasi: sprite pixel art `img/vases/<id>.png` (altezza proporzionale ai cm del foglio). Se manca lo sprite di un id (vaso nuovo nel foglio), compare un quadretto con la foto pixelata nello slot libero successivo. Carte regalo: busta `img/gift.png` con l'importo.
 - Clic su un oggetto: popup con le FOTO VERE (frecce, miniature, tastiera, swipe), prezzo, "Aggiungi al carrello" (stesso carrello del sito) e link al sito principale (`../#catalogue` o `../#giftcards`).
 - Vista elenco = alternativa senza movimento (accessibile da tastiera).
