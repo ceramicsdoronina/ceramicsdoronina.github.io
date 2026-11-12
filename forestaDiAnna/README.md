@@ -9,7 +9,7 @@ Indirizzo: `/forestaDiAnna/`. Usa gli stessi moduli, dati (foglio live, ODS di r
 - Vista elenco = alternativa senza movimento (accessibile da tastiera).
 
 ## Immagini
-Tutti i prompt usati con Codex sono in `prompts/` (un file `<Nome>.prompt.md` per vaso, piu' Anna, studio, salotto e busta regalo), con modello, immagini di riferimento, comando e post-produzione.
+I prompt usati con Codex (un file `<Nome>.prompt.md` per vaso, piu' Anna, studio, salotto e busta regalo) sono tenuti fuori dal repository, nella cartella `prompts/` sopra i repository.
 
 ## Comando (Codex CLI, modello `gpt-5.6-terra`; `gpt-5.5` del config non e' accettato dall'account ChatGPT)
 ```
