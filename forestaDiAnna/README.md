@@ -3,11 +3,15 @@
 Pagina nascosta (non linkata, `noindex`): Anna cammina nello studio di ceramica e i vasi in vendita sono quadretti pixelati sulle mensole.
 Indirizzo: `/forestaDiAnna/`. Usa gli stessi moduli, dati (foglio live, ODS di riserva) e carrello (`cd_stripe_cart_v1`) del sito; il pagamento resta nel sito principale.
 
-- `game.js`: scena in `CFG` (mensole, dimensioni); le mensole dello sfondo sono a x 0.72–0.99; se i vasi superano i posti, la striscia `img/studio-shelf.png` si ripete a destra.
-- Foto dei vasi: pixelate nel browser (`pixelate()`), l'originale si vede con "Vedi foto originale".
+- Scena: due sfondi affiancati, studio (`img/studio-bg.png`) e salotto (`img/showroom-bg.png`). `scene.js` contiene le posizioni (frazioni dell'immagine) di ogni oggetto sulle superfici: mensole, divano, tavolini, poltrona, sedie, sgabello (vasi) e credenza (carte regalo).
+- Vasi: sprite pixel art `img/vases/<id>.png` (altezza proporzionale ai cm del foglio). Se manca lo sprite di un id (vaso nuovo nel foglio), compare un quadretto con la foto pixelata nello slot libero successivo. Carte regalo: busta `img/gift.png` con l'importo.
+- Clic su un oggetto: popup con le FOTO VERE (frecce, miniature, tastiera, swipe), prezzo, "Aggiungi al carrello" (stesso carrello del sito) e link al sito principale (`../#catalogue` o `../#giftcards`).
 - Vista elenco = alternativa senza movimento (accessibile da tastiera).
 
-## Immagini (Codex CLI, modello `gpt-5.6-terra`; `gpt-5.5` del config non e' accettato dall'account ChatGPT)
+## Immagini
+Tutti i prompt usati con Codex sono in `prompts/` (un file `<Nome>.prompt.md` per vaso, piu' Anna, studio, salotto e busta regalo), con modello, immagini di riferimento, comando e post-produzione.
+
+## Comando (Codex CLI, modello `gpt-5.6-terra`; `gpt-5.5` del config non e' accettato dall'account ChatGPT)
 ```
 codex exec -m gpt-5.6-terra --skip-git-repo-check -i foto1.png -i foto2.png - < prompt.txt
 ```

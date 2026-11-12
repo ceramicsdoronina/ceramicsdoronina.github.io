@@ -12,7 +12,7 @@ test("forestaDiAnna: noindex, and every referenced local file exists", () => {
   const refs = [...html.matchAll(/(?:src|href)="([^"#]+)"/g)].map((m) => m[1]).filter((s) => !/^https?:/.test(s) && s !== "../");
   assert.ok(refs.length >= 6);
   refs.forEach((r) => assert.ok(fs.existsSync(path.join(root, "forestaDiAnna", r)), r));
-  ["img/anna-walk.png", "img/studio-bg.png", "img/studio-shelf.png"].forEach((f) => assert.ok(fs.existsSync(path.join(root, "forestaDiAnna", f)), f));
+  ["img/anna-walk.png", "img/studio-bg.png", "img/showroom-bg.png", "img/gift.png", "img/vases/v1.png", "img/vases/v11.png"].forEach((f) => assert.ok(fs.existsSync(path.join(root, "forestaDiAnna", f)), f));
 });
 
 test("forestaDiAnna: not linked from any other page or partial", () => {
@@ -29,4 +29,14 @@ test("forestaDiAnna: uses the shared cart key and shop modules, never writes any
   assert.match(js, /CD\.liveCatalogue/);
   assert.doesNotMatch(js, /innerHTML/);
   new Function(js);   // sintassi valida
+});
+
+test("forestaDiAnna: popup shows the real photos with navigation and links to the main site", () => {
+  const html = read("forestaDiAnna/index.html"), js = read("forestaDiAnna/game.js");
+  ["pop-img", "pop-prev", "pop-next", "pop-thumbs", "pop-site"].forEach((id) => assert.match(html, new RegExp('id="' + id + '"'), id));
+  assert.match(js, /gotoPhoto/);
+  assert.match(js, /"\.\.\/#catalogue"/);
+  assert.match(js, /"\.\.\/#giftcards"/);
+  assert.doesNotMatch(js, /pixelate\([^)]*pop/, "popup never shows pixelated photos");
+  assert.ok(fs.existsSync(path.join(root, "forestaDiAnna/scene.js")));
 });

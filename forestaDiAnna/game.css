@@ -10,25 +10,25 @@ html,body{margin:0;height:100%;background:#1c1410;color:var(--cream);font-family
 .world{position:absolute;left:0;top:0;height:100%;will-change:transform;
   background:#6b4a30 url("img/studio-bg.png") left top/100% 100% no-repeat;image-rendering:pixelated}
 .shelves{position:absolute;inset:0}
-.ext{position:absolute;top:0;height:100%;background:url("img/studio-shelf.png") left top/auto 100% repeat-x;image-rendering:pixelated}
-.ext[hidden]{display:none}
+.room{position:absolute;top:0;height:100%;background:url("img/showroom-bg.png") left top/100% 100% no-repeat;image-rendering:pixelated}
 
 /* Anna */
 .anna{position:absolute;background:url("img/anna-walk.png") 0 0/400% 100% no-repeat;image-rendering:pixelated;
   transform-origin:50% 100%;pointer-events:none;z-index:3}
 .anna.left{transform:scaleX(-1)}
 
-/* quadretti dei vasi */
-.frame{position:absolute;z-index:2;padding:0;border:0;background:none;cursor:pointer;transform:translate(-50%,-50%);
-  font:inherit;color:inherit}
-.frame .art{display:block;width:100%;height:100%;border:4px solid var(--wood);background:var(--cream);
-  box-shadow:0 0 0 2px var(--ink),3px 4px 0 rgba(0,0,0,.35);image-rendering:pixelated;transition:transform .15s}
-.frame canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
-.frame:hover .art,.frame:focus-visible .art{transform:scale(1.08)}
-.frame:focus-visible{outline:3px solid var(--glow);outline-offset:4px}
-.frame.near .art{box-shadow:0 0 0 2px var(--ink),0 0 18px 6px var(--glow);animation:pulse 1.4s ease-in-out infinite}
-@keyframes pulse{50%{box-shadow:0 0 0 2px var(--ink),0 0 26px 10px var(--glow)}}
-@media (prefers-reduced-motion:reduce){.frame.near .art{animation:none}}
+/* oggetti in vendita: sprite appoggiati sulle superfici (ancora = centro-basso) */
+.prop{position:absolute;z-index:2;padding:0;border:0;background:none;cursor:pointer;transform:translate(-50%,-100%);font:inherit;color:inherit}
+.prop img.spr{display:block;height:100%;width:auto;image-rendering:pixelated;transition:transform .15s;transform-origin:50% 100%}
+.prop:hover img.spr,.prop:focus-visible img.spr{transform:scale(1.1)}
+.prop:focus-visible{outline:3px solid var(--glow);outline-offset:4px;border-radius:4px}
+.prop.near img.spr{filter:drop-shadow(0 0 4px var(--glow)) drop-shadow(0 0 10px var(--glow));animation:pulse 1.4s ease-in-out infinite}
+.prop .tag{position:absolute;left:50%;top:100%;transform:translate(-50%,2px);background:var(--ink);color:var(--glow);font-size:12px;line-height:1;padding:3px 5px;border-radius:3px;white-space:nowrap;border:1px solid var(--glow)}
+.prop .art{display:block;width:100%;height:100%;border:4px solid var(--wood);background:var(--cream);box-shadow:0 0 0 2px var(--ink),3px 4px 0 rgba(0,0,0,.35)}
+.prop canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+.prop.near .art{box-shadow:0 0 0 2px var(--ink),0 0 18px 6px var(--glow)}
+@keyframes pulse{50%{filter:drop-shadow(0 0 6px var(--glow)) drop-shadow(0 0 18px var(--glow))}}
+@media (prefers-reduced-motion:reduce){.prop.near img.spr{animation:none}}
 
 /* HUD */
 .hud{position:absolute;left:0;right:0;top:0;z-index:10;display:flex;gap:12px;align-items:center;justify-content:space-between;
@@ -55,7 +55,8 @@ html,body{margin:0;height:100%;background:#1c1410;color:var(--cream);font-family
 .list ul{list-style:none;margin:0 auto;padding:0;display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));max-width:980px}
 .list button{width:100%;text-align:left;font:inherit;color:var(--cream);background:#2b1a10;border:2px solid var(--wood);border-radius:8px;padding:8px;cursor:pointer}
 .list button:hover,.list button:focus-visible{border-color:var(--glow);outline:none}
-.list canvas{display:block;width:100%;aspect-ratio:1;image-rendering:pixelated;border:3px solid var(--wood);background:var(--cream);margin-bottom:6px}
+.list img{display:block;width:100%;aspect-ratio:1;object-fit:cover;border:3px solid var(--wood);background:var(--cream);margin-bottom:6px}
+.list h2{font-size:15px;margin:18px auto 8px;max-width:980px;color:var(--glow)}
 .list .nm{display:block;font-size:14px}.list .pr{display:block;font-size:13px;color:var(--glow)}
 
 /* popup */
@@ -65,8 +66,17 @@ html,body{margin:0;height:100%;background:#1c1410;color:var(--cream);font-family
 .popup[open]{display:flex;gap:16px;padding:16px;flex-wrap:wrap}
 .pop-close{position:absolute;right:8px;top:4px;border:0;background:none;font-size:30px;line-height:1;cursor:pointer;color:var(--ink)}
 .pop-photo{flex:0 0 200px;max-width:100%}
-.pop-photo canvas,.pop-photo img{display:block;width:200px;max-width:100%;aspect-ratio:1;object-fit:cover;image-rendering:pixelated;border:4px solid var(--wood);background:#fff}
-.pop-photo img{image-rendering:auto}
+.pop-photo img#pop-img{display:block;width:200px;max-width:100%;aspect-ratio:1;object-fit:cover;border:4px solid var(--wood);background:#fff}
+.pop-stage{position:relative;width:200px;max-width:100%;touch-action:pan-y}
+.pop-nav{position:absolute;top:50%;transform:translateY(-50%);width:32px;height:44px;border:2px solid var(--ink);background:rgba(243,230,211,.92);color:var(--ink);font-size:26px;line-height:1;cursor:pointer;padding:0}
+.pop-nav.prev{left:0;border-radius:0 6px 6px 0}.pop-nav.next{right:0;border-radius:6px 0 0 6px}
+.pop-nav:focus-visible{outline:3px solid var(--terra-d);outline-offset:1px}
+.pop-count{position:absolute;right:6px;bottom:6px;background:var(--ink);color:var(--cream);font-size:12px;padding:2px 6px;border-radius:3px}
+.pop-site{display:block;margin-top:8px;color:var(--ink);font-size:13px}
+.pop-thumbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.pop-thumbs button{padding:0;border:2px solid var(--wood);background:#fff;width:42px;height:42px;cursor:pointer}
+.pop-thumbs button[aria-current="true"]{border-color:var(--terra)}
+.pop-thumbs img{width:100%;height:100%;object-fit:cover;display:block}
 .pop-body{flex:1 1 220px;min-width:0}
 .pop-body h2{margin:0 24px 8px 0;font-size:20px}
 .pop-body p{margin:0 0 10px;line-height:1.4;font-size:14px}
@@ -89,5 +99,6 @@ html,body{margin:0;height:100%;background:#1c1410;color:var(--cream);font-family
   .popup{width:calc(100vw - 20px)}
   .popup[open]{padding:12px}
   .pop-photo{flex:0 0 100%}
-  .pop-photo canvas,.pop-photo img{width:100%}
+  .pop-photo img#pop-img{width:100%}
+  .pop-stage{width:100%}
 }

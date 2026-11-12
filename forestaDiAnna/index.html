@@ -31,7 +31,7 @@
 <body>
   <div id="game" class="game" aria-label="Studio di ceramica di Anna">
     <div id="world" class="world">
-      <div id="ext" class="ext" hidden></div>
+      <div id="room" class="room" hidden></div>
       <div id="shelves" class="shelves"></div>
       <div id="anna" class="anna" role="img" aria-label="Anna"></div>
     </div>
@@ -56,22 +56,30 @@
       <button id="pad-right" type="button" aria-label="→">▶</button>
     </div>
 
-    <section id="list" class="list" hidden aria-label="Elenco dei vasi"></section>
+    <section id="list" class="list" hidden aria-label="Elenco dei prodotti"></section>
   </div>
 
   <dialog id="popup" class="popup" aria-labelledby="pop-title">
     <button id="pop-close" class="pop-close" type="button" aria-label="Chiudi">×</button>
-    <div class="pop-photo"><canvas id="pop-canvas" width="96" height="96"></canvas><img id="pop-orig" alt="" hidden></div>
+    <div class="pop-photo">
+      <div class="pop-stage" id="pop-stage">
+        <img id="pop-img" alt="">
+        <button id="pop-prev" class="pop-nav prev" type="button">‹</button>
+        <button id="pop-next" class="pop-nav next" type="button">›</button>
+        <span id="pop-count" class="pop-count" aria-live="polite"></span>
+      </div>
+      <div id="pop-thumbs" class="pop-thumbs"></div>
+    </div>
     <div class="pop-body">
       <h2 id="pop-title"></h2>
       <p id="pop-text"></p>
       <p id="pop-price" class="pop-price"></p>
       <div class="pop-actions">
         <button id="pop-add" class="pop-btn primary" type="button"></button>
-        <button id="pop-orig-btn" class="pop-btn" type="button" aria-pressed="false"></button>
       </div>
       <p id="pop-msg" class="pop-msg" role="status" aria-live="polite"></p>
       <a id="pop-pay" class="pop-pay" href="../" hidden></a>
+      <a id="pop-site" class="pop-site" href="../"></a>
     </div>
   </dialog>
 
@@ -79,6 +87,7 @@
   <script src="../Stripe/js/money.js"></script>
   <script src="../Stripe/js/liveCatalogue.js"></script>
   <script src="../Stripe/js/cart.js"></script>
+  <script src="scene.js"></script>
   <script src="game.js"></script>
 </body>
 </html>
