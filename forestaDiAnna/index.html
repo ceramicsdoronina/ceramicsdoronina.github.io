@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>La foresta di Anna</title>
+  <meta name="description" content="Esplora lo studio di ceramica di Anna.">
+  <link rel="icon" href="../images/logo.png">
+  <link rel="stylesheet" href="game.css">
+
+  <!-- Configurazione client: stessi endpoint del sito principale -->
+  <script>
+    window.CD = window.CD || {};
+    window.CD.config = {
+      catalogueEndpoint: "https://ceramicsdoronina.netlify.app/.netlify/functions/catalogue"
+    };
+    // SheetJS (solo per leggere l'ODS di riserva), asincrono come in index.html
+    window.__xlsxReady = new Promise(function (resolve, reject) {
+      var timer = setTimeout(function () { reject(new Error("SheetJS: timeout 15 s")); }, 15000);
+      var s = document.createElement("script");
+      s.src = "https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js";
+      s.async = true;
+      s.onload = function () { clearTimeout(timer); typeof XLSX !== "undefined" ? resolve(XLSX) : reject(new Error("XLSX non definito")); };
+      s.onerror = function () { clearTimeout(timer); reject(new Error("SheetJS: caricamento fallito")); };
+      document.head.appendChild(s);
+    });
+    window.__xlsxReady.catch(function (err) { console.error("[SheetJS]", err.message); });
+  </script>
+</head>
+<body>
+  <div id="game" class="game" aria-label="Studio di ceramica di Anna">
+    <div id="world" class="world">
+      <div id="ext" class="ext" hidden></div>
+      <div id="shelves" class="shelves"></div>
+      <div id="anna" class="anna" role="img" aria-label="Anna"></div>
+    </div>
+
+    <header class="hud">
+      <a class="hud-back" href="../" data-i18n="back">← Torna al sito</a>
+      <h1 class="hud-title" data-i18n="title">La foresta di Anna</h1>
+      <div class="hud-right">
+        <button id="btn-list" class="hud-btn" type="button" aria-pressed="false" data-i18n="listView">Vista elenco</button>
+        <a id="btn-cart" class="hud-btn" href="../" data-i18n-aria="cartAria"><span aria-hidden="true">🛒</span> <span id="cart-count">0</span></a>
+        <select id="lang" class="hud-btn" aria-label="Lingua">
+          <option value="it">IT</option><option value="en">EN</option><option value="ru">RU</option>
+        </select>
+      </div>
+    </header>
+
+    <p id="hint" class="hint" data-i18n="hint">Muovi Anna con le frecce o toccando il pavimento. Cerca i quadretti che brillano.</p>
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+
+    <div id="pad" class="pad" aria-hidden="true">
+      <button id="pad-left" type="button" aria-label="←">◀</button>
+      <button id="pad-right" type="button" aria-label="→">▶</button>
+    </div>
+
+    <section id="list" class="list" hidden aria-label="Elenco dei vasi"></section>
+  </div>
+
+  <dialog id="popup" class="popup" aria-labelledby="pop-title">
+    <button id="pop-close" class="pop-close" type="button" aria-label="Chiudi">×</button>
+    <div class="pop-photo"><canvas id="pop-canvas" width="96" height="96"></canvas><img id="pop-orig" alt="" hidden></div>
+    <div class="pop-body">
+      <h2 id="pop-title"></h2>
+      <p id="pop-text"></p>
+      <p id="pop-price" class="pop-price"></p>
+      <div class="pop-actions">
+        <button id="pop-add" class="pop-btn primary" type="button"></button>
+        <button id="pop-orig-btn" class="pop-btn" type="button" aria-pressed="false"></button>
+      </div>
+      <p id="pop-msg" class="pop-msg" role="status" aria-live="polite"></p>
+      <a id="pop-pay" class="pop-pay" href="../" hidden></a>
+    </div>
+  </dialog>
+
+  <script src="../Stripe/js/util.js"></script>
+  <script src="../Stripe/js/money.js"></script>
+  <script src="../Stripe/js/liveCatalogue.js"></script>
+  <script src="../Stripe/js/cart.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
