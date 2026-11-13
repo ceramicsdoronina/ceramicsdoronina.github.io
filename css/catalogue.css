@@ -13,8 +13,13 @@
   max-width:100%;
   text-align:left;           /* ← non più a destra */
   color:var(--muted);
-  font-size:15px;
-  line-height:1.5;
+  font-size:1em;             /* stessa dimensione dei paragrafi di presentazione (about) */
+  line-height:inherit;
+}
+/* piu' specifico delle regole .lead di mobile.css: il testo del catalogo resta uguale ai paragrafi about */
+body .catalogue-header p.lead{
+  font-size:1em !important;
+  line-height:inherit !important;
 }
 
 .catalogue-header h3{

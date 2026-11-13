@@ -192,3 +192,16 @@ test("buttons never fall back to the system blue (menu, modal close, cart close)
   assert.match(read("css/components.css"), /\.cart-drawer__close\{[^}]*color:var\(--text\)/);
   assert.match(read("css/mobile.css"), /#nav-toggle\{[^}]*color:var\(--text\)/);
 });
+
+test("css: no stray text outside rules (it silently drops the next rule) and the text-lowering rule is parsed", () => {
+  const fs2 = require("node:fs");
+  ["base", "layout", "components", "catalogue", "pages", "mobile"].forEach((n) => {
+    const css = read("css/" + n + ".css").replace(/\/\*[\s\S]*?\*\//g, "").replace(/"[^"]*"|'[^']*'/g, '""');
+    assert.doesNotMatch(css, /[Ѐ-ӿ]/, n + ".css contains stray Cyrillic text");
+    // fuori dai blocchi non ci possono essere parole isolate seguite da una riga vuota e da un altro blocco
+    assert.doesNotMatch(css, /\}\s*\n\s*[A-Za-zÀ-ɏ]+\s*\n\s*\n\s*(@media|[.#a-z])/, n + ".css has a bare word between rules");
+    assert.equal((css.match(/\{/g) || []).length, (css.match(/\}/g) || []).length, n + ".css has unbalanced braces");
+  });
+  assert.match(read("css/pages.css"), /@media \(min-width: 769px\)\{\s*\.giftcards-text, \.workshops-text\{ padding-top:56px; \}/);
+  assert.match(read("css/catalogue.css"), /body \.catalogue-header p\.lead\{\s*font-size:1em !important;/);
+});

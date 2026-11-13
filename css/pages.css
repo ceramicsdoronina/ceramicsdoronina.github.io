@@ -358,8 +358,6 @@
   color:var(--muted);
 }
 
-Удалить
-
 /* workshop e gift card: testo un po' più in basso rispetto alla foto (desktop) */
 @media (min-width: 769px){
   .giftcards-text, .workshops-text{ padding-top:56px; }
