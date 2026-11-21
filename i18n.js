@@ -89,19 +89,22 @@
     }
     const list = document.getElementById("language-list");
     if (!list) return;
-    let idx = 0;
+    const menu = document.getElementById("lang-menu") || btn.parentElement;
+    let idx = 0, byHover = false, hoverTimer = null;
 
     function focusOption() {
       const opts = langOptions();
       opts.forEach((o, i) => { o.tabIndex = i === idx ? 0 : -1; });
       if (opts[idx]) { opts[idx].focus(); list.setAttribute("aria-activedescendant", opts[idx].id); }
     }
-    function open() {
+    function open() {   // da clic o tastiera: il focus passa sulla voce corrente
+      byHover = false;
       list.hidden = false; btn.setAttribute("aria-expanded", "true");
       idx = Math.max(0, langOptions().findIndex((o) => o.dataset.lang === currentLang));
       focusOption();
     }
     function close(returnFocus) {
+      byHover = false;
       list.hidden = true; btn.setAttribute("aria-expanded", "false");
       list.removeAttribute("aria-activedescendant");
       if (returnFocus) btn.focus();
@@ -111,7 +114,24 @@
       close(true);
     }
 
-    btn.addEventListener("click", () => { if (list.hidden) open(); else close(false); });
+    // mouse: il menu si apre appena il puntatore e' sulla lingua e si chiude quando esce (solo dispositivi con hover)
+    const canHover = !!(window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches);
+    if (canHover) {
+      menu.addEventListener("mouseenter", () => {
+        clearTimeout(hoverTimer);
+        if (list.hidden) { byHover = true; list.hidden = false; btn.setAttribute("aria-expanded", "true"); }
+      });
+      menu.addEventListener("mouseleave", () => {
+        clearTimeout(hoverTimer);
+        hoverTimer = setTimeout(() => { if (!list.hidden && byHover) close(false); }, 180);
+      });
+    }
+
+    btn.addEventListener("click", () => {
+      if (list.hidden) open();
+      else if (byHover) { /* gia' aperto dal mouse: il clic non lo chiude, si chiudera' quando il mouse esce */ }
+      else close(false);
+    });
     btn.addEventListener("keydown", (e) => {
       if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); if (list.hidden) open(); }
     });

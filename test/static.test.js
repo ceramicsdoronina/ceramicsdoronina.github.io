@@ -220,3 +220,11 @@ test("language selector: plain code + small dropdown, no select box, no flags, n
   ["bindLangMenu", "syncLangMenu", "ArrowDown", "Escape"].forEach((k) => assert.ok(js.includes(k), k));
   assert.match(read("messages.js"), /language: "Lingua"/);
 });
+
+test("language menu opens on mouse hover (hover devices only) and keeps a hover bridge", () => {
+  const js = read("i18n.js");
+  assert.match(js, /\(hover: hover\) and \(pointer: fine\)/);
+  assert.match(js, /addEventListener\("mouseenter"/);
+  assert.match(js, /addEventListener\("mouseleave"/);
+  assert.match(read("css/components.css"), /\.lang-list::before\{/);
+});
