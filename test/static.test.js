@@ -262,3 +262,17 @@ test("text is Manrope (small, like the about paragraphs), titles keep the displa
   assert.match(cat, /\.card:hover h4\{ color:var\(--hover-red\); \}/);
   assert.match(cat, /prefers-reduced-motion:reduce[\s\S]*\.card:hover\{ transform:none; \}/);
 });
+
+test("header without separator line, no outline on cart and menu buttons, short arrowless pill buttons", () => {
+  const comp = read("css/components.css"), mob = read("css/mobile.css");
+  const header = comp.match(/\nheader\{[^}]*\}/)[0];
+  assert.doesNotMatch(header, /border-bottom/);
+  (mob.match(/header\{[^}]*\}/g) || []).forEach((r) => assert.doesNotMatch(r, /border-bottom/, r.slice(0, 60)));
+  assert.match(comp, /\.nav-icon-btn\{[^}]*border:0;/);
+  const toggles = mob.match(/#nav-toggle\{[^}]*display:inline-flex[^}]*\}/g) || [];
+  assert.equal(toggles.length, 2, "mobile-view and media-query hamburger rules");
+  toggles.forEach((r) => { assert.match(r, /border:0;/); assert.match(r, /background:transparent;/); });
+  assert.match(comp, /\.pill-arrow\{ display:none; \}/);
+  assert.match(comp, /\.pill-btn\{\s*width:auto;\s*min-width:190px;/);
+  assert.match(comp, /\.about-cta\{[^}]*align-items:flex-start;/);
+});

@@ -49,7 +49,6 @@ body.mobile-view header{
   z-index:2000;
   background:rgba(255,255,255,.95);
   backdrop-filter:saturate(180%) blur(14px);
-  border-bottom:1px solid var(--border);
 }
 
 body.mobile-view main{
@@ -76,9 +75,9 @@ body.mobile-view #nav-toggle{
   width:36px;
   height:36px;
   border-radius:8px;
-  border:1px solid var(--border);
-  background:#fff;
-  font-size:20px;
+  border:0;                  /* niente contorno attorno al menu */
+  background:transparent;
+  font-size:22px;
   padding:0;
   cursor:pointer;
 }
@@ -181,9 +180,9 @@ body.mobile-view .catalogue-grid{
     width:36px;
     height:36px;
     border-radius:8px;
-    border:1px solid var(--border);
-    background:#fff;
-    font-size:20px;
+    border:0;                /* niente contorno attorno al menu */
+    background:transparent;
+    font-size:22px;
     padding:0;
     cursor:pointer;
   }
@@ -195,7 +194,6 @@ body.mobile-view .catalogue-grid{
     z-index:2000;
     background:rgba(255,255,255,.95);
     backdrop-filter:saturate(180%) blur(14px);
-    border-bottom:1px solid var(--border);
   }
 
   main{ padding-top:72px; }
