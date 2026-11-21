@@ -48,6 +48,7 @@ body .catalogue-header p.lead{
   display:flex;
   flex-direction:column;
   background:#ffffff;
+  box-shadow:0 4px 14px rgba(0,0,0,.07);   /* ombra leggera sempre presente; al passaggio del mouse aumenta */
 }
 
 /* passaggio del mouse (solo dispositivi con mouse): la card si ingrandisce un poco e il titolo diventa rosso */

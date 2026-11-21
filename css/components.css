@@ -70,7 +70,9 @@ nav a:hover{
 .about-cta{
   display:flex;
   flex-direction:column;
-  align-items:flex-start;   /* pulsanti corti, non a tutta larghezza */
+  align-items:stretch;      /* i tre pulsanti hanno la stessa larghezza: quella del piu' lungo */
+  width:fit-content;
+  max-width:100%;
   gap:16px;
   margin:24px 0 4px;
 }

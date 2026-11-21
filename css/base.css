@@ -49,7 +49,7 @@ html,body{
 :root{
   --font-text:"Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --font-display:"Noto Serif Display", serif;
-  --hover-red:#c8302f;   /* titolo di una card al passaggio del mouse */
+  --hover-red:var(--btn-primary);   /* titolo di una card al passaggio del mouse: stesso bordeaux del pulsante Compra */
 }
 
 body{

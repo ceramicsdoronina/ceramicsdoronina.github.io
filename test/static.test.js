@@ -274,5 +274,12 @@ test("header without separator line, no outline on cart and menu buttons, short 
   toggles.forEach((r) => { assert.match(r, /border:0;/); assert.match(r, /background:transparent;/); });
   assert.match(comp, /\.pill-arrow\{ display:none; \}/);
   assert.match(comp, /\.pill-btn\{\s*width:auto;\s*min-width:190px;/);
-  assert.match(comp, /\.about-cta\{[^}]*align-items:flex-start;/);
+  assert.match(comp, /\.about-cta\{[^}]*align-items:stretch;[^}]*width:fit-content;/);
+});
+
+test("cards: always a light shadow, hover title uses the same dark red as the buy button", () => {
+  const cat = read("css/catalogue.css");
+  assert.match(cat, /\.card\{[^}]*box-shadow:0 4px 14px rgba\(0,0,0,\.07\);/);
+  assert.match(read("css/base.css"), /--hover-red:var\(--btn-primary\);/);
+  assert.match(cat, /\.card-btn\.primary\{[^}]*background:var\(--btn-primary\)/);
 });
