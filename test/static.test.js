@@ -279,7 +279,7 @@ test("header without separator line, no outline on cart and menu buttons, short 
 
 test("cards: always a light shadow, hover title uses the same dark red as the buy button", () => {
   const cat = read("css/catalogue.css");
-  assert.match(cat, /\.card\{[^}]*box-shadow:0 4px 14px rgba\(0,0,0,\.07\);/);
+  assert.match(cat, /\.card\{[^}]*box-shadow:0 5px 18px rgba\(0,0,0,\.10\);/);
   assert.match(read("css/base.css"), /--hover-red:var\(--btn-primary\);/);
   assert.match(cat, /\.card-btn\.primary\{[^}]*background:var\(--btn-primary\)/);
 });
@@ -291,4 +291,12 @@ test("card photo zooms 3% on hover inside its clipping frame, with a transition 
   assert.match(cat, /\.media-carousel\{[^}]*overflow:hidden;/);
   assert.match(cat, /\.media-single\{[^}]*overflow:hidden;/);
   assert.match(cat, /prefers-reduced-motion:reduce[\s\S]*\.card:hover \.card-img, \.card:hover \.media-single img\{ transform:none; \}/);
+});
+
+test("price and discount use the same burgundy as the buy/details buttons; shadows slightly stronger", () => {
+  const cat = read("css/catalogue.css");
+  ["price-current", "price-discount", "vase-price", "vase-discount"].forEach((c) =>
+    assert.match(cat, new RegExp("\\." + c + "\\{[^}]*color:var\\(--btn-primary\\)"), c));
+  assert.doesNotMatch(cat, /#b91c1c/);
+  assert.match(cat, /\.card:hover\{[^}]*box-shadow:0 12px 32px rgba\(0,0,0,\.16\)/);
 });

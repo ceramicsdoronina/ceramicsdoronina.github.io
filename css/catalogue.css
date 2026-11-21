@@ -48,7 +48,7 @@ body .catalogue-header p.lead{
   display:flex;
   flex-direction:column;
   background:#ffffff;
-  box-shadow:0 4px 14px rgba(0,0,0,.07);   /* ombra leggera sempre presente; al passaggio del mouse aumenta */
+  box-shadow:0 5px 18px rgba(0,0,0,.10);   /* ombra sempre presente; al passaggio del mouse aumenta */
 }
 
 /* passaggio del mouse (solo dispositivi con mouse): la card si ingrandisce un poco e il titolo diventa rosso */
@@ -63,7 +63,7 @@ body .catalogue-header p.lead{
   .card:hover{
     transform:scale(1.03);
     z-index:2;
-    box-shadow:0 10px 28px rgba(0,0,0,.12);
+    box-shadow:0 12px 32px rgba(0,0,0,.16);
   }
   .card:hover h4{ color:var(--hover-red); }
 }
@@ -110,7 +110,7 @@ body .catalogue-header p.lead{
 .price-current{
   font-size:16px;
   font-weight:600;
-  color:#b91c1c;
+  color:var(--btn-primary);   /* stesso bordeaux dei pulsanti Compra e Dettagli */
 }
 .price-old{
   font-size:16px;
@@ -119,7 +119,7 @@ body .catalogue-header p.lead{
 }
 .price-discount{
   font-size:14px;
-  color:#b91c1c;
+  color:var(--btn-primary);
 }
 
 /* stato venduto */
@@ -247,15 +247,15 @@ body .catalogue-header p.lead{
 .vase-price{
   font-size:26px;
   font-weight:700;
-  color:#b91c1c;
+  color:var(--btn-primary);
 }
 .vase-old-price{
   text-decoration:line-through;
   color:var(--muted);
 }
 .vase-discount{
-  background:#fee2e2;
-  color:#b91c1c;
+  background:rgba(125,15,15,.08);
+  color:var(--btn-primary);
   padding:4px 6px;
   border-radius:6px;
   font-size:13px;
