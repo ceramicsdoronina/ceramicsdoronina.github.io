@@ -283,3 +283,12 @@ test("cards: always a light shadow, hover title uses the same dark red as the bu
   assert.match(read("css/base.css"), /--hover-red:var\(--btn-primary\);/);
   assert.match(cat, /\.card-btn\.primary\{[^}]*background:var\(--btn-primary\)/);
 });
+
+test("card photo zooms 3% on hover inside its clipping frame, with a transition that wins over the base rule", () => {
+  const cat = read("css/catalogue.css");
+  assert.match(cat, /\.card:hover \.card-img,\s*\.card:hover \.media-single img\{ transform:scale\(1\.03\); \}/);
+  assert.match(cat, /\.card \.card-img\{ transition:opacity \.2s ease, transform \.35s ease; \}/);
+  assert.match(cat, /\.media-carousel\{[^}]*overflow:hidden;/);
+  assert.match(cat, /\.media-single\{[^}]*overflow:hidden;/);
+  assert.match(cat, /prefers-reduced-motion:reduce[\s\S]*\.card:hover \.card-img, \.card:hover \.media-single img\{ transform:none; \}/);
+});

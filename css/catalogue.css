@@ -55,6 +55,11 @@ body .catalogue-header p.lead{
 @media (hover:hover) and (pointer:fine){
   .card{ transition:transform .25s ease, box-shadow .25s ease; }
   .card h4{ transition:color .2s ease; }
+  /* la foto ha un piccolo zoom (3%) dentro il suo riquadro, che nasconde cio' che esce */
+  .card .card-img{ transition:opacity .2s ease, transform .35s ease; }
+  .card .media-single img{ transition:transform .35s ease; }
+  .card:hover .card-img,
+  .card:hover .media-single img{ transform:scale(1.03); }
   .card:hover{
     transform:scale(1.03);
     z-index:2;
@@ -63,8 +68,9 @@ body .catalogue-header p.lead{
   .card:hover h4{ color:var(--hover-red); }
 }
 @media (prefers-reduced-motion:reduce){
-  .card, .card h4{ transition:none; }
+  .card, .card h4, .card .card-img, .card .media-single img{ transition:none; }
   .card:hover{ transform:none; }
+  .card:hover .card-img, .card:hover .media-single img{ transform:none; }
 }
 
 /* PORTRAIT nelle card */
