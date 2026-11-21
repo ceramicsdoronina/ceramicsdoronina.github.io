@@ -21,6 +21,12 @@ body .catalogue-header p.lead{
   font-size:1em !important;
   line-height:inherit !important;
 }
+/* sottotitoli delle sezioni: sans geometrico (Manrope), come il sottotitolo iniziale */
+.catalogue-header .lead{
+  font-family:"Manrope", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-weight:500;
+  letter-spacing:.01em;
+}
 
 .catalogue-header h3{
   margin:0;

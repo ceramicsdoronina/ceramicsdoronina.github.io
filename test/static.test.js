@@ -228,3 +228,27 @@ test("language menu opens on mouse hover (hover devices only) and keeps a hover 
   assert.match(js, /addEventListener\("mouseleave"/);
   assert.match(read("css/components.css"), /\.lang-list::before\{/);
 });
+
+test("hero tagline uses self-hosted Manrope (no request to Google Fonts)", () => {
+  ["fonts/manrope-cyrillic.woff2", "fonts/manrope-latin.woff2", "fonts/README.txt"].forEach((f) => assert.ok(fs.existsSync(path.join(__dirname, "..", f)), f));
+  const base = read("css/base.css");
+  assert.match(base, /font-family:"Manrope";[\s\S]*manrope-cyrillic\.woff2/);
+  assert.match(base, /manrope-latin\.woff2/);
+  assert.match(read("css/pages.css"), /\.hero-tagline\{[^}]*font-family:"Manrope"/);
+  assert.doesNotMatch(read("index.html"), /fonts\.googleapis|fonts\.gstatic/);
+});
+
+test("language dropdown is centred under the chosen language and white like the bar; Manrope only on subtitles", () => {
+  const css = read("css/components.css");
+  const list = css.match(/\.lang-list\{[^}]*\}/)[0];
+  assert.match(list, /left:50%/);
+  assert.match(list, /translateX\(-50%\)/);
+  assert.match(list, /background:#fff/);
+  assert.match(read("css/catalogue.css"), /\.catalogue-header \.lead\{[^}]*font-family:"Manrope"/);
+  // nessun altro uso di Manrope oltre a hero-tagline e sottotitoli di sezione
+  ["base", "layout", "components", "mobile", "pages", "catalogue"].forEach((n) => {
+    const s = read("css/" + n + ".css").replace(/@font-face\{[^}]*\}/g, "");
+    const uses = (s.match(/[^{}]+\{[^}]*Manrope[^}]*\}/g) || []).map((x) => x.split("{")[0].trim());
+    uses.forEach((sel) => assert.match(sel, /hero-tagline|catalogue-header \.lead/, n + ".css: " + sel));
+  });
+});

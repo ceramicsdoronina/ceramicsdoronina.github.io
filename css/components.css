@@ -315,14 +315,15 @@ footer{
 .lang-btn:focus-visible{ outline:2px solid var(--btn-primary); outline-offset:2px; border-radius:4px; }
 .lang-list{
   position:absolute;
-  right:0;
+  left:50%;
+  transform:translateX(-50%);   /* centrato sotto la lingua scelta: stesso asse del testo */
   top:calc(100% + 8px);
   min-width:84px;
   margin:0;
   padding:6px;
   list-style:none;
-  background:#faf8f5;
-  border:1px solid #ddd8d0;
+  background:#fff;              /* stesso bianco della barra */
+  border:1px solid var(--border);
   border-radius:2px;
   box-shadow:0 8px 22px rgba(0,0,0,.08);
   z-index:2100;
@@ -341,6 +342,6 @@ footer{
   -webkit-tap-highlight-color:transparent;
 }
 .lang-list li:hover,
-.lang-list li:focus{ background:#f1eee9; outline:none; }
-.lang-list li[aria-selected="true"]{ background:#f1eee9; }
+.lang-list li:focus{ background:rgba(0,0,0,.05); outline:none; }
+.lang-list li[aria-selected="true"]{ background:rgba(0,0,0,.05); }
 .lang-list li:focus-visible{ outline:2px solid var(--btn-primary); outline-offset:-2px; }
