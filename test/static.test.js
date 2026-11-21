@@ -238,17 +238,27 @@ test("hero tagline uses self-hosted Manrope (no request to Google Fonts)", () =>
   assert.doesNotMatch(read("index.html"), /fonts\.googleapis|fonts\.gstatic/);
 });
 
-test("language dropdown is centred under the chosen language and white like the bar; Manrope only on subtitles", () => {
+test("language dropdown is centred under the chosen language and white like the bar", () => {
   const css = read("css/components.css");
   const list = css.match(/\.lang-list\{[^}]*\}/)[0];
   assert.match(list, /left:50%/);
   assert.match(list, /translateX\(-50%\)/);
   assert.match(list, /background:#fff/);
   assert.match(read("css/catalogue.css"), /\.catalogue-header \.lead\{[^}]*font-family:"Manrope"/);
-  // nessun altro uso di Manrope oltre a hero-tagline e sottotitoli di sezione
-  ["base", "layout", "components", "mobile", "pages", "catalogue"].forEach((n) => {
-    const s = read("css/" + n + ".css").replace(/@font-face\{[^}]*\}/g, "");
-    const uses = (s.match(/[^{}]+\{[^}]*Manrope[^}]*\}/g) || []).map((x) => x.split("{")[0].trim());
-    uses.forEach((sel) => assert.match(sel, /hero-tagline|catalogue-header \.lead/, n + ".css: " + sel));
-  });
+});
+
+test("text is Manrope (small, like the about paragraphs), titles keep the display serif, cards react on hover", () => {
+  const base = read("css/base.css");
+  assert.match(base, /--font-text:"Manrope"/);
+  assert.match(base, /body\{\s*font-family:var\(--font-text\);/);
+  assert.match(base, /button, input, select, textarea\{\s*font-family:inherit;/);
+  assert.match(base, /h1, h2, h3, h4, h5, h6 \{\s*font-family:var\(--font-display\);/);
+  // nessun testo corrente sopra i 16 px (restano titoli, icone e simboli)
+  assert.doesNotMatch(read("css/components.css"), /\.pill-text\{font-size:20px/);
+  assert.match(read("css/pages.css"), /\.hero-tagline\{[^}]*font-size:16px/);
+  assert.match(read("css/catalogue.css"), /\.price-current\{\s*font-size:16px/);
+  const cat = read("css/catalogue.css");
+  assert.match(cat, /@media \(hover:hover\) and \(pointer:fine\)\{[\s\S]*\.card:hover\{[^}]*transform:scale\(1\.03\)/);
+  assert.match(cat, /\.card:hover h4\{ color:var\(--hover-red\); \}/);
+  assert.match(cat, /prefers-reduced-motion:reduce[\s\S]*\.card:hover\{ transform:none; \}/);
 });
