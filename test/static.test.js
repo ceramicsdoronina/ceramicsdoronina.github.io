@@ -205,3 +205,18 @@ test("css: no stray text outside rules (it silently drops the next rule) and the
   assert.match(read("css/pages.css"), /@media \(min-width: 769px\)\{\s*\.giftcards-text, \.workshops-text\{ padding-top:56px; \}/);
   assert.match(read("css/catalogue.css"), /body \.catalogue-header p\.lead\{\s*font-size:1em !important;/);
 });
+
+test("language selector: plain code + small dropdown, no select box, no flags, no border on the trigger", () => {
+  const nav = read("Stripe/partials/navbar.html");
+  assert.doesNotMatch(nav, /<select/);
+  assert.doesNotMatch(nav, /[\u{1F1E6}-\u{1F1FF}]/u, "no flag emoji");
+  assert.match(nav, /id="language-selector"[^>]*aria-haspopup="listbox"[^>]*aria-expanded="false"/);
+  ["ru", "it", "en"].forEach((l) => assert.match(nav, new RegExp('role="option" id="lang-opt-' + l + '" data-lang="' + l + '"')));
+  const css = read("css/components.css");
+  assert.match(css, /\.lang-btn\{[^}]*border:0;/);
+  assert.match(css, /\.lang-list\{/);
+  assert.doesNotMatch(css, /\.lang select/);
+  const js = read("i18n.js");
+  ["bindLangMenu", "syncLangMenu", "ArrowDown", "Escape"].forEach((k) => assert.ok(js.includes(k), k));
+  assert.match(read("messages.js"), /language: "Lingua"/);
+});

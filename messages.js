@@ -12,6 +12,7 @@ const messages = {
       giftcards: "Подарочные сертификаты",
       contact: "Контакты",
       menu: "Открыть/закрыть меню",
+      language: "Язык",
       primary: "Основная навигация"
     },
     hero: {
@@ -181,6 +182,7 @@ const messages = {
       giftcards: "Carte Regalo",
       contact: "Contatti",
       menu: "Apri/chiudi menu",
+      language: "Lingua",
       primary: "Navigazione principale"
     },
     hero: {
@@ -351,6 +353,7 @@ const messages = {
       giftcards: "Gift Cards",
       contact: "Contact",
       menu: "Open/close menu",
+      language: "Language",
       primary: "Primary navigation"
     },
     hero: {

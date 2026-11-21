@@ -66,15 +66,6 @@ nav a:hover{
   border-bottom:1px solid var(--text);
 }
 
-.lang select{
-  border:1px solid var(--border);
-  background:#fafafa;
-  border-radius:999px;
-  padding:6px 10px;
-  font-size:14px;
-  font-family:"Noto Serif Display", serif;
-}
-
 /* CTA pill */
 .about-cta{
   display:flex;
@@ -270,25 +261,8 @@ footer{
   color:#444;
 }
 
-/* Language selector – same style as nav text */
-.lang select{
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-  color: var(--text);          /* stesso grigio del testo */
-  background: transparent;
-  border: none;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
-
-  /* rimuove stile browser */
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-}
-
 .lang{
+  position:relative;
   margin-right:6px;
 }
 
@@ -324,7 +298,47 @@ footer{
 .pill-btn.workshops-cta .pill-arrow,
 .pill-btn.giftcards-cta .pill-arrow{ display:none; }
 
-/* selettore lingua: niente anello blu del browser al click; focus da tastiera in bordeaux */
-.lang select:focus{ outline:none; box-shadow:none; }
-.lang select:focus-visible{ outline:2px solid var(--btn-primary); outline-offset:3px; border-radius:999px; }
-.lang select{ -webkit-tap-highlight-color:transparent; }
+/* selettore lingua: solo il codice ("RU"), niente cornice ne' bandiera; il menu si apre in un piccolo pannello */
+.lang-btn{
+  background:none;
+  border:0;
+  padding:6px 8px;
+  margin:0;
+  font:inherit;
+  font-size:15px;
+  letter-spacing:.04em;
+  color:var(--text);
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.lang-btn:focus{ outline:none; }
+.lang-btn:focus-visible{ outline:2px solid var(--btn-primary); outline-offset:2px; border-radius:4px; }
+.lang-list{
+  position:absolute;
+  right:0;
+  top:calc(100% + 8px);
+  min-width:84px;
+  margin:0;
+  padding:6px;
+  list-style:none;
+  background:#faf8f5;
+  border:1px solid #ddd8d0;
+  border-radius:2px;
+  box-shadow:0 8px 22px rgba(0,0,0,.08);
+  z-index:2100;
+}
+.lang-list[hidden]{ display:none; }
+.lang-list li{
+  padding:10px 18px;
+  text-align:center;
+  font-size:15px;
+  letter-spacing:.04em;
+  color:var(--text);
+  border-radius:8px;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.lang-list li:hover,
+.lang-list li:focus{ background:#f1eee9; outline:none; }
+.lang-list li[aria-selected="true"]{ background:#f1eee9; }
+.lang-list li:focus-visible{ outline:2px solid var(--btn-primary); outline-offset:-2px; }

@@ -21,12 +21,15 @@
       <img src="images/shopping.svg" alt="">
     </button>
 
-    <div class="lang">
-      <select id="language-selector">
-        <option value="ru">🇷🇺 RU</option>
-        <option value="it">🇮🇹 IT</option>
-        <option value="en">🇬🇧 EN</option>
-      </select>
+    <div class="lang" id="lang-menu">
+      <button type="button" id="language-selector" class="lang-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="language-list" data-i18n-aria-label="nav.language" aria-label="Language">
+        <span id="language-current">RU</span>
+      </button>
+      <ul id="language-list" class="lang-list" role="listbox" aria-labelledby="language-selector" hidden>
+        <li role="option" id="lang-opt-ru" data-lang="ru" tabindex="-1">RU</li>
+        <li role="option" id="lang-opt-it" data-lang="it" tabindex="-1">IT</li>
+        <li role="option" id="lang-opt-en" data-lang="en" tabindex="-1">EN</li>
+      </ul>
     </div>
 
     <button class="nav-toggle-btn" id="nav-toggle" data-i18n-aria-label="nav.menu" aria-label="Apri/chiudi menu">
