@@ -325,3 +325,10 @@ test("cart icon enlarges slightly on hover (mouse devices only)", () => {
   assert.match(css, /\(hover:hover\) and \(pointer:fine\)\{\s*\.nav-icon-btn img\{ transition:transform/);
   assert.match(css, /\.nav-icon-btn:hover img,\s*\.nav-icon-btn:focus-visible img\{ transform:scale\(1\.15\)/);
 });
+
+test("contact map points at no. 17 RED (17R), by coordinates, not at the black 17", () => {
+  const html = read("Stripe/partials/contact.html");
+  const src = html.match(/<iframe\s+src="([^"]+)"/)[1];
+  assert.match(src, /q=44\.4059252,8\.9318800/);
+  assert.doesNotMatch(src, /17r%2C/i, "no more address-text query that Google resolves to the black 17");
+});
