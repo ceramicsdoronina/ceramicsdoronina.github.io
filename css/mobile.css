@@ -52,7 +52,7 @@ body.mobile-view header{
 }
 
 body.mobile-view main{
-  padding-top:72px; /* coerente con header */
+  padding-top:var(--header-h); /* coerente con header */
 }
 
 /* HERO: evita che DORONINA esca dai bordi su Safari iPhone */
@@ -196,7 +196,7 @@ body.mobile-view .catalogue-grid{
     backdrop-filter:saturate(180%) blur(14px);
   }
 
-  main{ padding-top:72px; }
+  main{ padding-top:var(--header-h); }
 
   /* menu dropdown */
   nav ul{

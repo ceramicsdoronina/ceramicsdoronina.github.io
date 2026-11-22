@@ -46,11 +46,11 @@ main{ padding-top:var(--header-h); }   /* spazio per la barra fissa */
 
 .brand-img{
   display:block;
-  height:44px;              /* logo Doronina (script + Interior Ceramics), ritagliato senza margini */
+  height:60px;              /* logo Doronina (script + Interior Ceramics), ritagliato senza margini */
   width:auto;
   object-fit:contain;
 }
-@media (max-width:768px){ .brand-img{ height:38px; } }
+@media (max-width:768px){ .brand-img{ height:50px; } }
 
 nav ul{
   display:flex;
