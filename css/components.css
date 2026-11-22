@@ -97,9 +97,11 @@ nav a:hover{
   min-width:190px;          /* pulsante corto, senza freccia */
   justify-content:center;
   padding:10px 28px;
-  border:1px solid var(--text);
-  border-radius:999px;
+  /* stesso stile del pulsante "Dettagli" (card-btn secondary): contorno e testo bordeaux, angoli 12px, al passaggio sfondo rosato */
+  border:1px solid var(--btn-primary);
+  border-radius:12px;
   background:#fff;
+  color:var(--btn-primary);
   cursor:pointer;
 
   display:flex;
@@ -107,16 +109,16 @@ nav a:hover{
   gap:12px;
 
   font-size:16px;
+  text-decoration:none;
 
-  box-shadow:0 4px 12px rgba(0,0,0,.06);
+  box-shadow:none;
   transition:.2s ease-in-out;
 }
 .pill-btn:hover{
-  box-shadow:0 6px 18px rgba(0,0,0,.12);
-  background:#fdfdfd;
+  background:#fef2f2;
 }
 
-.pill-text{font-size:16px;}
+.pill-text{font-size:16px;color:inherit;}
 
 /* niente frecce nei pulsanti */
 .pill-arrow{ display:none; }

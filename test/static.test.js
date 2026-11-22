@@ -309,3 +309,13 @@ test("desktop nav: hovered/current item turns burgundy (no pill, no underline), 
   assert.match(read("Stripe/js/uiStripe.js"), /function initNavScrollSpy/);
   assert.match(read("Stripe/js/appStripe.js"), /initNavScrollSpy/);
 });
+
+test("pill buttons share the Dettagli/Compra look: 12px radius, burgundy outline, pink hover", () => {
+  const css = read("css/components.css");
+  const pill = css.match(/\.pill-btn\{[^}]*\}/)[0];
+  assert.match(pill, /border:1px solid var\(--btn-primary\)/);
+  assert.match(pill, /border-radius:12px/);
+  assert.match(pill, /color:var\(--btn-primary\)/);
+  assert.doesNotMatch(pill, /999px/);
+  assert.match(css, /\.pill-btn:hover\{\s*background:#fef2f2;/);
+});
