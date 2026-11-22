@@ -724,12 +724,45 @@
     startPendingWatch();
   }
 
+  // voce di menu della sezione visibile: classe is-current (evidenziata su desktop)
+  function initNavScrollSpy() {
+    if (typeof window === "undefined") return;
+    if (document.body.dataset.navSpy === "1") return;
+    document.body.dataset.navSpy = "1";
+
+    function update() {
+      // barra e sezioni vengono caricate come partial: le cerco a ogni aggiornamento
+      const links = Array.from(document.querySelectorAll("header nav a[href^='#']"));
+      const items = links
+        .map((a) => ({ a, el: document.getElementById(a.getAttribute("href").slice(1)) }))
+        .filter((x) => x.el);
+      if (!items.length) return;
+      const probe = (parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 52) + 40;
+      let cur = null;
+      for (const it of items) {
+        if (it.el.getBoundingClientRect().top <= probe) cur = it;
+      }
+      // fondo pagina: l'ultima voce
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) cur = items[items.length - 1];
+      for (const it of items) {
+        const on = it === cur && it.a.getAttribute("href") !== "#home";
+        it.a.classList.toggle("is-current", on);
+        if (on) it.a.setAttribute("aria-current", "true"); else it.a.removeAttribute("aria-current");
+      }
+    }
+    window.addEventListener("scroll", update, { passive: true });   // 6 misure per evento: leggero
+    window.addEventListener("resize", update);
+    window.addEventListener("load", update);
+    update();
+  }
+
   // ─────────────────────────────────────────────
   // EXPORT
   // ─────────────────────────────────────────────
   window.CD.ui = {
     initNavbarToggle,
     initNavbarAutoClose,
+    initNavScrollSpy,
     initViewToggle,
     initCartOpenButton
   };

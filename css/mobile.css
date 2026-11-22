@@ -77,7 +77,7 @@ body.mobile-view #nav-toggle{
   border-radius:8px;
   border:0;                  /* niente contorno attorno al menu */
   background:transparent;
-  font-size:22px;
+  font-size:0;               /* il glifo ☰ e' sostituito dalle tre linee disegnate qui sotto: centrate in modo esatto su ogni browser */
   padding:0;
   cursor:pointer;
 }
@@ -182,7 +182,7 @@ body.mobile-view .catalogue-grid{
     border-radius:8px;
     border:0;                /* niente contorno attorno al menu */
     background:transparent;
-    font-size:22px;
+    font-size:0;               /* il glifo ☰ e' sostituito dalle tre linee disegnate qui sotto: centrate in modo esatto su ogni browser */
     padding:0;
     cursor:pointer;
   }
@@ -482,3 +482,16 @@ body.mobile-view .contact-icons{
   }
 }
 
+
+/* icona hamburger disegnata in CSS (tre linee), centrata esattamente nel pulsante */
+.nav-toggle-btn::before,
+#nav-toggle::before{
+  content:"";
+  display:block;
+  width:20px;
+  height:14px;
+  background:
+    linear-gradient(currentColor,currentColor) 0 0   / 100% 2px no-repeat,
+    linear-gradient(currentColor,currentColor) 0 50%  / 100% 2px no-repeat,
+    linear-gradient(currentColor,currentColor) 0 100% / 100% 2px no-repeat;
+}

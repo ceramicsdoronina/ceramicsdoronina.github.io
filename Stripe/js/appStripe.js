@@ -90,6 +90,7 @@ async function appInitStripe() {
   CD.i18n.initLanguage();
   CD.ui.initNavbarToggle();
   CD.ui.initNavbarAutoClose();
+  if (CD.ui.initNavScrollSpy) CD.ui.initNavScrollSpy();
   CD.ui.initViewToggle();
   CD.ui.initCartOpenButton();
 

@@ -42,6 +42,8 @@ main{ padding-top:var(--header-h); }   /* spazio per la barra fissa */
 .brand-link{
   display:flex;
   align-items:center;
+  position:relative;
+  top:2px;                  /* il disegno del logo e' piu' alto della sua immagine: allineo al centro ottico della barra */
 }
 
 .brand-img{
@@ -68,6 +70,25 @@ nav a{
 nav a:hover{
   border-bottom:1px solid var(--text);
 }
+/* desktop: voce al passaggio del mouse / della sezione corrente = pulsante bordeaux con testo bianco (niente sottolineatura) */
+@media (min-width:769px){
+  body:not(.mobile-view) nav ul{ gap:6px; }
+  body:not(.mobile-view) nav a{
+    display:inline-block;
+    padding:8px 16px;
+    border-radius:12px;
+    border-bottom:0;
+    transition:background-color .2s ease, color .2s ease;
+  }
+  body:not(.mobile-view) nav a:hover,
+  body:not(.mobile-view) nav a:focus-visible,
+  body:not(.mobile-view) nav a.is-current{
+    background:var(--btn-primary);
+    color:var(--btn-primary-text);
+    border-bottom:0;
+  }
+}
+@media (prefers-reduced-motion:reduce){ nav a{ transition:none !important; } }
 
 /* CTA pill */
 .about-cta{
@@ -250,6 +271,7 @@ footer{
   justify-content:center;
 }
 
+.nav-icon-btn{ position:relative; top:-1px; }
 .nav-icon-btn img{
   width:18px;
   height:18px;
@@ -304,6 +326,8 @@ footer{
   font:inherit;
   font-size:15px;
   line-height:1;
+  position:relative;
+  top:-1px;
   letter-spacing:.04em;
   color:var(--text);
   cursor:pointer;
