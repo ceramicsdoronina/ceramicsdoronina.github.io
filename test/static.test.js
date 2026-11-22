@@ -301,9 +301,10 @@ test("price and discount use the same burgundy as the buy/details buttons; shado
   assert.match(cat, /\.card:hover\{[^}]*box-shadow:0 12px 32px rgba\(0,0,0,\.16\)/);
 });
 
-test("desktop nav: hovered/current item is a burgundy pill, with scroll-spy", () => {
+test("desktop nav: hovered/current item turns burgundy (no pill, no underline), with scroll-spy", () => {
   const css = read("css/components.css");
-  assert.match(css, /nav a\.is-current\{[^}]*background:var\(--btn-primary\)[^}]*color:var\(--btn-primary-text\)/);
+  assert.match(css, /nav a\.is-current\{[^}]*color:var\(--btn-primary\)/);
+  assert.doesNotMatch(css.slice(css.indexOf("desktop: voce al passaggio"), css.indexOf("prefers-reduced-motion:reduce){ nav a")), /background:/);
   assert.match(css, /body:not\(\.mobile-view\) nav a:hover/);
   assert.match(read("Stripe/js/uiStripe.js"), /function initNavScrollSpy/);
   assert.match(read("Stripe/js/appStripe.js"), /initNavScrollSpy/);
