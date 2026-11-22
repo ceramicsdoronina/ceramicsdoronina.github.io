@@ -12,7 +12,8 @@
   --btn-primary:#7d0f0f;
   --btn-primary-text:#ffffff;
 
-  --header-h:76px;   /* altezza barra fissa */
+  --header-h:88px;   /* altezza barra fissa */
+  --logo-h:60px;     /* altezza del logo (indipendente dalla barra) */
   --border:#e5e5e5;
   --modal-bg:rgba(15,23,42,.65);
 }
@@ -47,7 +48,7 @@ html,body{
   unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-@media (max-width:768px){ :root{ --header-h:66px; } }   /* barra un po' piu' bassa sul telefono */
+@media (max-width:768px){ :root{ --header-h:72px; --logo-h:50px; } }   /* barra un po' piu' bassa sul telefono */
 
 /* testo corrente in Manrope; i titoli restano nel serif di display */
 :root{
