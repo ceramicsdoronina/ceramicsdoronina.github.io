@@ -17,7 +17,7 @@ main{ padding-top:var(--header-h); }   /* spazio per la barra fissa */
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:8px 0;
+  padding:8px 20px;          /* margine laterale come il resto della pagina (il logo non ha piu' margini interni) */
   position:relative;
 }
 
@@ -42,18 +42,15 @@ main{ padding-top:var(--header-h); }   /* spazio per la barra fissa */
 .brand-link{
   display:flex;
   align-items:center;
-  position:relative;
-  top:2px;                  /* il disegno del logo e' piu' alto della sua immagine: allineo al centro ottico della barra */
 }
 
 .brand-img{
-  width:180px;
-  height:auto;
   display:block;
-  height:36px;              /* altezza FISSA */
-  object-fit:cover;         /* CROPPING */
-  object-position:center;   /* centro verticale */
+  height:44px;              /* logo Doronina (script + Interior Ceramics), ritagliato senza margini */
+  width:auto;
+  object-fit:contain;
 }
+@media (max-width:768px){ .brand-img{ height:38px; } }
 
 nav ul{
   display:flex;
