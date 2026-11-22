@@ -2,13 +2,16 @@
    NAVBAR
 ──────────────────────────────────────────────*/
 header{
-  position:sticky;
-  top:0;
-  z-index:50;
+  /* barra fissa in alto anche su desktop (come su mobile); sticky non funziona con overflow-x:hidden su html/body */
+  position:fixed;
+  top:0; left:0; right:0;
+  z-index:2000;
   background:rgba(255,255,255,.85);
   backdrop-filter:saturate(180%) blur(14px);
   /* nessuna riga di separazione sotto la barra */
 }
+
+main{ padding-top:var(--header-h); }   /* spazio per la barra fissa */
 
 .nav{
   display:flex;
@@ -256,6 +259,8 @@ footer{
 .lang{
   position:relative;
   margin-right:6px;
+  display:flex;              /* centra verticalmente il codice lingua nella barra */
+  align-items:center;
 }
 
 
@@ -298,6 +303,7 @@ footer{
   margin:0;
   font:inherit;
   font-size:15px;
+  line-height:1;
   letter-spacing:.04em;
   color:var(--text);
   cursor:pointer;

@@ -12,12 +12,14 @@
   --btn-primary:#7d0f0f;
   --btn-primary-text:#ffffff;
 
+  --header-h:52px;   /* altezza barra fissa */
   --border:#e5e5e5;
   --modal-bg:rgba(15,23,42,.65);
 }
 
 *{box-sizing:border-box;}
 
+html{ scroll-padding-top:var(--header-h); }   /* i link a #sezione non finiscono sotto la barra fissa */
 html,body{
   margin:0;
   padding:0;
