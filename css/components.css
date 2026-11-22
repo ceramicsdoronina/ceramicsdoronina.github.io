@@ -270,6 +270,16 @@ footer{
   height:18px;
   color:#444;
 }
+/* carrello: al passaggio del mouse (o con la tastiera) si ingrandisce leggermente */
+@media (hover:hover) and (pointer:fine){
+  .nav-icon-btn img{ transition:transform .2s ease; }
+  .nav-icon-btn:hover img,
+  .nav-icon-btn:focus-visible img{ transform:scale(1.15); }
+}
+@media (prefers-reduced-motion:reduce){
+  .nav-icon-btn img{ transition:none; }
+  .nav-icon-btn:hover img, .nav-icon-btn:focus-visible img{ transform:none; }
+}
 
 .lang{
   position:relative;

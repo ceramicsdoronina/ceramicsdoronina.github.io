@@ -319,3 +319,9 @@ test("pill buttons share the Dettagli/Compra look: 12px radius, burgundy outline
   assert.doesNotMatch(pill, /999px/);
   assert.match(css, /\.pill-btn:hover\{\s*background:#fef2f2;/);
 });
+
+test("cart icon enlarges slightly on hover (mouse devices only)", () => {
+  const css = read("css/components.css");
+  assert.match(css, /\(hover:hover\) and \(pointer:fine\)\{\s*\.nav-icon-btn img\{ transition:transform/);
+  assert.match(css, /\.nav-icon-btn:hover img,\s*\.nav-icon-btn:focus-visible img\{ transform:scale\(1\.15\)/);
+});
