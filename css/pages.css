@@ -295,6 +295,17 @@
   object-fit:contain;
 }
 
+/* icone di contatto (Instagram, e-mail, WhatsApp): si ingrandiscono finche' il mouse e' sopra (solo dispositivi con mouse) */
+@media (hover:hover) and (pointer:fine){
+  .contact-icon-btn{ transition:transform .2s ease; }
+  .contact-icon-btn:hover,
+  .contact-icon-btn:focus-visible{ transform:scale(1.15); }
+}
+@media (prefers-reduced-motion:reduce){
+  .contact-icon-btn{ transition:none; }
+  .contact-icon-btn:hover, .contact-icon-btn:focus-visible{ transform:none; }
+}
+
 
 /* mobile: 1 colonna */
 @media (max-width: 768px){
@@ -377,6 +388,8 @@
     gap:48px;
     align-items:center;
   }
+  /* il titolo "Contatti" parte dallo stesso bordo sinistro del blocco (Indirizzo, Telefono...) */
+  .contact-block > h3{ max-width:960px; margin-left:auto; margin-right:auto; }
   .contact-left{ justify-self:start; text-align:left; }
   .contact-right{ width:100%; }
   .contact-map{ margin:0 auto; width:100%; }

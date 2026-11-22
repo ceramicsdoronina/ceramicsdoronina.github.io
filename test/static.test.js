@@ -329,6 +329,17 @@ test("cart icon enlarges slightly on hover (mouse devices only)", () => {
 test("contact map points at no. 17 RED (17R), by coordinates, not at the black 17", () => {
   const html = read("Stripe/partials/contact.html");
   const src = html.match(/<iframe\s+src="([^"]+)"/)[1];
-  assert.match(src, /q=44\.4059252,8\.9318800/);
+  assert.match(src, /q=44\.40600208884721,8\.931874882976377/);
   assert.doesNotMatch(src, /17r%2C/i, "no more address-text query that Google resolves to the black 17");
+});
+
+test("desktop: the Contact title shares the left edge of the Address column", () => {
+  const css = read("css/pages.css");
+  assert.match(css, /\.contact-block > h3\{ max-width:960px; margin-left:auto; margin-right:auto; \}/);
+});
+
+test("contact icons enlarge while hovered (mouse devices only)", () => {
+  const css = read("css/pages.css");
+  assert.match(css, /\(hover:hover\) and \(pointer:fine\)\{\s*\.contact-icon-btn\{ transition:transform/);
+  assert.match(css, /\.contact-icon-btn:hover,\s*\.contact-icon-btn:focus-visible\{ transform:scale\(1\.15\)/);
 });
