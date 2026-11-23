@@ -343,3 +343,12 @@ test("contact icons enlarge while hovered (mouse devices only)", () => {
   assert.match(css, /\(hover:hover\) and \(pointer:fine\)\{\s*\.contact-icon-btn\{ transition:transform/);
   assert.match(css, /\.contact-icon-btn:hover,\s*\.contact-icon-btn:focus-visible\{ transform:scale\(1\.15\)/);
 });
+
+test('contatti: icona Telegram (t.me), email con busta, mappa ridotta', () => {
+  const fs = require('node:fs'), assert = require('node:assert');
+  const h = fs.readFileSync('Stripe/partials/contact.html', 'utf8');
+  assert.match(h, /href="https:\/\/t\.me\/\+393806327838"[^>]*>\s*<img src="images\/telegram\.amore\.s\.png"/);
+  assert.match(h, /href="mailto:[^"]+"[^>]*>\s*<img src="images\/email\.amore\.s\.png"/);
+  assert.ok(fs.existsSync('images/telegram.amore.s.png'));
+  assert.match(fs.readFileSync('css/pages.css', 'utf8'), /\.contact-map\{ width:84%/);
+});
